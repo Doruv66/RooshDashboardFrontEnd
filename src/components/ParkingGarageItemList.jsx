@@ -48,9 +48,9 @@ export default function ParkingGarageItemList(){
     return  (
         <div>
         {loading ? (
-            <div className="parkingGarageItem">Loading...</div>
+            <div className="parkingGarageItemText">Loading...</div>
         ) : error ? (
-            <div className="parkingGarageItem">Error: {error}</div>  
+            <div className="parkingGarageText">Error: {error}</div>  
         ) : (
             <ul>
                 {parkingGarages.length > 0 ? (
