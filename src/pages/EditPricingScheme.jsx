@@ -1,4 +1,4 @@
-import PricingSchemeForm from './components/PricingSchemeForm';
+import PricingSchemeForm from '../components/PricingSchemeForm';
 
 function EditPricingScheme() {
 
