@@ -1,4 +1,5 @@
 import React from "react";
+import './ParkingGarageItem.css';
 
 export default function ParkingGarageitem({parkingGarageitem, onInfo}){
 

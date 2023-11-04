@@ -1,0 +1,13 @@
+.parkingGarageItem {
+    list-style: none; 
+    border-bottom: 1px solid #dee2e6; 
+    padding: 10px 0; 
+  }
+  
+  .parkingGarageItemText {
+    font-weight: bold; 
+  }
+  
+  .parkingGarageItemContent {
+    margin-left: 10px; 
+  }

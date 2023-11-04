@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import routes from "../routes";
 import { NavLink } from 'react-router-dom';
 import ParkingGarageItemList from './ParkingGarageItemList';
+import './SideBar.css';
 
 function Sidebar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
