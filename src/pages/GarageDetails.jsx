@@ -8,4 +8,3 @@ function GarageDetails() {
     );
   }
   export default GarageDetails;
-  
