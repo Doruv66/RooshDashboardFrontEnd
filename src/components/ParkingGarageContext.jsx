@@ -4,18 +4,18 @@ export const ParkingGarageContext = createContext();
 
 const dummyParkingGarage = {
     id: 1,
-    name: "Central City Parking",
-    airport: "City Airport",
+    name: "Central city parking",
+    airport: "City airport",
     location: "123 Main St, Central City",
     travelTime: "15",
     travelDistance: "5000",
     phoneNumber: "555-1234",
     ParkingGarageUtility: {
       id: 1,
-      toilets: true,
+      toilet: true,
       amountOfParkingSpaces: 200,
       amountOfElectricParkingSpaces: 50,
-      electricCharging: true,
+      electricChargePoint: true,
       floors: 5,
     },
   };

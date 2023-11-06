@@ -1,17 +1,17 @@
 import React from "react";
 import './ParkingGarageItem.css';
 
-export default function ParkingGarageitem({parkingGarageitem, onInfo}){
+export default function ParkingGarageitem({parkingGarageItem, onInfo}){
 
     const handleItemClick = () => {
-        onInfo(parkingGarageitem.id);
+        onInfo(parkingGarageItem.id);
       };
 
 
     return  (
         <li className="parkingGarageItem" onClick={handleItemClick}>
             <span className="parkingGarageItemText">Garage:</span>
-            <div className="parkingGarageItemContent">{parkingGarageitem.location}</div>
+            <div className="parkingGarageItemContent">{parkingGarageItem.name}</div>
         </li>
     );
 }

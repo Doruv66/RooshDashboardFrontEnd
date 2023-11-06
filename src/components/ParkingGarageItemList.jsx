@@ -57,7 +57,7 @@ export default function ParkingGarageItemList(){
                     parkingGarages.map((parkingGarage, parkingGarageId) => (
                         <ParkingGarageItem
                             key={parkingGarageId}
-                            plantItem={parkingGarage}
+                            parkingGarageItem={parkingGarage}
                             onInfo={handleInfoClick}
                         />
                         

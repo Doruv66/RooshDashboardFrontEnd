@@ -32,13 +32,11 @@ export default function GarageInput(){
                 .then(handleResponse)
                 .then(data => {
                     console.log('Successfully updated field: ', data);
-                    setMessage("Field updated successfully.");
                     setPlant(updatedParkingGarage);
                     clearMessageAfterTimeout();
                 })
                 .catch(error => {
                     console.error('Error updating the field:', error);
-                    setMessage('Error updating the field.');
                 });
             setEditingField(null);
             setEditingValue('');
@@ -65,8 +63,29 @@ export default function GarageInput(){
             </div>
         )
     );
-    const make=[];
+    const handleToggleEParking = () => {
+        setParkingGarage(prevState => ({
+            ...prevState,
+            ParkingGarageUtility: {
+                ...prevState.ParkingGarageUtility,
+                electricChargePoint: !prevState.ParkingGarageUtility.electricChargePoint
+            }
+        }));
+        console.log(parkingGarage.ParkingGarageUtility.electricChargePoint.value);
+    };
 
+    const handleToggleToilets = () => {
+        setParkingGarage(prevState => ({
+            ...prevState,
+            ParkingGarageUtility: {
+                ...prevState.ParkingGarageUtility,
+                toilets: !prevState.ParkingGarageUtility.toilets
+            }
+        }));        
+        console.log(parkingGarage.ParkingGarageUtility.toilet.value);
+    };
+
+    const make=[];
     
     return (
         <div className="garage-input">
@@ -86,13 +105,19 @@ export default function GarageInput(){
                 <div className="parking-garage-checkboxes-container">
                     <label className="parking-garage-checkbox-label">
                         Electric parking spaces
-                        <input type="checkbox" name="electricParkingSpaces" />
-                        <span className="parking-garage-checkbox"></span>
+                        <input type="checkbox" 
+                            checked={parkingGarage.ParkingGarageUtility.electricChargePoint}
+                            onChange={handleToggleEParking}
+                        />
+                        <span className="parking-garage-checkbox" onChange={handleToggleEParking}></span>
                     </label>
                     <label className="parking-garage-checkbox-label">
                         Toilets
-                        <input type="checkbox" name="toilets" />
-                        <span className="parking-garage-checkbox"></span>
+                        <input type="checkbox" 
+                            onChange={handleToggleToilets} 
+                            checked={parkingGarage.ParkingGarageUtility.toilets}
+                        />
+                        <span className="parking-garage-checkbox" ></span>
                     </label>
                 </div>
             </div>
