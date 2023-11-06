@@ -65,35 +65,44 @@ export default function GarageInput(){
             </div>
         )
     );
+    const make=[];
 
     
-    return  (
-        <form>
-            {parkingGarageAttributes.map(attr => (
-                <div className="parking-garage-container">
-                <span className="parking-garage-text">{attr.replace(/([A-Z])/g, ' $1').replace(/ (\w)/, (match, p1) => ` ${p1.toLowerCase()}`)} </span>
-                {renderEditableField(attr, parkingGarage[attr])}
+    return (
+        <div className="garage-input">
+            <div className="form-grid">
+                {parkingGarageAttributes.map(attr => (
+                    <div className="parking-garage-container" key={attr}>
+                        <span className="parking-garage-text">{attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: </span>
+                        {renderEditableField(attr, parkingGarage[attr])}
+                    </div>
+                ))}
+                {parkingGarageUtilityAttributes.map(attr => (
+                    <div className="parking-garage-utilities-container" key={attr}>
+                        <span className="parking-garage-text">{attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}: </span>
+                        {renderEditableField(attr, parkingGarage.ParkingGarageUtility[attr])}
+                    </div>
+                ))}
+                <div className="parking-garage-checkboxes-container">
+                    <label className="parking-garage-checkbox-label">
+                        Electric parking spaces
+                        <input type="checkbox" name="electricParkingSpaces" />
+                        <span className="parking-garage-checkbox"></span>
+                    </label>
+                    <label className="parking-garage-checkbox-label">
+                        Toilets
+                        <input type="checkbox" name="toilets" />
+                        <span className="parking-garage-checkbox"></span>
+                    </label>
                 </div>
-            ))}
-            {parkingGarageUtilityAttributes.map(attr => (
-                <div className="parking-garage-utilities-container">
-                <span className="parking-garage-text">{attr.replace(/([A-Z])/g, ' $1').replace(/ (\w)/, (match, p1) => ` ${p1.toLowerCase()}`)} </span>
-                {renderEditableField(attr, parkingGarage.ParkingGarageUtility[attr])}
-                </div>
-            ))}
-            <div className="parking-garage-checkboxes-container">
-                <label className="parking-garage-checkbox-label">
-                    Electric parking spaces
-                    <input type="checkbox" name="electricParkingSpaces" />
-                    <span className="parking-garage-checkbox"></span>
-                </label>
-                <label className="parking-garage-checkbox-label">
-                    Toilets
-                    <input type="checkbox" name="toilets" />
-                    <span className="parking-garage-checkbox"></span>
-                </label>
             </div>
-        </form>
+            <div className="crud-button-container">
+                <button className="crud-button" onClick={make}>Create new parking garage</button>
+                <button className="crud-button" onClick={make}>Delete {parkingGarage.name}</button>
+                <button className="crud-button" onClick={make}>Update {parkingGarage.name}</button>
+            </div>
+        </div>
     );
+    
 }
 

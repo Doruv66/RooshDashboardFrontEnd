@@ -1,9 +1,8 @@
 .navbar {
     z-index: 1; 
-    width: 100%;
+    width: auto;
     height: 13.65vh; 
-    background-color: 
-    #DA4A0C; 
+    background-color: #DA4A0C; 
     display: flex; 
     align-items: center; 
     padding: 0 20px; 

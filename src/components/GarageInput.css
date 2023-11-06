@@ -1,11 +1,18 @@
 /* General form styling */
-form {
+.garage-input {
   width: 100%;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: auto auto; 
+  gap: 10%; 
+  background-color: #fff; 
+  padding-bottom: 20px; 
+}
+
+.form-grid {
+  grid-row: 1; 
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Splits the form into two columns */
-  gap: 20px; /* Adjust the space between columns */
-  padding: 20px;
-  background-color: #fff; /* Replace with the color of your form background */
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 }
 
 .parking-garage-container,
@@ -15,41 +22,69 @@ form {
   justify-content: flex-start;
 }
 
-/* Styling for text labels and input fields */
 .parking-garage-text {
-  font-weight: bold; /* Adjust as needed */
+  font-weight: bold; 
   margin-bottom: 5px;
 }
 
 .parking-garage-edit {
   padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc; /* Replace with your preferred border color */
+  width: 70%;
+  border: 2px solid #ffa600; 
   margin-bottom: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 90%;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
+
 
 .parking-garage-content {
   padding: 10px;
+  max-width: 90%;
+  border-radius: 10px;
   margin-bottom: 10px;
   cursor: pointer;
-  background-color: #f5f5f5; /* Replace with your preferred background color */
+  background-color: #d2d1d1;
   border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-/* Button styling */
+.parking-garage-content:hover{
+  transform: scale(1.01);
+}
+
+.parking-garage-content:focus{
+  box-shadow: inset 0 3px 5px rgba(0,0,0,0.3);
+}
+
 .parking-garage-edit-button {
-  background-color: #f90; /* Replace with your preferred button color */
+  margin-left: 6%;
+  max-height: 100%;
+  max-width: max-content;
+  background-color: #DA4A0C;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 20px;
   text-transform: uppercase;
+  font-weight: bold;
   letter-spacing: 1px;
-  border-radius: 5px;
+  border-radius: 10px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.parking-garage-edit-button:hover{
+  transform: scale(1.03);
 }
 
 .parking-garage-edit-button:hover {
   background-color: #e80;
+}
+
+.parking-garage-edit-button:focus{
+  box-shadow: inset 0 3px 3px rgba(0,0,0,0.3);
+  transform: scale(0.95);
 }
 
 input[type="checkbox"] {
@@ -85,10 +120,51 @@ input[type="checkbox"]:checked + .parking-garage-checkbox::before {
   display: flex;
   align-items: center;
   cursor: pointer;
+  font-size: 20px;
+}
+
+.crud-button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+  bottom: 0%;
+}
+
+.crud-button{
+  margin-left: 6%;
+  max-height: 100%;
+  max-width: max-content;
+  background-color: #DA4A0C;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  margin: 5%;
+  font-weight: bold;
+  letter-spacing: 1px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.crud-button:hover{
+  transform: scale(1.02);
+}
+
+.crud-button:focus{
+  box-shadow: inset 0 3px 3px rgba(0,0,0,0.3);
+  transform: scale(0.98);
 }
 
 @media (max-width: 768px) {
-  form {
-      grid-template-columns: 1fr;
+  .garage-input {
+      grid-template-columns: 1fr; /* Stack the columns on smaller screens */
+      grid-template-rows: auto; /* Adjust rows for a single column layout */
+  }
+  .form-grid {
+      grid-template-columns: 1fr; /* Stack the form fields in a single column */
+  }
+  .crud-button-container {
+      flex-direction: column; /* Stack the buttons on top of each other */
   }
 }
