@@ -4,11 +4,8 @@ function GarageDetails() {
   
     return (
       <div className="Container">
-
-        {/* <Header title="Garage Details Overview" /> */}
-        <GarageInput />
+        <GarageInput/>
       </div>
-      
     );
   }
   export default GarageDetails;
