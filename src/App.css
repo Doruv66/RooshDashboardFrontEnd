@@ -1,7 +1,13 @@
-
 .App {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+}
+
+.Container {
+  display: flex;  
+  flex-grow: 0;
+  z-index: 200;
+  padding-left: 15%;
 }

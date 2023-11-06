@@ -1,0 +1,47 @@
+form {
+    display: flex;
+    flex-direction: column;
+    
+  }
+  
+  label, input, select {
+    margin-bottom: 10px;
+  }
+
+.text-input input {
+    border-radius: 15px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 5px 10px;
+    width: 40%;
+    margin-bottom: 10%;
+}
+
+input:hover {
+    transform: scale(1.04);
+}
+
+select {
+    border-radius: 15px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    padding: 5px 10px;
+    width: 190%;
+    margin-bottom: 10%;
+
+}
+
+/* The container for the checkbox */
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 18px;  
+  user-select: none;
+}
+
+.info-right {
+    right: 50%;
+}

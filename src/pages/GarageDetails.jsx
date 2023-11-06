@@ -1,7 +1,10 @@
+import GarageInput from "../components/GarageInput";
+
 function GarageDetails() {
   
     return (
-      <div>
+      <div className="Container">
+
         {/* <Header title="Garage Details Overview" /> */}
         <GarageInput />
       </div>
