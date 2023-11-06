@@ -1,51 +1,89 @@
-import React from "react";
+import React, {useState} from "react";
 import './GarageInput.css';
-
+import { useParkingGarage } from "./ParkingGarageContext";
 
 export default function GarageInput(){
+    const { parkingGarage, setParkingGarage } = useParkingGarage();
+    const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
+    const parkingGarageUtilityAttributes = [ "amountOfParkingSpaces", "amountOfElectricParkingSpaces", "floors"];
+    const [editingField, setEditingField] = useState(null);
+    const [editingValue, setEditingValue] = useState('');
 
+    const handleEditField = (field, value) => {
+        setEditingField(field);
+        setEditingValue(value);
+    };
+
+    const handleResponse = response => {
+        if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    };
+
+    const handleSaveEditedField = () => {
+        const updatedParkingGarage = { ...parkingGarage, [editingField]: editingValue };
+        if (isEqual(updatedParkingGarage, parkingGarage)) {
+            console.log("No changes were made.");
+            setEditingField(null);
+            setEditingValue('');
+        } else {
+            PlantApi.updatePlant(updatedParkingGarage)
+                .then(handleResponse)
+                .then(data => {
+                    console.log('Successfully updated field: ', data);
+                    setMessage("Field updated successfully.");
+                    setPlant(updatedParkingGarage);
+                    clearMessageAfterTimeout();
+                })
+                .catch(error => {
+                    console.error('Error updating the field:', error);
+                    setMessage('Error updating the field.');
+                });
+            setEditingField(null);
+            setEditingValue('');
+        }
+    };
+
+    const renderEditableField = (field, value) => (
+        editingField === field ? 
+        (
+            <form onSubmit={(e) => {
+                e.preventDefault(); 
+                handleSaveEditedField();
+            }}>
+                <input className="parking-garage-edit"
+                    value={editingValue}
+                    onChange={(e) => setEditingValue(e.target.value)}
+                />
+                <button className="parking-garage-edit-button" type="submit">Save</button>
+            </form>
+        ) : 
+        (
+            <div className="parking-garage-content" onClick={() => handleEditField(field, value)}>
+                {value}
+            </div>
+        )
+    );
+
+    
     return  (
-
         <form>
-            <label for="Name">Name:</label>
-            <div className="text-input">
-                <input type="text" id="Name" name="Name"></input>
-                    <select id="Airport" name="Airport">
-                        <option value="" disabled selected>Select your Airport</option>
-                        <option value="city1">Airport 1</option>
-                        <option value="city2">Airport 2</option>
-                        <option value="city3">Airport 3</option>
-                    </select>
-                <label for="Location">Location:</label>
-                <input type="text" id="Location" name="Location"></input>
-                <label for="TravelTime">Travel time to the airport in minutes:</label>
-                <input type="text" id="TravelTime" name="TravelTime"></input>
-                <label for="TravelDistance">Distance to the airport in meters:</label>
-                <input type="text" id="TravelDistance" name="TravelDistance"></input>
-                <label for="Telephone">Telephone number:</label>
-                <input type="text" id="Telephone" name="Telephone"></input>
-            </div>
-            <h5>Garage Services</h5>
-            <div className="checkbox-container">
-                <input type="checkbox" id="toilets" name="toilets" value="toilets"></input>
-                <label for="toilets"> toilets</label><br></br>
-                <input type="checkbox" id="Electric" name="Electric" value="Electric"></input>
-                <label for="toilets"> Electric Charging</label><br></br>
-                <input type="checkbox" id="Valet" name="Valet" value="Valet"></input>
-                <label for="toilets"> Valet Service</label><br></br>
-                <input type="checkbox" id="Shuttle" name="Shuttle" value="Shuttle"></input>
-                <label for="toilets"> Shuttle Service</label><br></br>
-            </div>
-                <label for="Floors">Floors:</label>
-                <input type="Floors" id="Floors" name="Floors"></input>
-                <label for="nonElecParking">Non-Electric parking spaces:</label>
-                <input type="text" id="nonElecParking" name="nonElecParking"></input>
-
-                <label for="ElecParking">Electric parking spaces:</label>
-                <input type="text" id="ElecParking" name="ElecParking"></input>
+            {parkingGarageAttributes.map(attr => (
+                <div className="parking-garage-container">
+                <span className="parking-garage-text">{attr.replace(/([A-Z])/g, ' $1').replace(/ (\w)/, (match, p1) => ` ${p1.toLowerCase()}`)} </span>
+                {renderEditableField(attr, parkingGarage[attr])}
+                </div>
+            ))}
+            {parkingGarageUtilityAttributes.map(attr => (
+                <div className="parking-garage-utilities-container">
+                <span className="parking-garage-text">{attr.replace(/([A-Z])/g, ' $1').replace(/ (\w)/, (match, p1) => ` ${p1.toLowerCase()}`)} </span>
+                {renderEditableField(attr, parkingGarage.ParkingGarageUtility[attr])}
+                </div>
+            ))}
+            <input type="checkbox"></input>
+            <input type="checkbox"></input>
         </form>
-        
-
     );
 }
 
