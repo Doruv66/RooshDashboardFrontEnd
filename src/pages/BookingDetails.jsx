@@ -1,8 +1,10 @@
 function BookingDetails() {
+
   
     return (
       <div>
         <Header title="Booking Details" />
+        
       </div>
     );
   }
