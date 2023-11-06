@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
+import ParkingGarageApi from '../api/ParkingGarageApi';
+import isEqual from 'lodash/isEqual';
 
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
@@ -28,7 +30,7 @@ export default function GarageInput(){
             setEditingField(null);
             setEditingValue('');
         } else {
-            PlantApi.updatePlant(updatedParkingGarage)
+            ParkingGarageApi.updateParkingGarage(updatedParkingGarage)
                 .then(handleResponse)
                 .then(data => {
                     console.log('Successfully updated field: ', data);

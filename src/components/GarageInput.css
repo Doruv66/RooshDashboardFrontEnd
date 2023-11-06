@@ -51,7 +51,7 @@
 }
 
 .parking-garage-content:hover{
-  transform: scale(1.01);
+  transform: scale(1.018);
 }
 
 .parking-garage-content:focus{
@@ -65,8 +65,8 @@
   background-color: #DA4A0C;
   color: white;
   border: none;
-  padding: 12px 20px;
-  text-transform: uppercase;
+  padding: 10.5px 20px;
+  font-size: large;
   font-weight: bold;
   letter-spacing: 1px;
   border-radius: 10px;
@@ -76,9 +76,6 @@
 
 .parking-garage-edit-button:hover{
   transform: scale(1.03);
-}
-
-.parking-garage-edit-button:hover {
   background-color: #e80;
 }
 
@@ -103,6 +100,15 @@ input[type="checkbox"] {
   margin-right: 10px;
   vertical-align: middle;
   margin-left: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.parking-garage-checkbox{
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.parking-garage-checkbox:hover{
+ transform: scale(1.2);
 }
 
 input[type="checkbox"]:checked + .parking-garage-checkbox::before {
@@ -141,6 +147,7 @@ input[type="checkbox"]:checked + .parking-garage-checkbox::before {
   padding: 12px 20px;
   margin: 5%;
   font-weight: bold;
+  font-size: large;
   letter-spacing: 1px;
   border-radius: 10px;
   cursor: pointer;
@@ -149,6 +156,7 @@ input[type="checkbox"]:checked + .parking-garage-checkbox::before {
 
 .crud-button:hover{
   transform: scale(1.02);
+  background-color: #e80;
 }
 
 .crud-button:focus{
