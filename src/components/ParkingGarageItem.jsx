@@ -11,7 +11,7 @@ export default function ParkingGarageitem({parkingGarageitem, onInfo}){
     return  (
         <li className="parkingGarageItem" onClick={handleItemClick}>
             <span className="parkingGarageItemText">Garage:</span>
-            <div className="parkingGarageItemContent">{plantItem.Address}</div>
+            <div className="parkingGarageItemContent">{parkingGarageitem.location}</div>
         </li>
     );
 }

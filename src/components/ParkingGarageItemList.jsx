@@ -5,7 +5,7 @@ import { useParkingGarage } from "./ParkingGarageContext";
 
 export default function ParkingGarageItemList(){
     const [parkingGarages, setParkingGarages] = useState([]);
-    const { setParkingGarage} = useParkingGarage();
+    const { setParkingGarage } = useParkingGarage();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 

@@ -1,4 +1,3 @@
-
 function GarageDetails() {
   
     return (
