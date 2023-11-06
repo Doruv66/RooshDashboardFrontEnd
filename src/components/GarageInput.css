@@ -12,6 +12,7 @@ form {
 .parking-garage-utilities-container {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
 }
 
 /* Styling for text labels and input fields */
@@ -48,18 +49,46 @@ form {
 }
 
 .parking-garage-edit-button:hover {
-  background-color: #e80; /* Slightly darker for hover effect */
+  background-color: #e80;
 }
 
-/* Checkbox styling */
 input[type="checkbox"] {
-  /* Custom styling for checkboxes can be complex, 
-     you might want to use a library or pseudo-elements */
+  display: none;
 }
 
-/* Add responsive behavior */
+.parking-garage-checkbox::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  margin-right: 10px;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+input[type="checkbox"]:checked + .parking-garage-checkbox::before {
+  background-color: #f90;
+}
+
+.parking-garage-checkboxes-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+}
+
+.parking-garage-checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   form {
-      grid-template-columns: 1fr; /* Stack the columns on smaller screens */
+      grid-template-columns: 1fr;
   }
 }

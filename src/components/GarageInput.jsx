@@ -81,8 +81,18 @@ export default function GarageInput(){
                 {renderEditableField(attr, parkingGarage.ParkingGarageUtility[attr])}
                 </div>
             ))}
-            <input type="checkbox"></input>
-            <input type="checkbox"></input>
+            <div className="parking-garage-checkboxes-container">
+                <label className="parking-garage-checkbox-label">
+                    Electric parking spaces
+                    <input type="checkbox" name="electricParkingSpaces" />
+                    <span className="parking-garage-checkbox"></span>
+                </label>
+                <label className="parking-garage-checkbox-label">
+                    Toilets
+                    <input type="checkbox" name="toilets" />
+                    <span className="parking-garage-checkbox"></span>
+                </label>
+            </div>
         </form>
     );
 }
