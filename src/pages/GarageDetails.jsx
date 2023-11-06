@@ -1,6 +1,3 @@
-import GarageInput from "../components/GarageInput";
-
-
 function GarageDetails() {
   
     return (
@@ -12,4 +9,3 @@ function GarageDetails() {
     );
   }
   export default GarageDetails;
-  
