@@ -1,6 +1,6 @@
 const apiUrl = 'http://localhost:8080/bookings';
 
-const ParkingGarageApi = {
+const BookingApi = {
   
     getBooking(bookingId) {
       return fetch(`${apiUrl}/${bookingId}`);
@@ -11,4 +11,4 @@ const ParkingGarageApi = {
     }
   };
   
-  export default ParkingGarageApi;
+  export default BookingApi;

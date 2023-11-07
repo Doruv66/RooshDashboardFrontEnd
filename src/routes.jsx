@@ -14,6 +14,12 @@ const routes = [
       text: "Booking history"
     },
     {
+      path: "/booking/:bookingId", 
+      component: BookingDetails,
+      isNavLink: false, 
+      text: "Booking Details" 
+    },
+    {
       path: "/editpricingscheme",
       component: EditPricingScheme,
       isNavLink: true,

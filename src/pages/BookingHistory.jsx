@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import style from './css/BookingHistory.module.css'
 import BookingHistoryFilters from '../components/BookingHistoryComponents/BookingHistoryFilters'
 import BookingList from '../components/BookingHistoryComponents/BookingList'

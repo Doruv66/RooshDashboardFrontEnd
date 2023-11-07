@@ -2,6 +2,12 @@ import React from 'react'
 import style from './BookingOverview.module.css'
 
 const BookingOverview = ({ booking }) => {
+
+  const navigate = useNavigate();
+
+  const handleDetailsClick = () => {
+    navigate(`/booking/${booking.id}`); 
+  };
   return (
     <div className={style.card}>
         <div className={style.booking_details}>
@@ -12,7 +18,7 @@ const BookingOverview = ({ booking }) => {
             <p>Start Time: {booking.startDate}</p> 
             <p>End Time: {booking.endDate}</p> 
         </div>
-        <button className={style.btn}>Details</button>
+        <button className={style.btn} onClick={handleDetailsClick}>Details</button>
     </div>
   )
 }
