@@ -11,6 +11,7 @@ export default function GarageInput(){
     const [editingField, setEditingField] = useState(null);
     const [editingValue, setEditingValue] = useState('');
     const [isNewGarage, setIsNewGarage] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("")
 
     const handleEditField = (field, value) => {
         setEditingField(field);
@@ -24,9 +25,16 @@ export default function GarageInput(){
         return response.json();
     };
 
-    const handleSaveEditedField = () => {
+    const handleSaveEditedField = (field) => {
         const updatedParkingGarage = { ...parkingGarage, [editingField]: editingValue };
         if (!isEqual(updatedParkingGarage, parkingGarage)) {
+            switch(field){
+                case "name":
+                    if(!updatedParkingGarage.name.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+            }
             setParkingGarage(updatedParkingGarage);
         }
         setEditingField(null);
@@ -36,19 +44,20 @@ export default function GarageInput(){
     const renderEditableField = (field, value) => (
         editingField === field ? (
           <form onSubmit={(e) => {
-            e.preventDefault(); 
-            handleSaveEditedField();
+            e.preventDefault();
+            setErrorMessage(handleSaveEditedField(field, value))
           }}>
             <input className="parking-garage-edit"
               value={editingValue}
               onChange={(e) => setEditingValue(e.target.value)}
             />
             <button className="parking-garage-edit-button" type="submit">Save</button>
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
           </form>
         ) : (
-          <div className="parking-garage-content" onClick={() => handleEditField(field, value)}>
-            {value != null ? value : ''}
-          </div>
+            <div className={`parking-garage-content ${errorMessage ? 'disabled' : ''}`} onClick={() => !errorMessage && handleEditField(field, value)}>
+                {value != null ? value : ''}
+            </div>
         )
       );
 
@@ -82,6 +91,7 @@ export default function GarageInput(){
     };
 
     const handleSaveNewParkingGarage = () => {
+
         ParkingGarageApi.createParkingGarage(parkingGarage)
             .then(handleResponse)
             .then(data => {
