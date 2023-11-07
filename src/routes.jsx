@@ -8,12 +8,6 @@ import GaragePricing from "./pages/GaragePricing";
 
 const routes = [
     {
-      path: "/bookingdetails",
-      component: BookingDetails,
-      isNavLink: true,
-      text: "Booking details"
-    },
-    {
       path: "/bookinghistory",
       component: BookingHistory,
       isNavLink: true,

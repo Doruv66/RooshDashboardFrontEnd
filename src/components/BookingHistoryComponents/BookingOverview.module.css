@@ -1,0 +1,41 @@
+.card {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border: solid 1px;
+    border-radius: 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+    height: 80px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.01);
+    background-color: rgba(0, 0, 0, .1);
+}
+
+.btn {
+    background-color: #DA4A0C;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 5%;
+    font-weight: bold;
+    font-size: large;
+    letter-spacing: 1px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+
+}
+
+.btn:hover{
+    transform: scale(1.02);
+    background-color: #e80;
+}
+  
+.btn:focus{
+box-shadow: inset 0 3px 3px rgba(0,0,0,0.3);
+transform: scale(0.98);
+}

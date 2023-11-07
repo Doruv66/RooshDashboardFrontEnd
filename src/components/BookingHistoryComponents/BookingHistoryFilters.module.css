@@ -1,0 +1,10 @@
+.filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.filters div {
+    margin-left: 15px;
+    margin-right: 15px;
+}

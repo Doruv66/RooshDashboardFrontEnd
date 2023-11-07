@@ -5,7 +5,7 @@ import BookingList from '../components/BookingHistoryComponents/BookingList'
 
 const BookingHistory = () => {
   return (
-    <div>
+    <div className={style.wrapper}>
       <div className={style.header}>
           <h1>Booking History</h1>
           <BookingHistoryFilters />
