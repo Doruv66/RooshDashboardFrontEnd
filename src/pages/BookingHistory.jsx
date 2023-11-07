@@ -1,15 +1,17 @@
 import React from 'react'
-import style from './css/BookingHistory.css'
+import style from './css/BookingHistory.module.css'
+import BookingHistoryFilters from '../components/BookingHistoryComponents/BookingHistoryFilters'
+import BookingList from '../components/BookingHistoryComponents/BookingList'
 
 const BookingHistory = () => {
   return (
     <div>
       <div className={style.header}>
-          {/* Header */}
-          {/* Filters */}
+          <h1>Booking History</h1>
+          <BookingHistoryFilters />
       </div>
       <div className={style.booking_history}>
-          {/* Actual List of bookings  */}
+          <BookingList /> 
       </div>
     </div>
   )
