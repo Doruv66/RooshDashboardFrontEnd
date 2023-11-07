@@ -1,4 +1,5 @@
 import BookingDetails from "./pages/BookingDetails";
+import BookingHistory from "./pages/BookingHistory";
 import EditPricingScheme from "./pages/EditPricingScheme";
 import GarageDetails from "./pages/GarageDetails";
 import GarageImages from "./pages/GarageImages";
@@ -11,6 +12,12 @@ const routes = [
       component: BookingDetails,
       isNavLink: true,
       text: "Booking details"
+    },
+    {
+      path: "/bookinghistory",
+      component: BookingHistory,
+      isNavLink: true,
+      text: "Booking history"
     },
     {
       path: "/editpricingscheme",
