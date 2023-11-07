@@ -1,17 +1,15 @@
-import React from 'react'
-import style from './BookingList.module.css'
-import BookingOverview from './BookingOverview'
+import React from 'react';
+import style from './BookingList.module.css';
+import BookingOverview from './BookingOverview';
 
-const BookingList = () => {
+const BookingList = ({ bookings }) => { 
   return (
     <div className={style.booking_list}>
-        <BookingOverview />
-        <BookingOverview />
-        <BookingOverview />
-        <BookingOverview />
-        <BookingOverview />
+      {bookings.map(booking => (
+        <BookingOverview key={booking.id} booking={booking} />
+      ))}
     </div>
-  )
-}
+  );
+};
 
-export default BookingList
+export default BookingList;
