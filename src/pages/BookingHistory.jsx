@@ -1,5 +1,5 @@
 import React from 'react'
-import style from './css/BookingHistory.css'
+import style from './css/BookingHistory.module.css'
 
 const BookingHistory = () => {
   return (
