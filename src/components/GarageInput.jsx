@@ -34,6 +34,46 @@ export default function GarageInput(){
                         return "Please make sure the field is filled in."
                     }
                     break;
+                case "airport":
+                    if(!updatedParkingGarage.airport.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+                case "location":
+                    if(!updatedParkingGarage.location.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+                case "travelTime":
+                    if(!updatedParkingGarage.travelTime.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+                case "travelDistance":
+                    if(!updatedParkingGarage.travelDistance.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+                case "phoneNumber":
+                    if(!updatedParkingGarage.phoneNumber.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+                case "amountOfParkingSpaces":
+                    if(!updatedParkingGarage.amountOfParkingSpaces.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+                case "amountOfElectricParkingSpaces":
+                    if(!updatedParkingGarage.amountOfElectricParkingSpaces.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
+                case "floors":
+                    if(!updatedParkingGarage.floors.trim()){
+                        return "Please make sure the field is filled in."
+                    }
+                    break;
             }
             setParkingGarage(updatedParkingGarage);
         }
