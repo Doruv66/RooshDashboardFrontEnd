@@ -26,7 +26,14 @@ export default function GarageInput(){
     };
 
     const handleSaveEditedField = (field) => {
-        const updatedParkingGarage = { ...parkingGarage, [editingField]: editingValue };
+        let updatedParkingGarage = { ...parkingGarage };
+
+        if(parkingGarageUtilityAttributes.includes(field)){
+            updatedParkingGarage = {...parkingGarage,ParkingGarageUtility: {...parkingGarage.ParkingGarageUtility, [field]: editingValue }};
+        } else {
+            updatedParkingGarage = {...parkingGarage,[field]: editingValue};
+        }
+        
         if (!isEqual(updatedParkingGarage, parkingGarage)) {
             switch(field){
                 case "name":
