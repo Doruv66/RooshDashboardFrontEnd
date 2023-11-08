@@ -6,9 +6,9 @@ const CustomerInfo = ({booking}) => {
   return (
     <div className={style.customer_info}>
         <h2>Customer Info:</h2>
-        <p>Name: Arthur Jasper</p>
-        <p>Email: arthur@gmail.com</p>
-        <p>Mobile number: +312 213123 123123</p>
+        <p>Name: {booking.customer.name}</p>
+        <p>Email: {booking.customer.email}</p>
+        <p>Mobile number: {booking.customer.phoneNumber}</p>
     </div>
   )
 }

@@ -8,12 +8,12 @@ const OtherInfo = ({booking}) => {
         <h3>Other:</h3>
         <div className={style.information}>
             <div>
-                <p>Departur Date: 20-03-2024</p>
-                <p>Arrival Date: 20-03-2024</p>
+                <p>Departure Date: {booking.startDate}</p>
+                <p>Arrival Date: {booking.endDate}</p>
             </div>
             <div>
-                <p>Service Type: Shuttle</p>
-                <p>Assigned Space: 302</p>
+                <p>Service Type: {booking.service.serviceType}</p>
+                {/* <p>Assigned Space: 302</p> */}
             </div>
         </div>
     </div>

@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BookingApi from '../api/BookingApi';
 import style from './css/BookingDetails.module.css';
+import CustomerInfo from '../components/BookingDetailsComponents/CustomerInfo';
+import CarInfo from '../components/BookingDetailsComponents/CarInfo';
+import OtherInfo from '../components/BookingDetailsComponents/OtherInfo';
+import Flight from '../components/BookingDetailsComponents/Flight';
 
 const BookingDetails = () => {
   const [booking, setBooking] = useState(null);
@@ -46,45 +50,18 @@ const BookingDetails = () => {
     <div className={style.booking_details}>
       <h1>Booking details</h1>
       <div className={style.booking_information}>
-        {booking.customer && (
-          <div>
-            <h2>Customer Information</h2>
-            <p>Name: {booking.customer.name}</p>
-            <p>Email: {booking.customer.email}</p>
-            <p>Phone Number: {booking.customer.phoneNumber}</p>
-          </div>
-        )}
-        {booking.car && (
-          <div>
-            <h2>Car Information</h2>
-            <p>License Plate: {booking.car.licensePlate}</p>
-            <p>Brand: {booking.car.brand}</p>
-            <p>Model: {booking.car.model}</p>
-            <p>Electric: {booking.car.electric ? 'Yes' : 'No'}</p>
-          </div>
-        )}
-        {booking.flightNumberDeparture && booking.flightNumberArrival && (
-          <div>
-            <h2>Flight Information</h2>
-            <p>Departure Flight Number: {booking.flightNumberDeparture}</p>
-            <p>Arrival Flight Number: {booking.flightNumberArrival}</p>
-          </div>
-        )}
-        {booking.garage && (
-          <div>
-            <h2>Other Information</h2>
-            <p>Garage: {booking.garage.name}</p>
-            <p>Location: {booking.garage.location}</p>
-            <p>Travel Time to Airport: {booking.garage.travelTime} minutes</p>
-            <p>Travel Distance: {booking.garage.travelDistance} km</p>
-          </div>
-        )}
-        {booking.service && (
-          <div>
-            <h2>Service Type</h2>
-            <p>{booking.service.serviceType}</p>
-          </div>
-        )}
+        <div className={style.customer}>
+          
+          <CustomerInfo booking={booking} />
+          {/* Pass the entire booking object to the CarInfo component */}
+          <CarInfo booking={booking} />
+        </div>
+        <div className={style.information}>
+          {/* Pass the entire booking object to the Flight component */}
+          <Flight booking={booking} />
+          {/* Pass the entire booking object to the OtherInfo component */}
+          <OtherInfo booking={booking} />
+        </div>
       </div>
     </div>
   );

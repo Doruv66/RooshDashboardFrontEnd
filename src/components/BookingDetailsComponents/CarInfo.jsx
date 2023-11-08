@@ -6,10 +6,10 @@ const CarInfo = ({booking}) => {
   return (
     <div className={style.car_info}>
         <h2>Car Info:</h2>
-        <p>License Plate: 123-sf-123</p>
-        <p>Brand: Mercedes</p>
-        <p>Model: s class</p>
-        <p>Electric: no</p>
+        <p>License Plate: {booking.car.licensePlate}</p>
+        <p>Brand: {booking.car.brand}</p>
+        <p>Model: {booking.car.model}</p>
+        <p>Electric: {booking.car.electric ? 'Yes' : 'No'}</p>
     </div>
   )
 }
