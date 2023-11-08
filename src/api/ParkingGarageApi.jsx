@@ -3,6 +3,7 @@ const apiUrl = 'http://localhost:8080/parkinggarage';
 const ParkingGarageApi = {
   
   createParkingGarage(ParkingGarageData) {
+    console.log(ParkingGarageData)
     return fetch(`${apiUrl}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -11,12 +12,13 @@ const ParkingGarageApi = {
   },
   
   updateParkingGarage(updatedParkingGarage) {  
+    console.log(updatedParkingGarage);
     return fetch(`${apiUrl}/${updatedParkingGarage.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedParkingGarage),
     });
-  },  
+  },
   
   deleteParkingGarage(parkingGarageId) {
     return fetch(`${apiUrl}/${parkingGarageId}`, {
