@@ -1,0 +1,19 @@
+.booking_details {
+    display: flex;  
+    flex-direction: column;
+    flex-grow: 0;
+    z-index: 200;
+    padding-left: 15%;
+}
+
+.booking_information {
+    display: flex;
+
+}
+
+.customer {
+    display: flex;
+}
+.customer div {
+    margin: 10px 10px;
+}

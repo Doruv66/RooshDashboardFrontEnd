@@ -1,0 +1,20 @@
+.other_info {
+    font-size: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 20px;
+    height: 240px;
+    width: 450px;
+    border: 1px solid
+}
+
+.information {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.information div {
+    margin-left: 10px;
+    margin-right: 10px;
+}

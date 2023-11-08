@@ -2,6 +2,7 @@ import React from 'react'
 import style from './BookingHistoryFilters.module.css'
 
 const BookingHistoryFilters = () => {
+
   return (
     <div className={style.filters}>
         <div>
