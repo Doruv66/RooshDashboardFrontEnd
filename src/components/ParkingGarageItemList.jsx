@@ -40,10 +40,8 @@ export default function ParkingGarageItemList(){
     const handleInfoClick = (parkingGarageId) => {
         console.log('Info clicked for parking garage ID:', parkingGarageId);
         const garage = parkingGarages.find(p => p.id === parkingGarageId);
-        onInfoClick(garage);
         setParkingGarage(garage);
     };
-
 
     return  (
         <div>

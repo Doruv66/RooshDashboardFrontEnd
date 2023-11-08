@@ -7,7 +7,7 @@ import isEqual from 'lodash/isEqual';
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
-    const parkingGarageUtilityAttributes = [ "amountOfParkingSpaces", "amountOfElectricParkingSpaces", "floors"];
+    const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
     const [editingField, setEditingField] = useState(null);
     const [editingValue, setEditingValue] = useState('');
     const [isNewGarage, setIsNewGarage] = useState(false);
@@ -26,13 +26,27 @@ export default function GarageInput(){
     };
 
     const handleSaveEditedField = (field) => {
-        let updatedParkingGarage;
-
-        if(parkingGarageUtilityAttributes.includes(field)){
-            updatedParkingGarage = {...parkingGarage,ParkingGarageUtility: {...parkingGarage.ParkingGarageUtility, [field]: editingValue }};
+        let updatedParkingGarage = { ...parkingGarage };
+        let valueToSave = editingValue;
+    
+        if (field === "travelTime" || field === "travelDistance" ||
+            field === "floors" || field === "parkingSpacesElectric" || 
+            field === "parkingSpaces") {
+            valueToSave = parseInt(editingValue, 10); 
+            console.log(valueToSave)
+        }
+    
+        if (parkingGarageUtilityAttributes.includes(field)) {
+            updatedParkingGarage = {
+                ...updatedParkingGarage,
+                ParkingGarageUtility: {
+                    ...updatedParkingGarage.ParkingGarageUtility,
+                    [field]: valueToSave
+                }
+            };
         } 
         else {
-            updatedParkingGarage = {...parkingGarage,[field]: editingValue};
+            updatedParkingGarage[field] = valueToSave;
         }
 
         if (!isEqual(updatedParkingGarage, parkingGarage)) {
@@ -53,12 +67,12 @@ export default function GarageInput(){
                     }
                     break;
                 case "travelTime":
-                    if(!updatedParkingGarage.travelTime.trim()){
+                    if(updatedParkingGarage.travelTime == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
                 case "travelDistance":
-                    if(!updatedParkingGarage.travelDistance.trim()){
+                    if(updatedParkingGarage.travelDistance == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
@@ -68,17 +82,17 @@ export default function GarageInput(){
                     }
                     break;
                 case "amountOfParkingSpaces":
-                    if(!updatedParkingGarage.ParkingGarageUtility.amountOfParkingSpaces.trim()){
+                    if(updatedParkingGarage.ParkingGarageUtility.amountOfParkingSpaces == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
                 case "amountOfElectricParkingSpaces":
-                    if(!updatedParkingGarage.ParkingGarageUtility.amountOfElectricParkingSpaces.trim()){
+                    if(updatedParkingGarage.ParkingGarageUtility.amountOfElectricParkingSpaces == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
                 case "floors":
-                    if(!updatedParkingGarage.ParkingGarageUtility.floors.trim()){
+                    if(updatedParkingGarage.ParkingGarageUtility.floors == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
@@ -127,19 +141,28 @@ export default function GarageInput(){
                 ...prevState,
                 ParkingGarageUtility: {
                     ...prevState.ParkingGarageUtility,
-                    toilets: !prevState.ParkingGarageUtility.toilets
+                    toilet: !prevState.ParkingGarageUtility.toilet
                 }
             }));        
         }
     };
 
     const handleCreateNewParkingGarage = () => {
-        setParkingGarage(null); 
+        const newParkingGarage = {
+            ...parkingGarageAttributes.reduce((obj, attr) => ({ ...obj, [attr]: null }), {}),
+            ParkingGarageUtility: {
+                ...parkingGarageUtilityAttributes.reduce((obj, attr) => ({ ...obj, [attr]: null }), {}),
+                electricChargePoint: false,
+                toilet: false
+            }
+        };
+    
+        setParkingGarage(newParkingGarage);        
         setIsNewGarage(true); 
     };
 
     const handleSaveNewParkingGarage = () => {
-
+        parkingGarage.ParkingGarageUtility.id = 0;
         ParkingGarageApi.createParkingGarage(parkingGarage)
             .then(handleResponse)
             .then(data => {
@@ -207,7 +230,7 @@ export default function GarageInput(){
                         Toilets
                         <input type="checkbox" 
                             onChange={handleToggleToilets} 
-                            checked={parkingGarage?.ParkingGarageUtility?.toilets || false}
+                            checked={parkingGarage?.ParkingGarageUtility?.toilet || false}
                         />
                     </label>
                 </div>
@@ -222,7 +245,7 @@ export default function GarageInput(){
                         Save new parking garage
                     </button>
                 )}
-                {!isNewGarage && (
+                {!isNewGarage && parkingGarage &&(
                     <>
                         <button className="crud-button" onClick={handleDeleteParkingGarage}>
                             Delete {parkingGarage.name}
