@@ -1,6 +1,6 @@
 import React from 'react'
 import style from './BookingOverview.module.css'
-
+import { useNavigate } from 'react-router-dom';
 const BookingOverview = ({ booking }) => {
 
   const navigate = useNavigate();
@@ -11,8 +11,8 @@ const BookingOverview = ({ booking }) => {
   return (
     <div className={style.card}>
         <div className={style.booking_details}>
-            <p>Name: {booking.name}</p> 
-            <p>Service Type: {booking.service}</p> 
+            <p>Name: {booking.customer.name}</p> 
+            <p>Service Type: {booking.service.serviceType}</p> 
         </div>
         <div className={style.booking_time}>
             <p>Start Time: {booking.startDate}</p> 

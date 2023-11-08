@@ -9,7 +9,7 @@ const BookingHistory = () => {
   useEffect(() => {
     BookingApi.getAllBookings()
       .then(response => response.json())
-      .then(data => setBookings(data))
+      .then(data => setBookings(data.bookings))
       .catch(error => console.error('Error fetching bookings:', error));
   }, []);
 
