@@ -26,14 +26,15 @@ export default function GarageInput(){
     };
 
     const handleSaveEditedField = (field) => {
-        let updatedParkingGarage = { ...parkingGarage };
+        let updatedParkingGarage;
 
         if(parkingGarageUtilityAttributes.includes(field)){
             updatedParkingGarage = {...parkingGarage,ParkingGarageUtility: {...parkingGarage.ParkingGarageUtility, [field]: editingValue }};
-        } else {
+        } 
+        else {
             updatedParkingGarage = {...parkingGarage,[field]: editingValue};
         }
-        
+
         if (!isEqual(updatedParkingGarage, parkingGarage)) {
             switch(field){
                 case "name":
@@ -67,17 +68,17 @@ export default function GarageInput(){
                     }
                     break;
                 case "amountOfParkingSpaces":
-                    if(!updatedParkingGarage.amountOfParkingSpaces.trim()){
+                    if(!updatedParkingGarage.ParkingGarageUtility.amountOfParkingSpaces.trim()){
                         return "Please make sure the field is filled in."
                     }
                     break;
                 case "amountOfElectricParkingSpaces":
-                    if(!updatedParkingGarage.amountOfElectricParkingSpaces.trim()){
+                    if(!updatedParkingGarage.ParkingGarageUtility.amountOfElectricParkingSpaces.trim()){
                         return "Please make sure the field is filled in."
                     }
                     break;
                 case "floors":
-                    if(!updatedParkingGarage.floors.trim()){
+                    if(!updatedParkingGarage.ParkingGarageUtility.floors.trim()){
                         return "Please make sure the field is filled in."
                     }
                     break;
