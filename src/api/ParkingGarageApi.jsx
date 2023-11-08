@@ -12,6 +12,7 @@ const ParkingGarageApi = {
   },
   
   updateParkingGarage(updatedParkingGarage) {  
+    console.log(updatedParkingGarage);
     return fetch(`${apiUrl}/${updatedParkingGarage.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

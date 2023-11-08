@@ -12,6 +12,7 @@ export default function GarageInput(){
     const [editingValue, setEditingValue] = useState('');
     const [isNewGarage, setIsNewGarage] = useState(false);
     const [errorMessage, setErrorMessage] = useState("")
+    const [createdParkingGarageId, setCreatedParkingGarageId] = useState(null);
 
     const handleEditField = (field, value) => {
         setEditingField(field);
@@ -39,8 +40,8 @@ export default function GarageInput(){
         if (parkingGarageUtilityAttributes.includes(field)) {
             updatedParkingGarage = {
                 ...updatedParkingGarage,
-                ParkingGarageUtility: {
-                    ...updatedParkingGarage.ParkingGarageUtility,
+                parkingGarageUtility: {
+                    ...updatedParkingGarage.parkingGarageUtility,
                     [field]: valueToSave
                 }
             };
@@ -82,17 +83,17 @@ export default function GarageInput(){
                     }
                     break;
                 case "amountOfParkingSpaces":
-                    if(updatedParkingGarage.ParkingGarageUtility.amountOfParkingSpaces == null){
+                    if(updatedParkingGarage.parkingGarageUtility.amountOfParkingSpaces == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
                 case "amountOfElectricParkingSpaces":
-                    if(updatedParkingGarage.ParkingGarageUtility.amountOfElectricParkingSpaces == null){
+                    if(updatedParkingGarage.parkingGarageUtility.amountOfElectricParkingSpaces == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
                 case "floors":
-                    if(updatedParkingGarage.ParkingGarageUtility.floors == null){
+                    if(updatedParkingGarage.parkingGarageUtility.floors == null){
                         return "Please make sure the field is filled in."
                     }
                     break;
@@ -124,24 +125,24 @@ export default function GarageInput(){
       );
 
       const handleToggleEParking = () => {
-        if (parkingGarage && parkingGarage.ParkingGarageUtility) {
+        if (parkingGarage && parkingGarage.parkingGarageUtility) {
             setParkingGarage(prevState => ({
                 ...prevState,
-                ParkingGarageUtility: {
-                    ...prevState.ParkingGarageUtility,
-                    electricChargePoint: !prevState.ParkingGarageUtility.electricChargePoint
+                parkingGarageUtility: {
+                    ...prevState.parkingGarageUtility,
+                    electricChargePoint: !prevState.parkingGarageUtility.electricChargePoint
                 }
             }));
         }
     };
     
     const handleToggleToilets = () => {
-        if (parkingGarage && parkingGarage.ParkingGarageUtility) {
+        if (parkingGarage && parkingGarage.parkingGarageUtility) {
             setParkingGarage(prevState => ({
                 ...prevState,
-                ParkingGarageUtility: {
-                    ...prevState.ParkingGarageUtility,
-                    toilet: !prevState.ParkingGarageUtility.toilet
+                parkingGarageUtility: {
+                    ...prevState.parkingGarageUtility,
+                    toilet: !prevState.parkingGarageUtility.toilet
                 }
             }));        
         }
@@ -150,7 +151,7 @@ export default function GarageInput(){
     const handleCreateNewParkingGarage = () => {
         const newParkingGarage = {
             ...parkingGarageAttributes.reduce((obj, attr) => ({ ...obj, [attr]: null }), {}),
-            ParkingGarageUtility: {
+            parkingGarageUtility: {
                 ...parkingGarageUtilityAttributes.reduce((obj, attr) => ({ ...obj, [attr]: null }), {}),
                 electricChargePoint: false,
                 toilet: false
@@ -162,19 +163,28 @@ export default function GarageInput(){
     };
 
     const handleSaveNewParkingGarage = () => {
-        parkingGarage.ParkingGarageUtility.id = 0;
         ParkingGarageApi.createParkingGarage(parkingGarage)
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully created new parking garage: ', data);
+                setCreatedParkingGarageId(data.id); 
                 setIsNewGarage(false); 
+
+                return ParkingGarageApi.getParkingGarage(data.id); 
+            })
+            .then(handleResponse)
+            .then(data => {
+                console.log('Successfully retrieved new parking garage: ', data);
+                setParkingGarage(data);
             })
             .catch(error => {
-                console.error('Error creating the parking garage:', error);
+                console.error('Error with the parking garage:', error);
             });
     };
+    
 
     const handleDeleteParkingGarage = () => {
+        console.log(parkingGarage)
         ParkingGarageApi.deleteParkingGarage(parkingGarage.id) 
             .then(handleResponse)
             .then(data => {
@@ -187,16 +197,14 @@ export default function GarageInput(){
     };
 
     const handleUpdateParkingGarage = () => {
-        if (!isEqual(parkingGarage, editingValue)) {
-            ParkingGarageApi.updateParkingGarage(parkingGarage.id, editingValue)
-                .then(handleResponse)
-                .then(data => {
-                    console.log('Successfully updated parking garage: ', data);
-                })
-                .catch(error => {
-                    console.error('Error updating the parking garage:', error);
-                });
-        }
+        ParkingGarageApi.updateParkingGarage(parkingGarage)
+            .then(handleResponse)
+            .then(data => {
+                console.log('Successfully updated parking garage: ', data);
+            })
+            .catch(error => {
+                console.error('Error updating the parking garage:', error);
+            });
     };
 
     return (
@@ -215,14 +223,14 @@ export default function GarageInput(){
                     <span className="parking-garage-text">
                         {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
                     </span>
-                    {renderEditableField(attr, parkingGarage?.ParkingGarageUtility?.[attr] ?? '')}
+                    {renderEditableField(attr, parkingGarage?.parkingGarageUtility?.[attr] ?? '')}
                     </div>
                 ))}
                 <div className="parking-garage-checkboxes-container">
                     <label className="parking-garage-checkbox-label">
                         Electric parking spaces
                         <input type="checkbox" 
-                            checked={parkingGarage?.ParkingGarageUtility?.electricChargePoint || false}
+                            checked={parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
                             onChange={handleToggleEParking}
                         />
                     </label>
@@ -230,7 +238,7 @@ export default function GarageInput(){
                         Toilets
                         <input type="checkbox" 
                             onChange={handleToggleToilets} 
-                            checked={parkingGarage?.ParkingGarageUtility?.toilet || false}
+                            checked={parkingGarage?.parkingGarageUtility?.toilet || false}
                         />
                     </label>
                 </div>

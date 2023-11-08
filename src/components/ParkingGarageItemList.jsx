@@ -5,7 +5,7 @@ import { useParkingGarage } from "./ParkingGarageContext";
 
 export default function ParkingGarageItemList(){
     const [parkingGarages, setParkingGarages] = useState([]);
-    const { setParkingGarage } = useParkingGarage();
+    const { parkingGarage, setParkingGarage } = useParkingGarage();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -35,7 +35,7 @@ export default function ParkingGarageItemList(){
     .finally(() => {
       setLoading(false);
     });
-    }, []);
+    }, [parkingGarage]);
 
     const handleInfoClick = (parkingGarageId) => {
         console.log('Info clicked for parking garage ID:', parkingGarageId);
