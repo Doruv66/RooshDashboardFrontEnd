@@ -12,9 +12,7 @@ function NavBar() {
 
     return (
       <nav className="navbar">
-          <button onClick={toggleDropdown} className="sidebar-toggle">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Hamburger_icon.svg" alt="Menu" />
-          </button>
+        <img src="/roosh-logoversion-8.png" className={"RooshLogo"}/>
           <h1>Roosh Provider Dashboard</h1>
         {/* {routes.map(link => (
             <li key={link.id}>

@@ -1,0 +1,16 @@
+.drawer-below-navbar .MuiDrawer-paper {
+    top: 8vh;
+    width: 30vh;
+}
+
+.drawer-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+}
+
+.active-drawer-link {
+    background-color: #f0f0f0;
+    color: #303030;
+}
