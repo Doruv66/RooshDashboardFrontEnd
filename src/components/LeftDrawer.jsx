@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -11,16 +10,15 @@ import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import './LeftDrawer.css';
-import {FormControl, InputLabel, ListItemText, MenuItem, Select} from "@mui/material";
+import {FormControl, ListItemText, MenuItem, Select} from "@mui/material";
 import {NavLink} from "react-router-dom";
 import routes from "../routes.jsx";
-import ParkingGarageItemList from "./ParkingGarageItemList.jsx";
-import { ParkingGarageContext } from './ParkingGarageContext';
+import ParkingGarageItemList from './ParkingGarageItemList';
 import {useContext} from "react";
+import ParkingGarageMenu from "./ParkingGarageMenu.jsx";
 
 
 export default function LeftDrawer() {
-    const { parkingGarages } = useContext(ParkingGarageContext);
     const getIcon = (text) => {
         switch (text) {
             case "Garage details": return <GarageIcon />;
@@ -38,23 +36,7 @@ export default function LeftDrawer() {
             role="presentation"
         >
             <List>
-                <FormControl fullWidth>
-                    <InputLabel id="garage-select-label">Garage:</InputLabel>
-                    <Select
-                        labelId="garage-select-label"
-                        id="garage-select"
-                        value={garage}
-                        label="Garage"
-                        onChange={handleChange}
-                    >
-                        <MenuItem value={10}>Ten</MenuItem>
-                        <MenuItem value={20}>Twenty</MenuItem>
-                        <MenuItem value={30}>Thirty</MenuItem>
-                    </Select>
-                </FormControl>
-                <div className="dropdown-menu">
-                    <ParkingGarageItemList/>
-                </div>
+                <ParkingGarageMenu/>
                 {navLinks.map((route) => (
                     <ListItem key={route.text} disablePadding>
                         <NavLink
