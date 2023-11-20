@@ -19,7 +19,7 @@ function App() {
           <NavBar handleDrawerToggle={handleDrawerToggle}/>
           <ParkingGarageProvider>
             <LeftDrawer isDrawerOpen={isDrawerOpen} toggleDrawer={setIsDrawerOpen}/>
-            <div style={{ marginLeft: isDrawerOpen ? '30vh' : '0', transition: 'margin-left 0.5s' }}>
+            <div className="main-content" style={{ marginLeft: isDrawerOpen ? '5vh' : '0', transition: 'margin-left 0.5s' }}>
               <Routes>
                 {routes.map((route, index) => (
                     <Route key={index} path={route.path} element={<route.component />} />
