@@ -36,8 +36,8 @@ const LeftDrawer = ({ isDrawerOpen }) => {
     };
     const getIcon = (text) => {
         switch (text) {
-            case "Add garage": return <LocalParkingIcon/>
-            case "Garage details": return <GarageIcon />;
+            case "Add Garage": return <LocalParkingIcon/>
+            case "Garage Details": return <GarageIcon />;
             case "Departures and Arrivals": return <AirplaneTicketIcon />;
             case "Statistics": return <BarChartIcon />;
             case "Booking History": return <LibraryBooksIcon />;
