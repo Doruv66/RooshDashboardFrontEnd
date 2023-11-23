@@ -28,7 +28,8 @@ const routes = [
       isNavLink: true,
       text: "Garage details"
     },
-    {path: "/addgarage",
+    {
+        path: "/addgarage",
         component: GarageDetails,
         isNavLink: true,
         text: "Add garage"},
