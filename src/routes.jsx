@@ -26,7 +26,14 @@ const routes = [
       path: "/garagedetails",
       component: GarageDetails,
       isNavLink: true,
-      text: "Garage details"
+      text: "Garage Details"
+    },
+
+    {
+        path: "/addgarage",
+        component: GarageDetails,
+        isNavLink: true,
+        text: "Add Garage"
     },
 
     {
@@ -41,7 +48,7 @@ const routes = [
         component: Statistics,
         isNavLink: true,
         text: "Statistics"
-    }
+    },
   ];
   
   export default routes;

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
@@ -10,7 +10,7 @@ export default function GarageInput(){
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
     const [editingField, setEditingField] = useState(null);
     const [editingValue, setEditingValue] = useState('');
-    const [isNewGarage, setIsNewGarage] = useState(false);
+    const { isNewParkingGarage, setIsNewParkingGarage } = useParkingGarage();
     const [errorMessage, setErrorMessage] = useState("")
     const [createdParkingGarageId, setCreatedParkingGarageId] = useState(null);
 
@@ -148,6 +148,14 @@ export default function GarageInput(){
         }
     };
 
+    useEffect(() => {
+        if (isNewParkingGarage) {
+            setEditingField(null);
+            setEditingValue('');
+        }
+    }, [isNewParkingGarage]);
+
+
     const handleCreateNewParkingGarage = () => {
         const newParkingGarage = {
             ...parkingGarageAttributes.reduce((obj, attr) => ({ ...obj, [attr]: null }), {}),
@@ -157,9 +165,9 @@ export default function GarageInput(){
                 toilet: false
             }
         };
-    
-        setParkingGarage(newParkingGarage);        
-        setIsNewGarage(true); 
+
+        setParkingGarage(newParkingGarage);
+        setIsNewParkingGarage(true);
     };
 
     const handleSaveNewParkingGarage = () => {
@@ -168,7 +176,7 @@ export default function GarageInput(){
             .then(data => {
                 console.log('Successfully created new parking garage: ', data);
                 setCreatedParkingGarageId(data.id); 
-                setIsNewGarage(false); 
+                setIsNewParkingGarage(false);
 
                 return ParkingGarageApi.getParkingGarage(data.id); 
             })
@@ -215,7 +223,7 @@ export default function GarageInput(){
                     <span className="parking-garage-text">
                         {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
                     </span>
-                    {renderEditableField(attr, parkingGarage ? parkingGarage[attr] : '')}
+                        {renderEditableField(attr, isNewParkingGarage ? '' : parkingGarage ? parkingGarage[attr] : '')}
                     </div>
                 ))}
                 {parkingGarageUtilityAttributes.map(attr => (
@@ -223,28 +231,28 @@ export default function GarageInput(){
                     <span className="parking-garage-text">
                         {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
                     </span>
-                    {renderEditableField(attr, parkingGarage?.parkingGarageUtility?.[attr] ?? '')}
+                        {renderEditableField(attr, isNewParkingGarage ? '' : parkingGarage ? parkingGarage.parkingGarageUtility[attr] : '')}
                     </div>
                 ))}
                 <div className="parking-garage-checkboxes-container">
                     <label className="parking-garage-checkbox-label">
                         Electric parking spaces
-                        <input type="checkbox" 
-                            checked={parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
+                        <input type="checkbox"
+                            checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
                             onChange={handleToggleEParking}
                         />
                     </label>
                     <label className="parking-garage-checkbox-label">
                         Toilets
                         <input type="checkbox" 
-                            onChange={handleToggleToilets} 
-                            checked={parkingGarage?.parkingGarageUtility?.toilet || false}
+                            onChange={handleToggleToilets}
+                            checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.toilet || false}
                         />
                     </label>
                 </div>
             </div>
             <div className="crud-button-container">
-                {!isNewGarage ? (
+                {!isNewParkingGarage ? (
                     <button className="crud-button" onClick={handleCreateNewParkingGarage}>
                         Create new parking garage
                     </button>
@@ -253,7 +261,7 @@ export default function GarageInput(){
                         Save new parking garage
                     </button>
                 )}
-                {!isNewGarage && parkingGarage &&(
+                {!isNewParkingGarage && parkingGarage &&(
                     <>
                         <button className="crud-button" onClick={handleDeleteParkingGarage}>
                             Delete {parkingGarage.name}

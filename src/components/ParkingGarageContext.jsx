@@ -8,9 +8,17 @@ export const useParkingGarage = () => {
 
 export const ParkingGarageProvider = ({ children }) => {
     const [parkingGarage, setParkingGarage] = useState(null);
+    const [isNewParkingGarage, setIsNewParkingGarage] = useState(false)
+
+    const contextValue = {
+        parkingGarage,
+        setParkingGarage,
+        isNewParkingGarage,
+        setIsNewParkingGarage
+    };
 
     return (
-        <ParkingGarageContext.Provider value={{ parkingGarage, setParkingGarage }}>
+        <ParkingGarageContext.Provider value={ contextValue }>
             {children}
         </ParkingGarageContext.Provider>
     );

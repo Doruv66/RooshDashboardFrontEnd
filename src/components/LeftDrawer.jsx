@@ -15,8 +15,25 @@ import routes from "../routes.jsx";
 import ParkingGarageMenu from "./ParkingGarageMenu.jsx";
 import './LeftDrawer.css';
 import {ListItemText} from "@mui/material";
+import {useParkingGarage} from "./ParkingGarageContext.jsx";
 
 const LeftDrawer = ({ isDrawerOpen }) => {
+    const { setIsNewParkingGarage, isNewParkingGarage } = useParkingGarage();
+    const handleAddGarageClick = () => {
+        setIsNewParkingGarage(true);
+    };
+
+    const handleGarageDetailsClick = () => {
+        setIsNewParkingGarage(false);
+    }
+    const handleNavLinkClick = (text) => {
+
+        if (text === "Add Garage") {
+            handleAddGarageClick();
+        } else if (text === "Garage Details") {
+            handleGarageDetailsClick();
+        }
+    };
     const getIcon = (text) => {
         switch (text) {
             case "Add garage": return <LocalParkingIcon/>
@@ -38,6 +55,7 @@ const LeftDrawer = ({ isDrawerOpen }) => {
                         <NavLink
                             to={route.path}
                             className={({ isActive }) => isActive ? "drawer-link active-drawer-link" : "drawer-link"}
+                            onClick={(event) => handleNavLinkClick(route.text)}
                         >
                             <ListItemButton>
                                 <ListItemIcon>
