@@ -9,6 +9,7 @@ import GarageIcon from '@mui/icons-material/Garage';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import { NavLink } from "react-router-dom";
 import routes from "../routes.jsx";
 import ParkingGarageMenu from "./ParkingGarageMenu.jsx";
@@ -18,6 +19,7 @@ import {ListItemText} from "@mui/material";
 const LeftDrawer = ({ isDrawerOpen }) => {
     const getIcon = (text) => {
         switch (text) {
+            case "Add garage": return <LocalParkingIcon/>
             case "Garage details": return <GarageIcon />;
             case "Departures and Arrivals": return <AirplaneTicketIcon />;
             case "Statistics": return <BarChartIcon />;
