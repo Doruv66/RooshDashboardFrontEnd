@@ -3,6 +3,14 @@ import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
 import isEqual from 'lodash/isEqual';
+import { Box, Tab, Tabs } from '@mui/material';
+
+function a11yProps(index) {
+    return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+    };
+}
 
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
@@ -13,6 +21,102 @@ export default function GarageInput(){
     const { isNewParkingGarage, setIsNewParkingGarage } = useParkingGarage();
     const [errorMessage, setErrorMessage] = useState("")
     const [createdParkingGarageId, setCreatedParkingGarageId] = useState(null);
+    const [tabValue, setTabValue] = useState(0);
+    const [tabOneData, setTabOneData] = useState({});
+    const [tabTwoData, setTabTwoData] = useState({});
+    const [tabThreeData, setTabThreeData] = useState({});
+
+    const handleTabChange = (event, newValue) => {
+        setTabValue(newValue);
+    }
+
+    const TabOneContent = () => {
+        return <div><div className="form-grid">
+            {parkingGarageAttributes.map(attr => (
+                <div className="parking-garage-container" key={attr}>
+                    <span className="parking-garage-text">
+                        {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
+                    </span>
+                    {renderEditableField(attr, isNewParkingGarage ? '' : parkingGarage ? parkingGarage[attr] : '')}
+                </div>
+            ))}
+            <div className="parking-garage-checkboxes-container">
+                <label className="parking-garage-checkbox-label">
+                    Electric parking spaces
+                    <input type="checkbox"
+                           checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
+                           onChange={handleToggleEParking}
+                    />
+                </label>
+                <label className="parking-garage-checkbox-label">
+                    Toilets
+                    <input type="checkbox"
+                           onChange={handleToggleToilets}
+                           checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.toilet || false}
+                    />
+                </label>
+            </div>
+        </div>
+            <div className="crud-button-container">
+                {!isNewParkingGarage ? (
+                    <button className="crud-button" onClick={handleCreateNewParkingGarage}>
+                        Create new parking garage
+                    </button>
+                ) : (
+                    <button className="crud-button" onClick={handleSaveNewParkingGarage}>
+                        Save new parking garage
+                    </button>
+                )}
+                {!isNewParkingGarage && parkingGarage &&(
+                    <>
+                        <button className="crud-button" onClick={handleDeleteParkingGarage}>
+                            Delete {parkingGarage.name}
+                        </button>
+                        <button className="crud-button" onClick={handleUpdateParkingGarage}>
+                            Update {parkingGarage.name}
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>;
+    };
+
+    const TabTwoContent = () => {
+        // Content and logic for Tab Two
+        return (
+            <div>
+                {parkingGarageUtilityAttributes.map(attr => (
+                    <div className="parking-garage-utilities-container" key={attr}>
+                        <span className="parking-garage-text">
+                            {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
+                        </span>
+                        {renderEditableField(attr, isNewParkingGarage ? '' : parkingGarage ? parkingGarage.parkingGarageUtility[attr] : '')}
+                    </div>
+                ))}
+                <div className="parking-garage-checkboxes-container">
+                    <label className="parking-garage-checkbox-label">
+                        Electric parking spaces
+                        <input type="checkbox"
+                               checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
+                               onChange={handleToggleEParking}
+                        />
+                    </label>
+                    <label className="parking-garage-checkbox-label">
+                        Toilets
+                        <input type="checkbox"
+                               onChange={handleToggleToilets}
+                               checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.toilet || false}
+                        />
+                    </label>
+                </div>
+            </div>
+        );
+    };
+
+    const TabThreeContent = () => {
+        // Content and logic for Tab Three
+        return <div>Tab Three Content</div>;
+    };
 
     const handleEditField = (field, value) => {
         setEditingField(field);
@@ -216,63 +320,19 @@ export default function GarageInput(){
     };
 
     return (
+
             <div className="garage-input">
-                <div className="form-grid">
-                {parkingGarageAttributes.map(attr => (
-                    <div className="parking-garage-container" key={attr}>
-                    <span className="parking-garage-text">
-                        {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
-                    </span>
-                        {renderEditableField(attr, isNewParkingGarage ? '' : parkingGarage ? parkingGarage[attr] : '')}
-                    </div>
-                ))}
-                {parkingGarageUtilityAttributes.map(attr => (
-                    <div className="parking-garage-utilities-container" key={attr}>
-                    <span className="parking-garage-text">
-                        {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
-                    </span>
-                        {renderEditableField(attr, isNewParkingGarage ? '' : parkingGarage ? parkingGarage.parkingGarageUtility[attr] : '')}
-                    </div>
-                ))}
-                <div className="parking-garage-checkboxes-container">
-                    <label className="parking-garage-checkbox-label">
-                        Electric parking spaces
-                        <input type="checkbox"
-                            checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
-                            onChange={handleToggleEParking}
-                        />
-                    </label>
-                    <label className="parking-garage-checkbox-label">
-                        Toilets
-                        <input type="checkbox" 
-                            onChange={handleToggleToilets}
-                            checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.toilet || false}
-                        />
-                    </label>
-                </div>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
+                        <Tab label="General" />
+                        <Tab label="Amenities" />
+                        <Tab label="Images" />
+                    </Tabs>
+                </Box>
+                {tabValue === 0 && <TabOneContent />}
+                {tabValue === 1 && <TabTwoContent />}
+                {tabValue === 2 && <TabThreeContent />}
             </div>
-            <div className="crud-button-container">
-                {!isNewParkingGarage ? (
-                    <button className="crud-button" onClick={handleCreateNewParkingGarage}>
-                        Create new parking garage
-                    </button>
-                ) : (
-                    <button className="crud-button" onClick={handleSaveNewParkingGarage}>
-                        Save new parking garage
-                    </button>
-                )}
-                {!isNewParkingGarage && parkingGarage &&(
-                    <>
-                        <button className="crud-button" onClick={handleDeleteParkingGarage}>
-                            Delete {parkingGarage.name}
-                        </button>
-                        <button className="crud-button" onClick={handleUpdateParkingGarage}>
-                            Update {parkingGarage.name}
-                        </button>
-                    </>
-                )}
-            </div>
-        </div>
     );
     
 }
