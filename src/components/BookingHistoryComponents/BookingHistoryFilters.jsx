@@ -34,19 +34,6 @@ const BookingHistoryFilters = () => {
 
   return (
     <div className={style.filters}>
-      <FormControl fullWidth sx={{width: 200}}>
-          <InputLabel id="demo-simple-select-label" sx={{pl: 2.5}}>Service</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={serviceType}
-            label="Service"
-            onChange={handleServiceTypeChange}
-          >
-            <MenuItem value={"Valet"}>Valet</MenuItem>
-            <MenuItem value={"Shuttle"}>Shuttle</MenuItem>
-          </Select>
-        </FormControl>
         <FormControl fullWidth sx={{width: 250}}>
           <InputLabel id="demo-simple-select-label" sx={{pl: 2.5}}>Sort By</InputLabel>
           <Select
@@ -58,6 +45,19 @@ const BookingHistoryFilters = () => {
           >
             <MenuItem value={"Arrival Day (asc)"}>Arrival Day (asc)</MenuItem>
             <MenuItem value={"Departure Day (asc)"}>Departure Day (asc)</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl fullWidth sx={{width: 200}}>
+          <InputLabel id="demo-simple-select-label" sx={{pl: 2.5}}>Service</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={serviceType}
+            label="Service"
+            onChange={handleServiceTypeChange}
+          >
+            <MenuItem value={"Valet"}>Valet</MenuItem>
+            <MenuItem value={"Shuttle"}>Shuttle</MenuItem>
           </Select>
         </FormControl>
         <FormControlLabel
