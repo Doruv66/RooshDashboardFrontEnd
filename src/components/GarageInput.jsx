@@ -11,7 +11,7 @@ export default function GarageInput(){
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
     const [editingField, setEditingField] = useState(null);
     const [editingValue, setEditingValue] = useState('');
-    const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId } = useParkingGarage();
+    const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId, updateTrigger, setUpdateTrigger } = useParkingGarage();
     const [errorMessage, setErrorMessage] = useState("")
     const [tabValue, setTabValue] = useState(0);
     const [newParkingGarage, setNewParkingGarage] = useState({})
@@ -112,7 +112,7 @@ export default function GarageInput(){
                             <button type="submit" className="crud-button">
                                 Update parking garage
                             </button>
-                            <button className="crud-button" onClick={handleDeleteParkingGarage}>
+                            <button type="button" className="crud-button" onClick={handleDeleteParkingGarage}>
                                 Delete parking garage
                             </button>
                         </div>
@@ -207,7 +207,7 @@ export default function GarageInput(){
                             <button type="submit" className="crud-button">
                                 Update parking garage
                             </button>
-                            <button className="crud-button" onClick={() => handleDeleteParkingGarage()}>
+                            <button type="button" className="crud-button" onClick={handleDeleteParkingGarage}>
                                 Delete parking garage
                             </button>
                         </div>
@@ -351,7 +351,7 @@ export default function GarageInput(){
                 setIsNewParkingGarage(false);
                 setNewGarageAdded(true);
                 navigate(`/garagedetails`);
-                return ParkingGarageApi.getParkingGarage(data.id); 
+                return ParkingGarageApi.getParkingGarage(data.id);
             })
             .then(handleResponse)
             .then(data => {
@@ -362,14 +362,15 @@ export default function GarageInput(){
                 console.error('Error with the parking garage:', error);
             });
     };
-    
 
-    const handleDeleteParkingGarage = () => {
-        console.log(parkingGarage)
-        ParkingGarageApi.deleteParkingGarage(parkingGarage.id) 
+
+    const handleDeleteParkingGarage = (event) => {
+        event.preventDefault();
+        console.log(parkingGarage);
+        ParkingGarageApi.deleteParkingGarage(parkingGarage.id)
             .then(handleResponse)
             .then(data => {
-                setParkingGarage(null);
+                setNewGarageId(1)
                 setNewGarageAdded(true);
                 console.log('Successfully deleted parking garage: ', data);
             })
@@ -393,7 +394,8 @@ export default function GarageInput(){
             .then(data => {
                 console.log(data)
                 console.log('Successfully updated parking garage: ', data);
-                setNewGarageId(data.id);
+                setUpdateTrigger(prev => !prev);
+                setNewGarageId(data.id)
                 setNewGarageAdded(true);
             })
             .catch(error => {
@@ -416,6 +418,6 @@ export default function GarageInput(){
                 {tabValue === 2 && <TabThreeContent />}
             </div>
     );
-    
+
 }
 
