@@ -9,12 +9,18 @@ export const useParkingGarage = () => {
 export const ParkingGarageProvider = ({ children }) => {
     const [parkingGarage, setParkingGarage] = useState(null);
     const [isNewParkingGarage, setIsNewParkingGarage] = useState(false)
+    const [newGarageAdded, setNewGarageAdded] = useState(false);
+    const [newGarageId, setNewGarageId] = useState(null);
 
     const contextValue = {
         parkingGarage,
         setParkingGarage,
         isNewParkingGarage,
-        setIsNewParkingGarage
+        setIsNewParkingGarage,
+        newGarageAdded,
+        setNewGarageAdded,
+        newGarageId,
+        setNewGarageId
     };
 
     return (

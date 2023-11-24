@@ -4,6 +4,7 @@ import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
 import isEqual from 'lodash/isEqual';
 import { Box, Tab, Tabs } from '@mui/material';
+import {useLocation, useNavigate} from "react-router-dom";
 
 function a11yProps(index) {
     return {
@@ -18,7 +19,7 @@ export default function GarageInput(){
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
     const [editingField, setEditingField] = useState(null);
     const [editingValue, setEditingValue] = useState('');
-    const { isNewParkingGarage, setIsNewParkingGarage } = useParkingGarage();
+    const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId } = useParkingGarage();
     const [errorMessage, setErrorMessage] = useState("")
     const [createdParkingGarageId, setCreatedParkingGarageId] = useState(null);
     const [tabValue, setTabValue] = useState(0);
@@ -27,6 +28,8 @@ export default function GarageInput(){
     const [tabThreeData, setTabThreeData] = useState({});
     const [newParkingGarage, setNewParkingGarage] = useState({})
 
+    const navigate = useNavigate();
+    const location = useLocation();
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     }
@@ -41,22 +44,6 @@ export default function GarageInput(){
                     {renderEditableField(attr, isNewParkingGarage ? newParkingGarage[attr] : (parkingGarage ? parkingGarage[attr] : ''))}
                 </div>
             ))}
-            <div className="parking-garage-checkboxes-container">
-                <label className="parking-garage-checkbox-label">
-                    Electric parking spaces
-                    <input type="checkbox"
-                           checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.electricChargePoint || false : parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
-                           onChange={handleToggleEParking}
-                    />
-                </label>
-                <label className="parking-garage-checkbox-label">
-                    Toilets
-                    <input type="checkbox"
-                           onChange={handleToggleToilets}
-                           checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.toilet || false : parkingGarage?.parkingGarageUtility?.toilet || false}
-                    />
-                </label>
-            </div>
         </div>
             <div className="crud-button-container">
                 {isNewParkingGarage && (
@@ -87,14 +74,14 @@ export default function GarageInput(){
                         <span className="parking-garage-text">
                             {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
                         </span>
-                        {renderEditableField(attr, isNewParkingGarage ? newParkingGarage.parkingGarageUtility[attr] : (parkingGarage ? parkingGarage.parkingGarageUtility[attr] : ''))}
+                        {renderEditableField(attr, isNewParkingGarage ? (newParkingGarage.parkingGarageUtility && newParkingGarage.parkingGarageUtility[attr]) : (parkingGarage && parkingGarage.parkingGarageUtility && parkingGarage.parkingGarageUtility[attr]))}
                     </div>
                 ))}
                 <div className="parking-garage-checkboxes-container">
                     <label className="parking-garage-checkbox-label">
                         Electric parking spaces
                         <input type="checkbox"
-                               checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.electricChargePoint || false}
+                               checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.electricChargePoint : parkingGarage?.parkingGarageUtility?.electricChargePoint}
                                onChange={handleToggleEParking}
                         />
                     </label>
@@ -102,7 +89,8 @@ export default function GarageInput(){
                         Toilets
                         <input type="checkbox"
                                onChange={handleToggleToilets}
-                               checked={isNewParkingGarage ? false : parkingGarage?.parkingGarageUtility?.toilet || false}
+                               checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.toilet : parkingGarage?.parkingGarageUtility?.toilet}
+
                         />
                     </label>
                 </div>
@@ -115,10 +103,31 @@ export default function GarageInput(){
         return <div>Tab Three Content</div>;
     };
 
-    const handleEditField = (field, value) => {
-        setEditingField(field);
-        setEditingValue(value);
-    };
+    useEffect(() => {
+        setEditingField(null);
+        setEditingValue('');
+        setErrorMessage('');
+        setTabValue(0);
+
+        setNewParkingGarage({
+            name: '',
+            airport: '',
+            location: '',
+            travelTime: '',
+            travelDistance: '',
+            phoneNumber: '',
+            parkingGarageUtility: {
+                parkingSpaces: '',
+                parkingSpacesElectric: '',
+                floors: '',
+                electricChargePoint: false,
+                toilet: false
+            }
+        });
+
+        setIsNewParkingGarage(location.pathname === '/addgarage');
+
+    }, [location.pathname]);
 
     const handleResponse = response => {
         if (!response.ok) {
@@ -240,8 +249,16 @@ export default function GarageInput(){
         );
     };
 
-      const handleToggleEParking = () => {
-        if (parkingGarage && parkingGarage.parkingGarageUtility) {
+    const handleToggleEParking = () => {
+        if (isNewParkingGarage) {
+            setNewParkingGarage(prevState => ({
+                ...prevState,
+                parkingGarageUtility: {
+                    ...prevState.parkingGarageUtility,
+                    electricChargePoint: !prevState.parkingGarageUtility.electricChargePoint
+                }
+            }));
+        } else if (parkingGarage && parkingGarage.parkingGarageUtility) {
             setParkingGarage(prevState => ({
                 ...prevState,
                 parkingGarageUtility: {
@@ -251,16 +268,24 @@ export default function GarageInput(){
             }));
         }
     };
-    
+
     const handleToggleToilets = () => {
-        if (parkingGarage && parkingGarage.parkingGarageUtility) {
+        if (isNewParkingGarage) {
+            setNewParkingGarage(prevState => ({
+                ...prevState,
+                parkingGarageUtility: {
+                    ...prevState.parkingGarageUtility,
+                    toilet: !prevState.parkingGarageUtility.toilet
+                }
+            }));
+        } else if (parkingGarage && parkingGarage.parkingGarageUtility) {
             setParkingGarage(prevState => ({
                 ...prevState,
                 parkingGarageUtility: {
                     ...prevState.parkingGarageUtility,
                     toilet: !prevState.parkingGarageUtility.toilet
                 }
-            }));        
+            }));
         }
     };
 
@@ -287,13 +312,15 @@ export default function GarageInput(){
     }, []);
 
     const handleSaveNewParkingGarage = () => {
-        ParkingGarageApi.createParkingGarage(parkingGarage)
+        console.log(newParkingGarage)
+        ParkingGarageApi.createParkingGarage(newParkingGarage)
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully created new parking garage: ', data);
-                setCreatedParkingGarageId(data.id); 
+                setNewGarageId(data.id);
                 setIsNewParkingGarage(false);
-
+                setNewGarageAdded(true);
+                navigate(`/garagedetails`);
                 return ParkingGarageApi.getParkingGarage(data.id); 
             })
             .then(handleResponse)

@@ -10,7 +10,7 @@ import "./ParkingGarageMenu.css"
 
 export default function ParkingGarageMenu() {
     const [parkingGarages, setParkingGarages] = useState([]);
-    const { setParkingGarage } = useParkingGarage();
+    const { setParkingGarage, newGarageAdded, setNewGarageAdded, newGarageId } = useParkingGarage();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedGarageId, setSelectedGarageId] = useState('');
@@ -27,6 +27,14 @@ export default function ParkingGarageMenu() {
             .then(data => {
                 if (data.parkingGarages) {
                     setParkingGarages(data.parkingGarages);
+                    if (newGarageAdded && newGarageId) {
+                        setSelectedGarageId(newGarageId); // Select the new garage
+                        const newGarage = data.parkingGarages.find(garage => garage.id === newGarageId);
+                        if (newGarage) {
+                            setParkingGarage(newGarage);
+                        }
+                        setNewGarageAdded(false); // Reset the flag
+                    }
                 } else {
                     setParkingGarages([]);
                 }
@@ -38,7 +46,7 @@ export default function ParkingGarageMenu() {
             .finally(() => {
                 setLoading(false);
             });
-    }, []);
+    }, [newGarageAdded, newGarageId, setNewGarageAdded, setParkingGarage])
 
     const handleChange = (event) => {
         const garageId = event.target.value;
