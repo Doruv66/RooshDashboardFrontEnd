@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
 import isEqual from 'lodash/isEqual';
 import { Box, Tab, Tabs } from '@mui/material';
 import {useLocation, useNavigate} from "react-router-dom";
-
+import TextField from '@mui/material/TextField';
 function a11yProps(index) {
     return {
         id: `simple-tab-${index}`,
@@ -21,28 +21,39 @@ export default function GarageInput(){
     const [editingValue, setEditingValue] = useState('');
     const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId } = useParkingGarage();
     const [errorMessage, setErrorMessage] = useState("")
-    const [createdParkingGarageId, setCreatedParkingGarageId] = useState(null);
     const [tabValue, setTabValue] = useState(0);
-    const [tabOneData, setTabOneData] = useState({});
-    const [tabTwoData, setTabTwoData] = useState({});
-    const [tabThreeData, setTabThreeData] = useState({});
     const [newParkingGarage, setNewParkingGarage] = useState({})
-
+    const [formValues, setFormValues] = useState({});
     const navigate = useNavigate();
     const location = useLocation();
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
     }
 
+    const toTitleCase = (str) => {
+        return str
+            // Insert a space before all caps
+            .replace(/([A-Z])/g, ' $1')
+            // Uppercase the first character of each word
+            .replace(/^./, str => str.toUpperCase());
+    }
+
+    const handleFieldChange = useCallback((fieldName, value) => {
+        setFormValues(prev => ({ ...prev, [fieldName]: value }));
+    }, []);
+
     const TabOneContent = () => {
+
         return <div><div className="form-grid">
             {parkingGarageAttributes.map(attr => (
-                <div className="parking-garage-container" key={attr}>
-                    <span className="parking-garage-text">
-                        {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
-                    </span>
+                <TextField
+                    key={attr}
+                    label={toTitleCase(attr)}
+                    className="textFieldMarginTop"
+                    value={formValues[attr] || ''}
+                    onChange={(e) => handleFieldChange(attr, e.target.value)}>
                     {renderEditableField(attr, isNewParkingGarage ? newParkingGarage[attr] : (parkingGarage ? parkingGarage[attr] : ''))}
-                </div>
+                </TextField>
             ))}
         </div>
             <div className="crud-button-container">
@@ -104,30 +115,28 @@ export default function GarageInput(){
     };
 
     useEffect(() => {
-        setEditingField(null);
-        setEditingValue('');
-        setErrorMessage('');
-        setTabValue(0);
+        // Initialize formValues based on whether it's a new garage or an existing one
+        const initialValues = parkingGarageAttributes.reduce((acc, attr) => {
+            // For a new garage, all values should be initialized to empty strings
+            // For an existing garage, use existing values or default to empty strings
+            acc[attr] = isNewParkingGarage ? '' : (parkingGarage ? parkingGarage[attr] : '');
+            return acc;
+        }, {});
 
-        setNewParkingGarage({
-            name: '',
-            airport: '',
-            location: '',
-            travelTime: '',
-            travelDistance: '',
-            phoneNumber: '',
-            parkingGarageUtility: {
-                parkingSpaces: '',
-                parkingSpacesElectric: '',
-                floors: '',
-                electricChargePoint: false,
-                toilet: false
-            }
-        });
+        // If it's a new garage, initialize parkingGarageUtility attributes to their default values
+        if (isNewParkingGarage) {
+            initialValues.parkingGarageUtility = parkingGarageUtilityAttributes.reduce((acc, attr) => {
+                acc[attr] = ''; // Initialize utility attributes to empty strings
+                return acc;
+            }, {});
+        } else {
+            // For an existing garage, include the parkingGarageUtility attributes
+            initialValues.parkingGarageUtility = parkingGarage && parkingGarage.parkingGarageUtility ? {...parkingGarage.parkingGarageUtility} : {};
+        }
 
-        setIsNewParkingGarage(location.pathname === '/addgarage');
+        setFormValues(initialValues);
+    }, [isNewParkingGarage, parkingGarage]);
 
-    }, [location.pathname]);
 
     const handleResponse = response => {
         if (!response.ok) {
@@ -368,7 +377,7 @@ export default function GarageInput(){
                         <Tab label="Images" />
                     </Tabs>
                 </Box>
-                {tabValue === 0 && <TabOneContent />}
+                {tabValue === 0 && <TabOneContent inputValues={formValues} handleInputChange={handleFieldChange} />}
                 {tabValue === 1 && <TabTwoContent />}
                 {tabValue === 2 && <TabThreeContent />}
             </div>

@@ -15,6 +15,10 @@
   gap: 20px;
 }
 
+.textFieldMarginTop {
+  margin-top: 8px !important;
+}
+
 .parking-garage-container,
 .parking-garage-utilities-container {
   display: flex;
