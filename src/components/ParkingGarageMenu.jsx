@@ -29,7 +29,7 @@ export default function ParkingGarageMenu() {
                     setParkingGarages(data.parkingGarages);
                     if (newGarageAdded && newGarageId) {
                         setSelectedGarageId(newGarageId);
-                        const newGarage = data.parkingGarages.find(garage => garage.id === newGarageId);
+                        const newGarage = parkingGarages.find(garage => garage.id === newGarageId);
                         if (newGarage) {
                             setParkingGarage(newGarage);
                         }
@@ -46,7 +46,7 @@ export default function ParkingGarageMenu() {
             .finally(() => {
                 setLoading(false);
             });
-    }, [newGarageAdded, setNewGarageAdded, setParkingGarage])
+    }, [newGarageId])
 
     const handleChange = (event) => {
         const garageId = event.target.value;
