@@ -15,7 +15,7 @@ export default function GarageInput(){
     const [editingValue ,setEditingValue] = useState('');
     const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId, setUpdateTrigger } = useParkingGarage();
     const [tabValue, setTabValue] = useState(0);
-    const [setNewParkingGarage] = useState({})
+    const [newParkingGarage, setNewParkingGarage] = useState({})
     const [formValues, setFormValues] = useState({});
     const navigate = useNavigate();
     const tabOneRef = useRef(null);
