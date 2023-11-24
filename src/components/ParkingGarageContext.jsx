@@ -11,6 +11,7 @@ export const ParkingGarageProvider = ({ children }) => {
     const [isNewParkingGarage, setIsNewParkingGarage] = useState(false)
     const [newGarageAdded, setNewGarageAdded] = useState(false);
     const [newGarageId, setNewGarageId] = useState(null);
+    const [updateTrigger, setUpdateTrigger] = useState(false)
     const [filters, setFilters] = useState({
         garageId: null,
         service: '',
@@ -32,7 +33,9 @@ export const ParkingGarageProvider = ({ children }) => {
         newGarageId,
         setNewGarageId,
         filters,
-        updateFilters
+        updateFilters,
+        updateTrigger,
+        setUpdateTrigger
     };
 
     return (

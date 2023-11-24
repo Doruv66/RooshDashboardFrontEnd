@@ -10,44 +10,39 @@ import "./ParkingGarageMenu.css"
 
 export default function ParkingGarageMenu() {
     const [parkingGarages, setParkingGarages] = useState([]);
-    const { setParkingGarage, newGarageAdded, setNewGarageAdded, newGarageId, updateFilters } = useParkingGarage();
+    const { setParkingGarage, newGarageAdded, setNewGarageAdded, newGarageId, updateFilters, updateTrigger } = useParkingGarage();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedGarageId, setSelectedGarageId] = useState('');
     
 
     useEffect(() => {
-        setLoading(true);
-        ParkingGarageApi.getAllParkingGarages()
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.parkingGarages) {
-                    setParkingGarages(data.parkingGarages);
-                    if (newGarageAdded && newGarageId) {
+        const fetchParkingGarages = async () => {
+            setLoading(true);
+            try {
+                const response = await ParkingGarageApi.getAllParkingGarages();
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const data = await response.json();
+                setParkingGarages(data.parkingGarages);
+
+                if (newGarageAdded && newGarageId) {
+                    const newGarage = data.parkingGarages.find(garage => garage.id === newGarageId);
+                    if (newGarage) {
+                        setParkingGarage(newGarage);
                         setSelectedGarageId(newGarageId);
-                        const newGarage = parkingGarages.find(garage => garage.id === newGarageId);
-                        if (newGarage) {
-                            setParkingGarage(newGarage);
-                        }
-                        setNewGarageAdded(false);
                     }
-                } else {
-                    setParkingGarages([]);
+                    setNewGarageAdded(false);
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error fetching the parking garages:', error);
                 setError('An error occurred while fetching data.');
-            })
-            .finally(() => {
+            } finally {
                 setLoading(false);
-            });
-    }, [newGarageId])
+            }
+        };
+        fetchParkingGarages();
+    }, [newGarageId, updateTrigger]);
+
 
     const handleChange = (event) => {
         const garageId = event.target.value;
