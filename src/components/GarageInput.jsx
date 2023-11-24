@@ -2,17 +2,9 @@ import React, {useCallback, useEffect, useMemo, useState} from "react";
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
-import isEqual from 'lodash/isEqual';
 import { Box, Tab, Tabs } from '@mui/material';
 import {useLocation, useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
-function a11yProps(index) {
-    return {
-        id: `simple-tab-${index}`,
-        'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
-
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
@@ -38,7 +30,7 @@ export default function GarageInput(){
     }
 
     const handleFieldChange = useCallback((fieldName, value) => {
-        setParkingGarage(prev => ({ ...prev, [fieldName]: value }));
+        setFormValues(prev => ({ ...prev, [fieldName]: value }));
     }, []);
 
     const TabOneContent = () => {
@@ -82,14 +74,17 @@ export default function GarageInput(){
 
 
     const TabTwoContent = () => {
-        // Content and logic for Tab Two
         return (
             <div>
                 {parkingGarageUtilityAttributes.map(attr => (
                     <div className="parking-garage-utilities-container" key={attr}>
-                        <span className="parking-garage-text">
-                            {attr.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:
-                        </span>
+                        <TextField
+                            key={attr}
+                            label={toTitleCase(attr)}
+                            className="textFieldMarginTop"
+                            defaultValue={formValues[attr] || ''}
+                            onChange={(e) => handleFieldChange(attr, e.target.value)}
+                        />
                     </div>
                 ))}
                 <div className="parking-garage-checkboxes-container">
