@@ -5,12 +5,14 @@ import ParkingGarageApi from '../api/ParkingGarageApi';
 import { Box, Tab, Tabs } from '@mui/material';
 import {useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
-    const [setEditingField] = useState(null);
-    const [setEditingValue] = useState('');
+    const [editingField ,setEditingField] = useState(null);
+    const [editingValue ,setEditingValue] = useState('');
     const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId, setUpdateTrigger } = useParkingGarage();
     const [tabValue, setTabValue] = useState(0);
     const [setNewParkingGarage] = useState({})
@@ -18,6 +20,10 @@ export default function GarageInput(){
     const navigate = useNavigate();
     const tabOneRef = useRef(null);
     const tabTwoRef = useRef(null);
+    const [confirmationMessage, setConfirmationMessage] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
     const handleTabChange = (event, newValue) => {
         if (tabValue === 0 && tabOneRef.current) {
             const localValues = tabOneRef.current.getLatestValues();
@@ -29,6 +35,13 @@ export default function GarageInput(){
             updateGlobalStateBeforeTabChange(1, updatedValues);
         }
         setTabValue(newValue);
+    };
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
     };
 
     const updateGlobalStateBeforeTabChange = (tabIndex, newValues) => {
@@ -343,10 +356,16 @@ export default function GarageInput(){
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully retrieved new parking garage: ', data);
+                setConfirmationMessage('New parking garage successfully created.');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
                 setParkingGarage(data);
             })
             .catch(error => {
                 console.error('Error with the parking garage:', error);
+                setConfirmationMessage('Error creating the parking garage.');
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
             });
     };
 
@@ -360,9 +379,15 @@ export default function GarageInput(){
                 setNewGarageId(1)
                 setNewGarageAdded(true);
                 console.log('Successfully deleted parking garage: ', data);
+                setConfirmationMessage('Parking garage successfully deleted.');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
             })
             .catch(error => {
                 console.error('Error deleting the parking garage:', error);
+                setConfirmationMessage('Error deleting the parking garage.');
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
             });
     };
 
@@ -381,18 +406,38 @@ export default function GarageInput(){
             .then(data => {
                 console.log(data)
                 console.log('Successfully updated parking garage: ', data);
+                setConfirmationMessage('Parking garage successfully updated.');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
                 setUpdateTrigger(prev => !prev);
                 setNewGarageId(data.id)
                 setNewGarageAdded(true);
             })
             .catch(error => {
                 console.error('Error updating the parking garage:', error);
+                setConfirmationMessage('Error updating the parking garage.');
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
             });
     };
 
     return (
 
             <div className="garage-input">
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                >
+                    <MuiAlert
+                        onClose={handleCloseSnackbar}
+                        severity={snackbarSeverity}
+                        elevation={6}
+                        variant="filled"
+                    >
+                        {confirmationMessage}
+                    </MuiAlert>
+                </Snackbar>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
                         <Tab label="General" />
