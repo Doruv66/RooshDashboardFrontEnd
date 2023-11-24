@@ -68,7 +68,7 @@ const BookingHistoryFilters = () => {
             label="Service"
             onChange={handleServiceTypeChange}
           >
-            <MenuItem value={"Valet"}>All</MenuItem>
+            <MenuItem value={"All"}>All</MenuItem>
             <MenuItem value={"Valet"}>Valet</MenuItem>
             <MenuItem value={"Shuttle"}>Shuttle</MenuItem>
           </Select>
