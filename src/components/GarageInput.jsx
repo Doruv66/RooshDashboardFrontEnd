@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState} from "react";
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
@@ -17,9 +17,30 @@ export default function GarageInput(){
     const [newParkingGarage, setNewParkingGarage] = useState({})
     const [formValues, setFormValues] = useState({});
     const navigate = useNavigate();
+    const tabOneRef = useRef(null);
+    const tabTwoRef = useRef(null);
     const handleTabChange = (event, newValue) => {
+        if (tabValue === 0 && tabOneRef.current) {
+            const localValues = tabOneRef.current.getLatestValues();
+            updateGlobalStateBeforeTabChange(0, localValues);
+        }
+        if (tabValue === 1 && tabTwoRef.current) {
+            const localValues = tabTwoRef.current.getLatestValues();
+            const updatedValues = { ...formValues, parkingGarageUtility: { ...formValues.parkingGarageUtility, ...localValues } };
+            updateGlobalStateBeforeTabChange(1, updatedValues);
+        }
         setTabValue(newValue);
-    }
+    };
+
+    const updateGlobalStateBeforeTabChange = (tabIndex, newValues) => {
+        if (tabValue === tabIndex) {
+            updateGlobalState(newValues);
+        }
+    };
+    const updateGlobalState = (newValues) => {
+        setFormValues(prev => ({ ...prev, ...newValues }));
+        console.log(formValues)
+    };
 
     const toTitleCase = (str) => {
         return str
@@ -33,82 +54,178 @@ export default function GarageInput(){
         setFormValues(prev => ({ ...prev, [fieldName]: value }));
     }, []);
 
-    const TabOneContent = () => {
-        const textFields = useMemo(() => {
-            return parkingGarageAttributes.map(attr => (
-                <TextField
-                    key={attr}
-                    label={toTitleCase(attr)}
-                    className="textFieldMarginTop"
-                    defaultValue={formValues[attr] || ''}
-                    onChange={(e) => handleFieldChange(attr, e.target.value)}
-                />
-            ));
-        }, [parkingGarageAttributes, formValues, handleFieldChange]);
+    const TabOneContent = forwardRef((props, ref) => {
+        const [localValues, setLocalValues] = useState({});
+        useEffect(() => {
+            setLocalValues(formValues);
+        }, [formValues]);
+
+        useEffect(() => {
+            if (tabValue !== 0) {
+                console.log(localValues)
+                updateGlobalState(localValues);
+            }
+        }, [tabValue]);
+
+        const handleLocalChange = (attr, value) => {
+            setLocalValues(prev => ({ ...prev, [attr]: value }));
+            console.log(localValues)
+        };
+
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                if(isNewParkingGarage){
+                    handleSaveNewParkingGarage()
+                }
+                else{
+                    handleUpdateParkingGarage(localValues);
+                }
+            }, 0);
+        };
+
+        useImperativeHandle(ref, () => ({
+            getLatestValues: () => {
+                return localValues;
+            }
+        }));
+
+        const textFields = parkingGarageAttributes.map(attr => (
+            <TextField
+                name={attr}
+                key={attr}
+                label={toTitleCase(attr)}
+                className="textFieldMarginTop"
+                value={localValues[attr] || ''}
+                onChange={(e) => handleLocalChange(attr, e.target.value)}
+            />
+        ));
 
         return (
             <div>
-                <div className="form-grid">
-                    {textFields}
-                </div>
-                <div className="crud-button-container">
-                    {isNewParkingGarage && (
-                        <button className="crud-button" onClick={handleSaveNewParkingGarage}>
-                            Save new parking garage
-                        </button>
-                    )}
+                <form onSubmit={handleFormSubmit}>
+                    <div className="form-grid">
+                        {textFields}
+                    </div>
                     {!isNewParkingGarage && parkingGarage && (
-                        <>
-                            <button className="crud-button" onMouseDown={handleDeleteParkingGarage}>
-                                Delete parking garage
-                            </button>
-                            <button className="crud-button" onMouseDown={handleUpdateParkingGarage}>
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
                                 Update parking garage
                             </button>
-                        </>
+                            <button className="crud-button" onClick={handleDeleteParkingGarage}>
+                                Delete parking garage
+                            </button>
+                        </div>
                     )}
-                </div>
+                    {isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
+                                Save new parking garage
+                            </button>
+                        </div>
+                    )}
+                </form>
             </div>
         );
-    };
+    });
+    TabOneContent.displayName = 'TabOneContent';
 
+    const TabTwoContent = forwardRef((props, ref) => {
+        const [localValues, setLocalValues] = useState({});
 
-    const TabTwoContent = () => {
+        useEffect(() => {
+            setLocalValues(formValues.parkingGarageUtility || {});
+        }, [formValues]);
+
+        const handleLocalChange = (attr, value) => {
+            setLocalValues(prev => ({ ...prev, [attr]: value }));
+            console.log(localValues)
+        };
+
+        useImperativeHandle(ref, () => ({
+            getLatestValues: () => {
+                return localValues;
+            }
+        }));
+
+        const handleToggleEParking = () => {
+            setLocalValues(prev => ({
+                ...prev,
+                electricChargePoint: !prev.electricChargePoint
+            }));
+        };
+
+        const handleToggleToilets = () => {
+            setLocalValues(prev => ({
+                ...prev,
+                toilet: !prev.toilet
+            }));
+        };
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                if (isNewParkingGarage) {
+                    handleSaveNewParkingGarage();
+                } else {
+                    handleUpdateParkingGarage({ parkingGarageUtility: localValues });
+                }
+            }, 0);
+        };
+
         return (
             <div>
-                {parkingGarageUtilityAttributes.map(attr => (
-                    <div className="parking-garage-utilities-container" key={attr}>
-                        <TextField
-                            key={attr}
-                            label={toTitleCase(attr)}
-                            className="textFieldMarginTop"
-                            defaultValue={formValues[attr] || ''}
-                            onChange={(e) => handleFieldChange(attr, e.target.value)}
-                        />
+                <form onSubmit={handleFormSubmit}>
+                    {parkingGarageUtilityAttributes.map(attr => (
+                        <div className="parking-garage-utilities-container" key={attr}>
+                            <TextField
+                                key={attr}
+                                label={toTitleCase(attr)}
+                                className="textFieldMarginTop"
+                                value={localValues[attr] || ''}
+                                onChange={(e) => handleLocalChange(attr, e.target.value)}
+                            />
+                        </div>
+                    ))}
+                    <div className="parking-garage-checkboxes-container">
+                        <label className="parking-garage-checkbox-label">
+                            Electric parking spaces
+                            <input type="checkbox"
+                                   checked={localValues.electricChargePoint || false}
+                                   onChange={handleToggleEParking}
+                            />
+                        </label>
+                        <label className="parking-garage-checkbox-label">
+                            Toilets
+                            <input type="checkbox"
+                                   onChange={handleToggleToilets}
+                                   checked={localValues.toilet || false}
+                            />
+                        </label>
                     </div>
-                ))}
-                <div className="parking-garage-checkboxes-container">
-                    <label className="parking-garage-checkbox-label">
-                        Electric parking spaces
-                        <input type="checkbox"
-                               checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.electricChargePoint : parkingGarage?.parkingGarageUtility?.electricChargePoint}
-                               onChange={handleToggleEParking}
-                        />
-                    </label>
-                    <label className="parking-garage-checkbox-label">
-                        Toilets
-                        <input type="checkbox"
-                               onChange={handleToggleToilets}
-                               checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.toilet : parkingGarage?.parkingGarageUtility?.toilet}
-                        />
-                    </label>
-                </div>
+                    {!isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
+                                Update parking garage
+                            </button>
+                            <button className="crud-button" onClick={() => handleDeleteParkingGarage()}>
+                                Delete parking garage
+                            </button>
+                        </div>
+                    )}
+                    {isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
+                                Save new parking garage
+                            </button>
+                        </div>
+                    )}
+                </form>
             </div>
         );
-    };
+    });
+    TabTwoContent.displayName = 'TabTwoContent';
 
     const TabThreeContent = () => {
-        // Content and logic for Tab Three
         return <div>Tab Three Content</div>;
     };
 
@@ -201,8 +318,32 @@ export default function GarageInput(){
     }, []);
 
     const handleSaveNewParkingGarage = () => {
-        console.log(newParkingGarage)
-        ParkingGarageApi.createParkingGarage(newParkingGarage)
+        const tabOneValues = tabOneRef.current ? tabOneRef.current.getLatestValues() : {};
+        const tabTwoValues = tabTwoRef.current ? tabTwoRef.current.getLatestValues() : {};
+
+        const updatedValues = {
+            ...formValues,
+            ...tabOneValues,
+            parkingGarageUtility: {
+                ...formValues.parkingGarageUtility,
+                ...tabTwoValues
+            }
+        };
+
+        const parkingGarageToSave = {
+            ...updatedValues,
+            travelTime: parseInt(updatedValues.travelTime || 0),
+            travelDistance: parseInt(updatedValues.travelDistance || 0),
+            parkingGarageUtility: {
+                ...updatedValues.parkingGarageUtility,
+                parkingSpaces: parseInt(updatedValues.parkingGarageUtility.parkingSpaces || 0),
+                parkingSpacesElectric: parseInt(updatedValues.parkingGarageUtility.parkingSpacesElectric || 0),
+                electricChargePoint: updatedValues.parkingGarageUtility.electricChargePoint || false,
+                toilet: updatedValues.parkingGarageUtility.toilet || false
+            }
+        };
+
+        ParkingGarageApi.createParkingGarage(parkingGarageToSave)
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully created new parking garage: ', data);
@@ -229,6 +370,7 @@ export default function GarageInput(){
             .then(handleResponse)
             .then(data => {
                 setParkingGarage(null);
+                setNewGarageAdded(true);
                 console.log('Successfully deleted parking garage: ', data);
             })
             .catch(error => {
@@ -236,11 +378,23 @@ export default function GarageInput(){
             });
     };
 
-    const handleUpdateParkingGarage = () => {
-        ParkingGarageApi.updateParkingGarage(parkingGarage)
+    const handleUpdateParkingGarage = (values) => {
+        const updatedParkingGarage = {
+            ...parkingGarage,
+            ...values,
+            parkingGarageUtility: {
+                ...parkingGarage.parkingGarageUtility,
+                ...values.parkingGarageUtility
+            }
+        };
+        console.log(updatedParkingGarage)
+        ParkingGarageApi.updateParkingGarage(updatedParkingGarage)
             .then(handleResponse)
             .then(data => {
+                console.log(data)
                 console.log('Successfully updated parking garage: ', data);
+                setNewGarageId(data.id);
+                setNewGarageAdded(true);
             })
             .catch(error => {
                 console.error('Error updating the parking garage:', error);
@@ -257,8 +411,8 @@ export default function GarageInput(){
                         <Tab label="Images" />
                     </Tabs>
                 </Box>
-                {tabValue === 0 && <TabOneContent inputValues={formValues} handleInputChange={handleFieldChange} />}
-                {tabValue === 1 && <TabTwoContent />}
+                {tabValue === 0 && <TabOneContent ref={tabOneRef} />}
+                {tabValue === 1 && <TabTwoContent ref={tabTwoRef} />}
                 {tabValue === 2 && <TabThreeContent />}
             </div>
     );
