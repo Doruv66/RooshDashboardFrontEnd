@@ -16,7 +16,6 @@ export default function ParkingGarageMenu() {
     const [selectedGarageId, setSelectedGarageId] = useState('');
 
     useEffect(() => {
-        // Fetching parking garages
         const fetchParkingGarages = async () => {
             setLoading(true);
             try {
@@ -40,9 +39,8 @@ export default function ParkingGarageMenu() {
                 setLoading(false);
             }
         };
-
         fetchParkingGarages();
-    }, [newGarageId, updateTrigger, newGarageAdded, setParkingGarage, setNewGarageAdded]);
+    }, [newGarageId, updateTrigger]);
 
 
     const handleChange = (event) => {
