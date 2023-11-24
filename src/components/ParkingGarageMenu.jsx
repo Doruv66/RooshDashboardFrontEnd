@@ -10,10 +10,11 @@ import "./ParkingGarageMenu.css"
 
 export default function ParkingGarageMenu() {
     const [parkingGarages, setParkingGarages] = useState([]);
-    const { setParkingGarage, newGarageAdded, setNewGarageAdded, newGarageId } = useParkingGarage();
+    const { setParkingGarage, newGarageAdded, setNewGarageAdded, newGarageId, updateFilters } = useParkingGarage();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [selectedGarageId, setSelectedGarageId] = useState('');
+    
 
     useEffect(() => {
         setLoading(true);
@@ -53,6 +54,7 @@ export default function ParkingGarageMenu() {
         setSelectedGarageId(garageId);
         const selectedGarage = parkingGarages.find(garage => garage.id === garageId);
         setParkingGarage(selectedGarage);
+        updateFilters({ garageId: selectedGarage.id });
     };
 
     return (
