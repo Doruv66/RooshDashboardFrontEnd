@@ -1,12 +1,30 @@
 import { Container, Box, Card, CardContent, Typography } from '@mui/material';
+import BookingApi from '../../api/BookingApi';
+import FlightLandIcon from '@mui/icons-material/FlightLand';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';    
+import React, { useState, useEffect}from 'react'
 
-import { PiAirplaneLandingLight } from "react-icons/pi";
-import { PiAirplaneTakeoffLight } from "react-icons/pi";    
-import React from 'react'
+const TomorrowsCard = (props) => {
 
-const TomorrowsCard = () => {
+    const [arrivalsDepartures, setArrivalsDepartures] = useState(null);
+    const refreshArrivalsDepartures = (date) => {
+        BookingApi.getArrivalsDepartures(date)
+        .then(response => setArrivalsDepartures(response))
+        .catch(error => console.log(error))
+    };
+
+    useEffect(() => {
+        const tomorrow = new Date();
+        tomorrow.setDate(new Date().getDate() + 1);
+        refreshArrivalsDepartures(tomorrow);
+    }, []);
+
   return (
-    <Card
+    arrivalsDepartures !== null ?
+    <Card onClick={() => {
+        props.setData(arrivalsDepartures)
+        props.setTitle("Tomorrow")
+    }}
             sx={{
                 height: 150,
                 width: 370,
@@ -25,22 +43,22 @@ const TomorrowsCard = () => {
                     </Typography>
                     <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '40px'}}>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            <PiAirplaneLandingLight style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px' }}/>
+                            <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px' }}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
-                                <Typography variant='h5'>0</Typography>
+                                <Typography variant='h5'>{arrivalsDepartures.arrivals.length}</Typography>
                                 <Typography>ARRIVALS</Typography>
                             </Box>
                         </Box>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <PiAirplaneTakeoffLight style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
+                        <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
-                                <Typography variant='h5'>0</Typography>
+                                <Typography variant='h5'>{arrivalsDepartures.departures.length}</Typography>
                                 <Typography>DEPARTURES</Typography>
                             </Box>
                         </Box>
                     </Box>
                 </CardContent>
-        </Card>
+        </Card> : <Typography>Nothing available try to enter this page later </Typography>
   )
 }
 

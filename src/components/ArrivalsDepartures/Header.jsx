@@ -1,21 +1,22 @@
 import React from 'react'
 import { Box, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material'
-import { PiAirplaneLandingLight } from "react-icons/pi";
-import { PiAirplaneTakeoffLight } from "react-icons/pi";
+import FlightLandIcon from '@mui/icons-material/FlightLand';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';  
 import { useState } from 'react';
 
-const Header = () => {
+const Header = (props) => {
     const [selectedButton, setSelectedButton] = useState('arrivals');
 
     const handleButtonChange = (event, newSelectedButton) => {
         if (newSelectedButton !== null) {
         setSelectedButton(newSelectedButton);
+        props.setOption(!props.option);
         }
     };
   return (
     <Box sx={{display:'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px'}}>
             <Box sx={{flexDirection: 'column', alignContent: 'start'}}>
-                 <Typography variant='h3'>Today</Typography>
+                 <Typography variant='h3'>{props.title}</Typography>
                  <Typography variant='p'>Arrivals & Departures</Typography>
             </Box>
             <Box sx={{display: 'flex', alignItems: 'center'}}>
@@ -41,7 +42,7 @@ const Header = () => {
                         transition: 'background-color 0.3s, color 0.3s', 
                     }}
                     >
-                    <PiAirplaneLandingLight style={{ marginRight: '5px' }} /> Arrivals
+                    <FlightLandIcon style={{ marginRight: '5px' }} /> Arrivals
                     </ToggleButton>
                     <ToggleButton
                     value="departures"
@@ -58,7 +59,7 @@ const Header = () => {
                         transition: 'background-color 0.3s, color 0.3s', // Smooth transition
                     }}
                     >
-                    <PiAirplaneTakeoffLight style={{ marginRight: '5px' }} /> Departures
+                    <FlightTakeoffIcon style={{ marginRight: '5px' }} /> Departures
                     </ToggleButton>
                 </ToggleButtonGroup>
             </Box>
