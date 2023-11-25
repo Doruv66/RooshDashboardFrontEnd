@@ -11,6 +11,17 @@ export const ParkingGarageProvider = ({ children }) => {
     const [isNewParkingGarage, setIsNewParkingGarage] = useState(false)
     const [newGarageAdded, setNewGarageAdded] = useState(false);
     const [newGarageId, setNewGarageId] = useState(null);
+    const [updateTrigger, setUpdateTrigger] = useState(false)
+    const [filters, setFilters] = useState({
+        garageId: null,
+        service: '',
+        finished: false,
+        ongoing: false
+    });
+
+    const updateFilters = (newFilters) => {
+        setFilters(prev => ({ ...prev, ...newFilters }));
+    };
 
     const contextValue = {
         parkingGarage,
@@ -20,7 +31,11 @@ export const ParkingGarageProvider = ({ children }) => {
         newGarageAdded,
         setNewGarageAdded,
         newGarageId,
-        setNewGarageId
+        setNewGarageId,
+        filters,
+        updateFilters,
+        updateTrigger,
+        setUpdateTrigger
     };
 
     return (

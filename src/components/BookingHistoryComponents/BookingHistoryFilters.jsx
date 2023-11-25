@@ -6,8 +6,10 @@ import {MenuItem} from '@mui/material'
 import {FormControl} from '@mui/material'
 import {FormControlLabel} from '@mui/material'
 import Checkbox from '@mui/material/Checkbox';
+import { useParkingGarage } from '../ParkingGarageContext.jsx'; 
 
 const BookingHistoryFilters = () => {
+  const { updateFilters } = useParkingGarage();
   const [state, setState] = useState({
     ongoing:false,
     completed: false
@@ -16,13 +18,23 @@ const BookingHistoryFilters = () => {
   const [serviceType, setServiceType] = useState('');
   const [sortBy, setSortBy] = useState('');
 
+
+  const handleCheckboxChange = (event) => {
+    setState({
+      ...state,
+      [event.target.name]: event.target.checked,
+    });
+    updateFilters({ [event.target.name]: event.target.checked }); // update the filter
+  };
+
   const handleSortByChange = (event) => {
     setSortBy(event.target.value);
   }
 
   const handleServiceTypeChange = (event) => {
     setServiceType(event.target.value);
-  }
+    updateFilters({ service: event.target.value }); // update the filter
+  };
 
 
   const handleChange = (event) => {
@@ -56,22 +68,23 @@ const BookingHistoryFilters = () => {
             label="Service"
             onChange={handleServiceTypeChange}
           >
+            <MenuItem value={"All"}>All</MenuItem>
             <MenuItem value={"Valet"}>Valet</MenuItem>
             <MenuItem value={"Shuttle"}>Shuttle</MenuItem>
           </Select>
         </FormControl>
         <FormControlLabel
-            control={
-              <Checkbox checked={state.ongoing} onChange={handleChange} name="ongoing" />
-            }
-            label="Ongoing"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox checked={state.completed} onChange={handleChange} name="completed" />
-            }
-            label="Completed"
-          />
+      control={
+        <Checkbox checked={state.ongoing} onChange={handleCheckboxChange} name="ongoing" />
+      }
+      label="Ongoing"
+    />
+    <FormControlLabel
+      control={
+        <Checkbox checked={state.completed} onChange={handleCheckboxChange} name="completed" />
+      }
+      label="Completed"
+    />
     </div>
   )
 }

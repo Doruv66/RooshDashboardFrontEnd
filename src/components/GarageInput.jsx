@@ -1,25 +1,58 @@
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
 import { Box, Tab, Tabs } from '@mui/material';
-import {useLocation, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
-    const [editingField, setEditingField] = useState(null);
-    const [editingValue, setEditingValue] = useState('');
-    const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId } = useParkingGarage();
-    const [errorMessage, setErrorMessage] = useState("")
+    const [editingField ,setEditingField] = useState(null);
+    const [editingValue ,setEditingValue] = useState('');
+    const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId, setUpdateTrigger } = useParkingGarage();
     const [tabValue, setTabValue] = useState(0);
     const [newParkingGarage, setNewParkingGarage] = useState({})
     const [formValues, setFormValues] = useState({});
     const navigate = useNavigate();
+    const tabOneRef = useRef(null);
+    const tabTwoRef = useRef(null);
+    const [confirmationMessage, setConfirmationMessage] = useState('');
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
     const handleTabChange = (event, newValue) => {
+        if (tabValue === 0 && tabOneRef.current) {
+            const localValues = tabOneRef.current.getLatestValues();
+            updateGlobalStateBeforeTabChange(0, localValues);
+        }
+        if (tabValue === 1 && tabTwoRef.current) {
+            const localValues = tabTwoRef.current.getLatestValues();
+            const updatedValues = { ...formValues, parkingGarageUtility: { ...formValues.parkingGarageUtility, ...localValues } };
+            updateGlobalStateBeforeTabChange(1, updatedValues);
+        }
         setTabValue(newValue);
-    }
+    };
+
+    const handleCloseSnackbar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
+
+    const updateGlobalStateBeforeTabChange = (tabIndex, newValues) => {
+        if (tabValue === tabIndex) {
+            updateGlobalState(newValues);
+        }
+    };
+    const updateGlobalState = (newValues) => {
+        setFormValues(prev => ({ ...prev, ...newValues }));
+        console.log(formValues)
+    };
 
     const toTitleCase = (str) => {
         return str
@@ -29,86 +62,210 @@ export default function GarageInput(){
             .replace(/^./, str => str.toUpperCase());
     }
 
-    const handleFieldChange = useCallback((fieldName, value) => {
-        setFormValues(prev => ({ ...prev, [fieldName]: value }));
-    }, []);
+    const TabOneContent = forwardRef((props, ref) => {
+        const [localValues, setLocalValues] = useState({});
+        useEffect(() => {
+            setLocalValues(formValues);
+        }, [formValues]);
 
-    const TabOneContent = () => {
-        const textFields = useMemo(() => {
-            return parkingGarageAttributes.map(attr => (
+        useEffect(() => {
+            if (tabValue !== 0) {
+                console.log(localValues)
+                updateGlobalState(localValues);
+            }
+        }, [tabValue]);
+
+        const handleLocalChange = (attr, value) => {
+            setLocalValues(prev => ({ ...prev, [attr]: value }));
+            console.log(localValues)
+        };
+
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                if(isNewParkingGarage){
+                    handleSaveNewParkingGarage()
+                }
+                else{
+                    handleUpdateParkingGarage(localValues);
+                }
+            }, 0);
+        };
+
+        useImperativeHandle(ref, () => ({
+            getLatestValues: () => {
+                return localValues;
+            }
+        }));
+
+        const textFields = parkingGarageAttributes.map(attr => {
+            let label = toTitleCase(attr);
+            if (attr === 'travelTime') {
+                label = label + ' (in minutes)';
+            } else if (attr === 'travelDistance') {
+                label = label + ' (in meters)';
+            }
+
+            return (
                 <TextField
+                    name={attr}
                     key={attr}
-                    label={toTitleCase(attr)}
-                    className="textFieldMarginTop"
-                    defaultValue={formValues[attr] || ''}
-                    onChange={(e) => handleFieldChange(attr, e.target.value)}
+                    label={label}
+                    className="textField"
+                    value={localValues[attr] || ''}
+                    onChange={(e) => handleLocalChange(attr, e.target.value)}
                 />
-            ));
-        }, [parkingGarageAttributes, formValues, handleFieldChange]);
+            );
+        });
 
         return (
             <div>
-                <div className="form-grid">
-                    {textFields}
-                </div>
-                <div className="crud-button-container">
-                    {isNewParkingGarage && (
-                        <button className="crud-button" onClick={handleSaveNewParkingGarage}>
-                            Save new parking garage
-                        </button>
-                    )}
+                <form onSubmit={handleFormSubmit}>
+                    <div className="form-grid">
+                        {textFields}
+                        <TextField label="Address" className="textField" />
+                        <TextField label="Zip Code" className="textField" />
+                        <TextField label="City" className="textField" />
+                        <TextField label="Country" className="textField" />
+                    </div>
                     {!isNewParkingGarage && parkingGarage && (
-                        <>
-                            <button className="crud-button" onMouseDown={handleDeleteParkingGarage}>
-                                Delete parking garage
-                            </button>
-                            <button className="crud-button" onMouseDown={handleUpdateParkingGarage}>
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
                                 Update parking garage
                             </button>
-                        </>
+                            <button type="button" className="crud-button" onClick={handleDeleteParkingGarage}>
+                                Delete parking garage
+                            </button>
+                        </div>
                     )}
-                </div>
+                    {isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
+                                Save new parking garage
+                            </button>
+                        </div>
+                    )}
+                </form>
             </div>
         );
-    };
+    });
+    TabOneContent.displayName = 'TabOneContent';
+
+    const TabTwoContent = forwardRef((props, ref) => {
+        const [localValues, setLocalValues] = useState({});
+        const dummyCheckboxes = [
+            "Vehicle Inspection",
+            "No Max Drive in Height",
+            "Illuminated Garage",
+            "Waiting Room",
+            "Asphalt or Pavement",
+            "Camera Security",
+            "Fenced",
+            "Baggage Help"
+        ];
 
 
-    const TabTwoContent = () => {
+        useEffect(() => {
+            setLocalValues(formValues.parkingGarageUtility || {});
+        }, [formValues]);
+
+        const handleLocalChange = (attr, value) => {
+            setLocalValues(prev => ({ ...prev, [attr]: value }));
+            console.log(localValues)
+        };
+
+        useImperativeHandle(ref, () => ({
+            getLatestValues: () => {
+                return localValues;
+            }
+        }));
+
+        const handleToggleEParking = () => {
+            setLocalValues(prev => ({
+                ...prev,
+                electricChargePoint: !prev.electricChargePoint
+            }));
+        };
+
+        const handleToggleToilets = () => {
+            setLocalValues(prev => ({
+                ...prev,
+                toilet: !prev.toilet
+            }));
+        };
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                if (isNewParkingGarage) {
+                    handleSaveNewParkingGarage();
+                } else {
+                    handleUpdateParkingGarage({ parkingGarageUtility: localValues });
+                }
+            }, 0);
+        };
+
         return (
             <div>
-                {parkingGarageUtilityAttributes.map(attr => (
-                    <div className="parking-garage-utilities-container" key={attr}>
-                        <TextField
-                            key={attr}
-                            label={toTitleCase(attr)}
-                            className="textFieldMarginTop"
-                            defaultValue={formValues[attr] || ''}
-                            onChange={(e) => handleFieldChange(attr, e.target.value)}
-                        />
+                <form onSubmit={handleFormSubmit}>
+                    {parkingGarageUtilityAttributes.map(attr => (
+                        <div className="parking-garage-utilities-container" key={attr}>
+                            <TextField
+                                key={attr}
+                                label={toTitleCase(attr)}
+                                className="textField"
+                                value={localValues[attr] || ''}
+                                onChange={(e) => handleLocalChange(attr, e.target.value)}
+                            />
+                        </div>
+                    ))}
+                    <div className="parking-garage-checkboxes-container">
+                        <label className="parking-garage-checkbox-label">
+                            Electric parking spaces
+                            <input type="checkbox"
+                                   checked={localValues.electricChargePoint || false}
+                                   onChange={handleToggleEParking}
+                            />
+                        </label>
+                        <label className="parking-garage-checkbox-label">
+                            Toilets
+                            <input type="checkbox"
+                                   onChange={handleToggleToilets}
+                                   checked={localValues.toilet || false}
+                            />
+                        </label>
+                        <div className="parking-garage-checkboxes-container">
+                            {dummyCheckboxes.map(checkboxLabel => (
+                                <label key={checkboxLabel} className="parking-garage-checkbox-label">
+                                    {checkboxLabel}
+                                    <input type="checkbox" />
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                ))}
-                <div className="parking-garage-checkboxes-container">
-                    <label className="parking-garage-checkbox-label">
-                        Electric parking spaces
-                        <input type="checkbox"
-                               checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.electricChargePoint : parkingGarage?.parkingGarageUtility?.electricChargePoint}
-                               onChange={handleToggleEParking}
-                        />
-                    </label>
-                    <label className="parking-garage-checkbox-label">
-                        Toilets
-                        <input type="checkbox"
-                               onChange={handleToggleToilets}
-                               checked={isNewParkingGarage ? newParkingGarage.parkingGarageUtility?.toilet : parkingGarage?.parkingGarageUtility?.toilet}
-                        />
-                    </label>
-                </div>
+                    {!isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
+                                Update parking garage
+                            </button>
+                            <button type="button" className="crud-button" onClick={handleDeleteParkingGarage}>
+                                Delete parking garage
+                            </button>
+                        </div>
+                    )}
+                    {isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <button type="submit" className="crud-button">
+                                Save new parking garage
+                            </button>
+                        </div>
+                    )}
+                </form>
             </div>
         );
-    };
+    });
+    TabTwoContent.displayName = 'TabTwoContent';
 
     const TabThreeContent = () => {
-        // Content and logic for Tab Three
         return <div>Tab Three Content</div>;
     };
 
@@ -138,46 +295,6 @@ export default function GarageInput(){
         return response.json();
     };
 
-    const handleToggleEParking = () => {
-        if (isNewParkingGarage) {
-            setNewParkingGarage(prevState => ({
-                ...prevState,
-                parkingGarageUtility: {
-                    ...prevState.parkingGarageUtility,
-                    electricChargePoint: !prevState.parkingGarageUtility.electricChargePoint
-                }
-            }));
-        } else if (parkingGarage && parkingGarage.parkingGarageUtility) {
-            setParkingGarage(prevState => ({
-                ...prevState,
-                parkingGarageUtility: {
-                    ...prevState.parkingGarageUtility,
-                    electricChargePoint: !prevState.parkingGarageUtility.electricChargePoint
-                }
-            }));
-        }
-    };
-
-    const handleToggleToilets = () => {
-        if (isNewParkingGarage) {
-            setNewParkingGarage(prevState => ({
-                ...prevState,
-                parkingGarageUtility: {
-                    ...prevState.parkingGarageUtility,
-                    toilet: !prevState.parkingGarageUtility.toilet
-                }
-            }));
-        } else if (parkingGarage && parkingGarage.parkingGarageUtility) {
-            setParkingGarage(prevState => ({
-                ...prevState,
-                parkingGarageUtility: {
-                    ...prevState.parkingGarageUtility,
-                    toilet: !prevState.parkingGarageUtility.toilet
-                }
-            }));
-        }
-    };
-
     useEffect(() => {
         if (isNewParkingGarage) {
             setEditingField(null);
@@ -201,8 +318,32 @@ export default function GarageInput(){
     }, []);
 
     const handleSaveNewParkingGarage = () => {
-        console.log(newParkingGarage)
-        ParkingGarageApi.createParkingGarage(newParkingGarage)
+        const tabOneValues = tabOneRef.current ? tabOneRef.current.getLatestValues() : {};
+        const tabTwoValues = tabTwoRef.current ? tabTwoRef.current.getLatestValues() : {};
+
+        const updatedValues = {
+            ...formValues,
+            ...tabOneValues,
+            parkingGarageUtility: {
+                ...formValues.parkingGarageUtility,
+                ...tabTwoValues
+            }
+        };
+
+        const parkingGarageToSave = {
+            ...updatedValues,
+            travelTime: parseInt(updatedValues.travelTime || 0),
+            travelDistance: parseInt(updatedValues.travelDistance || 0),
+            parkingGarageUtility: {
+                ...updatedValues.parkingGarageUtility,
+                parkingSpaces: parseInt(updatedValues.parkingGarageUtility.parkingSpaces || 0),
+                parkingSpacesElectric: parseInt(updatedValues.parkingGarageUtility.parkingSpacesElectric || 0),
+                electricChargePoint: updatedValues.parkingGarageUtility.electricChargePoint || false,
+                toilet: updatedValues.parkingGarageUtility.toilet || false
+            }
+        };
+
+        ParkingGarageApi.createParkingGarage(parkingGarageToSave)
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully created new parking garage: ', data);
@@ -210,46 +351,93 @@ export default function GarageInput(){
                 setIsNewParkingGarage(false);
                 setNewGarageAdded(true);
                 navigate(`/garagedetails`);
-                return ParkingGarageApi.getParkingGarage(data.id); 
+                return ParkingGarageApi.getParkingGarage(data.id);
             })
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully retrieved new parking garage: ', data);
+                setConfirmationMessage('New parking garage successfully created.');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
                 setParkingGarage(data);
             })
             .catch(error => {
                 console.error('Error with the parking garage:', error);
+                setConfirmationMessage('Error creating the parking garage.');
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
             });
     };
-    
 
-    const handleDeleteParkingGarage = () => {
-        console.log(parkingGarage)
-        ParkingGarageApi.deleteParkingGarage(parkingGarage.id) 
+
+    const handleDeleteParkingGarage = (event) => {
+        event.preventDefault();
+        console.log(parkingGarage);
+        ParkingGarageApi.deleteParkingGarage(parkingGarage.id)
             .then(handleResponse)
             .then(data => {
-                setParkingGarage(null);
+                setNewGarageId(1)
+                setNewGarageAdded(true);
                 console.log('Successfully deleted parking garage: ', data);
+                setConfirmationMessage('Parking garage successfully deleted.');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
             })
             .catch(error => {
                 console.error('Error deleting the parking garage:', error);
+                setConfirmationMessage('Error deleting the parking garage.');
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
             });
     };
 
-    const handleUpdateParkingGarage = () => {
-        ParkingGarageApi.updateParkingGarage(parkingGarage)
+    const handleUpdateParkingGarage = (values) => {
+        const updatedParkingGarage = {
+            ...parkingGarage,
+            ...values,
+            parkingGarageUtility: {
+                ...parkingGarage.parkingGarageUtility,
+                ...values.parkingGarageUtility
+            }
+        };
+        console.log(updatedParkingGarage)
+        ParkingGarageApi.updateParkingGarage(updatedParkingGarage)
             .then(handleResponse)
             .then(data => {
+                console.log(data)
                 console.log('Successfully updated parking garage: ', data);
+                setConfirmationMessage('Parking garage successfully updated.');
+                setSnackbarSeverity('success');
+                setOpenSnackbar(true);
+                setUpdateTrigger(prev => !prev);
+                setNewGarageId(data.id)
+                setNewGarageAdded(true);
             })
             .catch(error => {
                 console.error('Error updating the parking garage:', error);
+                setConfirmationMessage('Error updating the parking garage.');
+                setSnackbarSeverity('error');
+                setOpenSnackbar(true);
             });
     };
 
     return (
 
             <div className="garage-input">
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                >
+                    <MuiAlert
+                        onClose={handleCloseSnackbar}
+                        severity={snackbarSeverity}
+                        elevation={6}
+                        variant="filled"
+                    >
+                        {confirmationMessage}
+                    </MuiAlert>
+                </Snackbar>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                     <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
                         <Tab label="General" />
@@ -257,11 +445,11 @@ export default function GarageInput(){
                         <Tab label="Images" />
                     </Tabs>
                 </Box>
-                {tabValue === 0 && <TabOneContent inputValues={formValues} handleInputChange={handleFieldChange} />}
-                {tabValue === 1 && <TabTwoContent />}
+                {tabValue === 0 && <TabOneContent ref={tabOneRef} />}
+                {tabValue === 1 && <TabTwoContent ref={tabTwoRef} />}
                 {tabValue === 2 && <TabThreeContent />}
             </div>
     );
-    
+
 }
 
