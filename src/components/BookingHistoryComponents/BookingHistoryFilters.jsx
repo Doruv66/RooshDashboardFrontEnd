@@ -46,13 +46,6 @@ const handleSortByChange = (event) => {
   };
 
 
-  const handleChange = (event) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.checked,
-    });
-  };
-
   return (
     <div className={style.filters}>
         <FormControl fullWidth sx={{width: 250}}>
