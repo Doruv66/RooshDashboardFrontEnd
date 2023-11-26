@@ -11,12 +11,13 @@ import BookingApi from '../../api/BookingApi';
 
 const CustomCard = (props) => {
     const [arrivalsDepartures, setArrivalsDepartures] = useState(null);
-    const [interval, setInterval] = useState('This Month');
+    const [interval, setInterval] = useState('');
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
 
     const handleIntervalChange = (event) => {
         setInterval(event.target.value);
+
     }
 
     const formatDateString = (startDate, endDate) => {
@@ -28,11 +29,30 @@ const CustomCard = (props) => {
         return `${formattedStartDate} - ${formattedEndDate}`;
     };
 
-    const refreshArrivalsDepartures = (startDate, endDate) => {
-        BookingApi.getIntervalArrivalsDepartures(startDate, endDate)
-        .then(response => setArrivalsDepartures(response))
-        .catch(console.error());
-    }
+    const refreshArrivalsDepartures = async (startDate, endDate) => {
+        try {
+            const response = await BookingApi.getIntervalArrivalsDepartures(startDate, endDate);
+            setArrivalsDepartures(response);
+            if(interval === "Pick Dates") {
+                props.setData(response);
+            } else if (interval === "This Month") {
+                props.setData(response);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const refreshArrivalsDeparturesForThisMonth = async (startDate, endDate) => {
+        try {
+            const response = await BookingApi.getIntervalArrivalsDepartures(startDate, endDate);
+            setArrivalsDepartures(response);
+            props.setData(response);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
 
     useEffect(() => {
         if(interval === "This Month") {
@@ -53,8 +73,7 @@ const CustomCard = (props) => {
             refreshArrivalsDepartures(startDate, endDate);
             if(interval === "Pick Dates") {
                 props.setTitle(formatDateString(startDate, endDate));
-                props.setData(arrivalsDepartures);
-            }
+            } 
         }
     }, [startDate, endDate]);
 
@@ -92,7 +111,7 @@ const CustomCard = (props) => {
                                 label="Service"
                                 style={{ height: '40px'}}      
                             >
-                            <MenuItem value={"This Month"}>This Month</MenuItem>
+                            <MenuItem value={"This Month"} onClick={() => refreshArrivalsDeparturesForThisMonth(startDate, endDate)}>This Month</MenuItem>
                             <MenuItem value={"Pick Dates"}>Pick Dates</MenuItem>
                         </Select>
                     </FormControl>
@@ -113,11 +132,7 @@ const CustomCard = (props) => {
                                     <DatePicker
                                         label="End Date"
                                         value={dayjs(endDate)}
-                                        onChange={(newValue) => {
-                                            setEndDate(newValue);
-                                            refreshArrivalsDepartures(startDate, endDate);
-                                            props.setData(arrivalsDepartures);
-                                        }}
+                                        onChange={(newValue) => setEndDate(newValue)}
                                         style={{height: '10px'}}
                                         slotProps={{ textField: { size: 'small' } }}
                                     />
