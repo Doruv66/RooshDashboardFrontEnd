@@ -15,6 +15,11 @@
   gap: 20px;
 }
 
+.textField {
+  margin-top: 20px !important;
+  width: 500px;
+}
+
 .parking-garage-container,
 .parking-garage-utilities-container {
   display: flex;
@@ -87,7 +92,6 @@
 }
 
 input[type="checkbox"] {
-  /* display: none; */
   width: 30px;
   height: 30px;
   margin-left: 20px;
@@ -128,6 +132,8 @@ input[type="checkbox"]:checked + .parking-garage-checkbox::before {
   justify-content: flex-start;
   align-items: center;
   gap: 20px;
+  flex-wrap: wrap;
+  max-width: 90%;
 }
 
 .parking-garage-checkbox-label {
@@ -135,6 +141,12 @@ input[type="checkbox"]:checked + .parking-garage-checkbox::before {
   align-items: center;
   cursor: pointer;
   font-size: 20px;
+  word-wrap: break-word;
+  white-space: nowrap;
+}
+
+.parking-garage-checkbox-label input[type="checkbox"] {
+  margin-right: 5px;
 }
 
 .crud-button-container {
