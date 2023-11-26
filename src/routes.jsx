@@ -5,6 +5,7 @@ import GarageDetails from "./pages/GarageDetails";
 import GarageImages from "./pages/GarageImages";
 import GarageOverview from "./pages/GarageOverview";
 import GaragePricing from "./pages/GaragePricing";
+import SignIn from "./pages/SignIn";
 
 const routes = [
     {
@@ -48,7 +49,7 @@ const routes = [
         component: GaragePricing,
         isNavLink: true,
         text: "Garage pricing"
-    },
+    }
   ];
   
   export default routes;
