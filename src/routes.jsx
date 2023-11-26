@@ -5,14 +5,15 @@ import GarageDetails from "./pages/GarageDetails";
 import GarageImages from "./pages/GarageImages";
 import GarageOverview from "./pages/GarageOverview";
 import GaragePricing from "./pages/GaragePricing";
-import SignIn from "./pages/SignIn";
+import DeparturesAndArrivals from "./pages/DeparturesAndArrivals.jsx";
+import Statistics from "./pages/Statistics.jsx";
 
 const routes = [
     {
       path: "/bookinghistory",
       component: BookingHistory,
       isNavLink: true,
-      text: "Booking history"
+      text: "Booking History"
     },
     {
       path: "/booking/:bookingId", 
@@ -20,36 +21,33 @@ const routes = [
       isNavLink: false, 
       text: "Booking Details" 
     },
-    {
-      path: "/editpricingscheme",
-      component: EditPricingScheme,
-      isNavLink: true,
-      text: "Edit pricing scheme"
-    },
+
     {
       path: "/garagedetails",
       component: GarageDetails,
       isNavLink: true,
-      text: "Garage details"
+      text: "Garage Details"
+    },
+
+    {
+        path: "/addgarage",
+        component: GarageDetails,
+        isNavLink: true,
+        text: "Add Garage"
     },
     {
-        path: "/garageimages",
-        component: GarageImages,
+        path: "/departuresandarrivals",
+        component: DeparturesAndArrivals,
         isNavLink: true,
-        text: "Garage images"
+        text: "Departures and Arrivals"
     },
+
     {
-        path: "/garageoverview",
-        component: GarageOverview,
+        path: "/statistics",
+        component: Statistics,
         isNavLink: true,
-        text: "Garage overview"
+        text: "Statistics"
     },
-    {
-        path: "/garagepricing",
-        component: GaragePricing,
-        isNavLink: true,
-        text: "Garage pricing"
-    }
   ];
   
   export default routes;

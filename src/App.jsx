@@ -23,14 +23,16 @@ function App() {
     <>
     {claims ? (
         <Router>
-          <NavBar/>
+          <NavBar handleDrawerToggle={handleDrawerToggle}/>
           <ParkingGarageProvider>
-            <SideBar/>
-            <Routes>
-              {routes.map((route, index) => (
-                  <Route key={index} path={route.path} element={<route.component />} />
+            <LeftDrawer isDrawerOpen={isDrawerOpen} toggleDrawer={setIsDrawerOpen}/>
+            <div className="main-content" style={{ marginLeft: isDrawerOpen ? '5vh' : '0', transition: 'margin-left 0.5s' }}>
+              <Routes>
+                {routes.map((route, index) => (
+                    <Route key={index} path={route.path} element={<route.component />} />
                 ))}
-            </Routes>
+              </Routes>
+            </div>
           </ParkingGarageProvider>
         </Router>
     ) : (
@@ -40,4 +42,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
