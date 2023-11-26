@@ -49,7 +49,7 @@ const handleSortByChange = (event) => {
   return (
     <div className={style.filters}>
         <FormControl fullWidth sx={{width: 250}}>
-          <InputLabel id="sort-select-label">Sort By</InputLabel>
+          <InputLabel id="sort-select-label" sx={{paddingLeft: '20px'}}>Sort By</InputLabel>
           <Select
             labelId="sort-select-label"
             id="sort-select"
