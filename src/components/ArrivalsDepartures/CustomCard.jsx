@@ -105,14 +105,15 @@ const CustomCard = (props) => {
             >
                 <CardContent sx={{display: 'flex', flexDirection: 'column'}}>
                     <FormControl sx={{width: '250', height: '40px'}}>
-                        <InputLabel id="demo-simple-select-label" sx={{paddingBottom: '40px'}}>Interval</InputLabel>
+                        <InputLabel id="demo-simple-select-label" size='small'>Interval</InputLabel>
                             <Select
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 value={interval}
                                 onChange={handleIntervalChange}
-                                label="Service"
-                                style={{ height: '40px'}}      
+                                label="Service"     
+                                slotProps={{ InputLabel: { size: 'small' } }}
+                                style={{height: '40px'}}
                             >
                             <MenuItem value={"This Month"} onClick={() => refreshArrivalsDeparturesForThisMonth(startDate, endDate)}>This Month</MenuItem>
                             <MenuItem value={"Pick Dates"}>Pick Dates</MenuItem>
