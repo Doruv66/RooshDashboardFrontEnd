@@ -6,7 +6,10 @@ const ParkingGarageApi = {
     console.log(ParkingGarageData)
     return fetch(`${apiUrl}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+         Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
+      },
       body: JSON.stringify(ParkingGarageData),
     });
   },
@@ -15,7 +18,10 @@ const ParkingGarageApi = {
     console.log(updatedParkingGarage);
     return fetch(`${apiUrl}/${updatedParkingGarage.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+       },
       body: JSON.stringify(updatedParkingGarage),
     });
   },
@@ -23,15 +29,24 @@ const ParkingGarageApi = {
   deleteParkingGarage(parkingGarageId) {
     return fetch(`${apiUrl}/${parkingGarageId}`, {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
     });
   },
   
   getParkingGarage(parkingGarageId) {
-    return fetch(`${apiUrl}/${parkingGarageId}`);
+    return fetch(`${apiUrl}/${parkingGarageId}`, { headers: {
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+    }
+  });
   },
   
   getAllParkingGarages() {
-    return fetch(`${apiUrl}`);
+    return fetch(`${apiUrl}`, { headers: {
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+    }
+  });
   }
 };
 

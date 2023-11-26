@@ -21,7 +21,10 @@ const BookingHistory = () => {
 
         try {
             // Fetching filtered bookings
-            const response = await fetch(fetchUrl);
+            const response = await fetch(fetchUrl, { headers: {
+              Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+            }
+          });
 
             // Check for a valid response
             if (!response.ok) {

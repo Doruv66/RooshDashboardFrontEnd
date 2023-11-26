@@ -1,10 +1,6 @@
 import BookingDetails from "./pages/BookingDetails";
 import BookingHistory from "./pages/BookingHistory";
-import EditPricingScheme from "./pages/EditPricingScheme";
 import GarageDetails from "./pages/GarageDetails";
-import GarageImages from "./pages/GarageImages";
-import GarageOverview from "./pages/GarageOverview";
-import GaragePricing from "./pages/GaragePricing";
 import DeparturesAndArrivals from "./pages/DeparturesAndArrivals.jsx";
 import Statistics from "./pages/Statistics.jsx";
 

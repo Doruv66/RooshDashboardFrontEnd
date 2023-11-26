@@ -1,4 +1,4 @@
-import jwt_decode from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 const TokenManager = {
   getAccessToken: () => localStorage.getItem("accessToken"),
@@ -8,7 +8,7 @@ const TokenManager = {
   },
   setAccessToken: (token) => {
     localStorage.setItem("accessToken", token);
-    const claims = jwt_decode(token);
+    const claims = jwtDecode(token);
     localStorage.setItem("claims", JSON.stringify(claims));
     return claims;
   },
@@ -20,7 +20,7 @@ const TokenManager = {
     }
 
     try {
-      const decoded_token = jwt_decode(token);
+      const decoded_token = jwtDecode(token);
       return decoded_token;
     } catch (error) {
       console.error("Error decoding token:", error);

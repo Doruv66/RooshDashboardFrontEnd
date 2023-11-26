@@ -3,16 +3,26 @@ const apiUrl = 'http://localhost:8080/bookings';
 const BookingApi = {
   
     getBooking(bookingId) {
-      return fetch(`${apiUrl}/${bookingId}`);
+      return fetch(`${apiUrl}/${bookingId}`, { headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    }
+    );
     },
     
     getAllBookings() {
-      return fetch(`${apiUrl}`);
+      return fetch(`${apiUrl}`, { headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    });
     },
 
     getFilteredBookings(garageId, service, finished, ongoing) {
       const filterUrl = `${apiUrl}/filter?garageId=${garageId}&service=${service}&finished=${finished}&ongoing=${ongoing}`;
-      return fetch(filterUrl)
+      return fetch(filterUrl, { headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        })
           .then(response => {
               if (!response.ok) {
                   throw new Error(`HTTP error! Status: ${response.status}`);
@@ -25,7 +35,10 @@ const BookingApi = {
     const formattedDate = date.toISOString().split('T')[0]; // Format date to YYYY-MM-DD
     const arrivalsDeparturesUrl = `${apiUrl}/arrivals-departures?date=${formattedDate}`;
     
-    return fetch(arrivalsDeparturesUrl)
+      return fetch(arrivalsDeparturesUrl, { headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      })
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -41,7 +54,10 @@ const BookingApi = {
     const intervalArrivalsDeparturesUrl = `${apiUrl}/bookings/interval-arrivals-departures?startTime=${formattedStartDate}&endTime=${formattedEndDate}`;
   
     try {
-      const response = await fetch(intervalArrivalsDeparturesUrl);
+      const response = await fetch(intervalArrivalsDeparturesUrl, { headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
