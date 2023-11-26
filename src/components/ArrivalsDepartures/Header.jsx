@@ -42,7 +42,7 @@ const Header = (props) => {
                         transition: 'background-color 0.3s, color 0.3s', 
                     }}
                     >
-                    <FlightLandIcon style={{ marginRight: '5px' }} /> Arrivals
+                    <FlightTakeoffIcon style={{ marginRight: '5px' }} /> Arrivals
                     </ToggleButton>
                     <ToggleButton
                     value="departures"
@@ -59,7 +59,7 @@ const Header = (props) => {
                         transition: 'background-color 0.3s, color 0.3s', // Smooth transition
                     }}
                     >
-                    <FlightTakeoffIcon style={{ marginRight: '5px' }} /> Departures
+                    <FlightLandIcon style={{ marginRight: '5px' }} /> Departures
                     </ToggleButton>
                 </ToggleButtonGroup>
             </Box>
