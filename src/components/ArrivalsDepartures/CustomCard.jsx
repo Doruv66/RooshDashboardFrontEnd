@@ -37,6 +37,9 @@ const CustomCard = (props) => {
                 props.setData(response);
             } else if (interval === "This Month") {
                 props.setData(response);
+                const currentDate = new Date();
+                const currentMonth = currentDate.toLocaleString('default', { month: 'long' });
+                props.setTitle(currentMonth);
             }
         } catch (error) {
             console.error(error);
