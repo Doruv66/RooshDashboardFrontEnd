@@ -46,7 +46,7 @@ const BookingOverview = ({ booking }) => {
         <Button
           variant="contained"
           onClick={handleDetailsClick}
-          sx={{ width: '100%', textTransform: 'none', bgcolor: "#DA4A0C", '&:hover': {
+          sx={{ width: '70%', textTransform: 'none', bgcolor: "#DA4A0C", '&:hover': {
             bgcolor: '#e80',
           }}}
         >

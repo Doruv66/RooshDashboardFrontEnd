@@ -2,7 +2,7 @@ import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} fro
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Button, Tab, Tabs } from '@mui/material';
 import {useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Snackbar from '@mui/material/Snackbar';
@@ -130,19 +130,66 @@ export default function GarageInput(){
                     </div>
                     {!isNewParkingGarage && parkingGarage && (
                         <div className="crud-button-container">
-                            <button type="submit" className="crud-button">
+                            <Button type="submit"
+                            variant="contained"
+                            sx={{
+                                width: 'max-content',
+                                margin: '5%',
+                                padding: "12px 20px",
+                                fontSize: "large",
+                                letterSpacing: "1px",
+                                textTransform: 'none',
+                                bgcolor: "#DA4A0C",
+                                '&:hover': {
+                                    bgcolor: '#e80',
+                                },
+                                borderRadius: '10px',
+                                marginLeft: '5%',
+                                }}>
                                 Update parking garage
-                            </button>
-                            <button type="button" className="crud-button" onClick={handleDeleteParkingGarage}>
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleDeleteParkingGarage}
+                                sx={{
+                                width: 'max-content',
+                                margin: '5%',
+                                padding: "12px 20px",
+                                fontSize: "large",
+                                letterSpacing: "1px",
+                                textTransform: 'none',
+                                bgcolor: "#DA4A0C",
+                                '&:hover': {
+                                    bgcolor: '#e80',
+                                },
+                                borderRadius: '10px',
+                                marginLeft: '5%',
+                                }}
+                            >
                                 Delete parking garage
-                            </button>
+                            </Button>
                         </div>
                     )}
                     {isNewParkingGarage && (
                         <div className="crud-button-container">
-                            <button type="submit" className="crud-button">
+                            <Button type="submit" 
+                            variant="contained"
+                            sx={{
+                                width: 'max-content',
+                                margin: '5%',
+                                padding: "12px 20px",
+                                fontSize: "large",
+                                letterSpacing: "1px",
+                                textTransform: 'none',
+                                bgcolor: "#DA4A0C",
+                                '&:hover': {
+                                    bgcolor: '#e80',
+                                },
+                                borderRadius: '10px',
+                                marginLeft: '5%',
+                                }}>
                                 Save new parking garage
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </form>
@@ -244,19 +291,65 @@ export default function GarageInput(){
                     </div>
                     {!isNewParkingGarage && (
                         <div className="crud-button-container">
-                            <button type="submit" className="crud-button">
+                            <Button type="submit" 
+                            variant="contained"
+                            sx={{
+                                width: 'max-content',
+                                margin: '5%',
+                                padding: "12px 20px",
+                                fontSize: "large",
+                                letterSpacing: "1px",
+                                textTransform: 'none',
+                                bgcolor: "#DA4A0C",
+                                '&:hover': {
+                                    bgcolor: '#e80',
+                                },
+                                borderRadius: '10px',
+                                marginLeft: '5%',
+                                }}>
                                 Update parking garage
-                            </button>
-                            <button type="button" className="crud-button" onClick={handleDeleteParkingGarage}>
+                            </Button>
+                            <Button type="button" 
+                            variant="contained"
+                            sx={{
+                                width: 'max-content',
+                                margin: '5%',
+                                padding: "12px 20px",
+                                fontSize: "large",
+                                letterSpacing: "1px",
+                                textTransform: 'none',
+                                bgcolor: "#DA4A0C",
+                                '&:hover': {
+                                    bgcolor: '#e80',
+                                },
+                                borderRadius: '10px',
+                                marginLeft: '5%',
+                                }}
+                                onClick={handleDeleteParkingGarage}>
                                 Delete parking garage
-                            </button>
+                            </Button>
                         </div>
                     )}
                     {isNewParkingGarage && (
                         <div className="crud-button-container">
-                            <button type="submit" className="crud-button">
+                            <Button type="submit" 
+                            variant="contained"
+                            sx={{
+                                width: 'max-content',
+                                margin: '5%',
+                                padding: "12px 20px",
+                                fontSize: "large",
+                                letterSpacing: "1px",
+                                textTransform: 'none',
+                                bgcolor: "#DA4A0C",
+                                '&:hover': {
+                                    bgcolor: '#e80',
+                                },
+                                borderRadius: '10px',
+                                marginLeft: '5%',
+                                }}>
                                 Save new parking garage
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </form>

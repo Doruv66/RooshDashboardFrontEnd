@@ -152,9 +152,11 @@ input[type="checkbox"]:checked + .parking-garage-checkbox::before {
 .crud-button-container {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-around;
   gap: 20px;
   bottom: 0%;
+  margin-right: 100px;
 }
 
 .crud-button{
