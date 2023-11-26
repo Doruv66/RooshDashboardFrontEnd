@@ -7,7 +7,12 @@ import { useParkingGarage } from '../components/ParkingGarageContext';
 const BookingHistory = () => {
   const { filters } = useParkingGarage();
   const [bookings, setBookings] = useState([]);
+  const [sortBy, setSortBy] = useState('');
 
+  const handleSortChange = (newSortBy) => {
+    setSortBy(newSortBy);
+  };
+  
   useEffect(() => {
     const fetchFilteredBookings = async () => {
         // Constructing the URL for fetching
@@ -40,13 +45,32 @@ const BookingHistory = () => {
         fetchFilteredBookings();
     }
 }, [filters]);
+  useEffect(() => {
+    const sortedBookings = sortBookings(bookings, sortBy);
+    setBookings(sortedBookings);
+  }, [sortBy]);
+
+  const sortBookings = (bookingsList, sortCriteria) => {
+    switch (sortCriteria) {
+      case 'startDateAsc':
+        return [...bookingsList].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      case 'startDateDesc':
+        return [...bookingsList].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+      case 'endDateAsc':
+        return [...bookingsList].sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+      case 'endDateDesc':
+        return [...bookingsList].sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+      default:
+        return bookingsList;
+    }
+  };
 
 
   return (
     <div className={style.wrapper}>
       <div className={style.header}>
           <h1>Booking History</h1>
-          <BookingHistoryFilters />
+          <BookingHistoryFilters onSortChange={handleSortChange} />
       </div>
       <div className={style.booking_history}>
       <BookingList bookings={bookings} />

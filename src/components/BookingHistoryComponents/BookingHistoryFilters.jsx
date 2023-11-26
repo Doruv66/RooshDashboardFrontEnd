@@ -8,8 +8,9 @@ import {FormControlLabel} from '@mui/material'
 import Checkbox from '@mui/material/Checkbox';
 import { useParkingGarage } from '../ParkingGarageContext.jsx'; 
 
-const BookingHistoryFilters = () => {
+const BookingHistoryFilters = ({ onSortChange }) => {
   const { updateFilters } = useParkingGarage();
+  
   const [state, setState] = useState({
     ongoing:false,
     completed: false
@@ -20,16 +21,24 @@ const BookingHistoryFilters = () => {
 
 
   const handleCheckboxChange = (event) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.checked,
-    });
-    updateFilters({ [event.target.name]: event.target.checked }); // update the filter
-  };
+    const newState = {
+        ...state,
+        [event.target.name]: event.target.checked,
+    };
+    setState(newState);
 
-  const handleSortByChange = (event) => {
-    setSortBy(event.target.value);
-  }
+    // Update filters based on the checkbox name
+    if (event.target.name === 'completed') {
+        updateFilters({ finished: event.target.checked });
+    } else if (event.target.name === 'ongoing') {
+        updateFilters({ ongoing: event.target.checked });
+    }
+};
+
+const handleSortByChange = (event) => {
+  setSortBy(event.target.value);
+  onSortChange(event.target.value); // Update parent component
+}
 
   const handleServiceTypeChange = (event) => {
     setServiceType(event.target.value);
@@ -40,16 +49,18 @@ const BookingHistoryFilters = () => {
   return (
     <div className={style.filters}>
         <FormControl fullWidth sx={{width: 250}}>
-          <InputLabel id="demo-simple-select-label" sx={{pl: 2.5}}>Sort By</InputLabel>
+          <InputLabel id="sort-select-label">Sort By</InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
+            labelId="sort-select-label"
+            id="sort-select"
             value={sortBy}
-            label="Service"
+            label="Sort By"
             onChange={handleSortByChange}
           >
-            <MenuItem value={"Arrival Day (asc)"}>Arrival Day (asc)</MenuItem>
-            <MenuItem value={"Departure Day (asc)"}>Departure Day (asc)</MenuItem>
+            <MenuItem value={"startDateAsc"}>Arrival Day (Asc)</MenuItem>
+            <MenuItem value={"startDateDesc"}>Arrival Day (Desc)</MenuItem>
+            <MenuItem value={"endDateAsc"}>Departure Day (Asc)</MenuItem>
+            <MenuItem value={"endDateDesc"}>Departure Day (Desc)</MenuItem>
           </Select>
         </FormControl>
         <FormControl fullWidth sx={{width: 200}}>
