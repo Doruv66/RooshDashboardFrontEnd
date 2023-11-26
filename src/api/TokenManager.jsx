@@ -1,15 +1,15 @@
 import jwt_decode from "jwt-decode";
 
 const TokenManager = {
-  getAccessToken: () => loaclStorage.getItem("accessToken"),
+  getAccessToken: () => localStorage.getItem("accessToken"),
   getClaims: () => {
-    const claims = loaclStorage.getItem("claims");
+    const claims = localStorage.getItem("claims");
     return claims ? JSON.parse(claims) : undefined;
   },
   setAccessToken: (token) => {
     localStorage.setItem("accessToken", token);
     const claims = jwt_decode(token);
-    loaclStorage.setItem("claims", JSON.stringify(claims));
+    localStorage.setItem("claims", JSON.stringify(claims));
     return claims;
   },
   getAccessTokenInfo: () => {
