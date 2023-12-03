@@ -4,20 +4,23 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
+import FlightLandIcon from '@mui/icons-material/FlightLand';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'; 
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Divider, Typography } from '@mui/material';
 
-const DataTable = ({bookings}) => {
+const DataTable = ({bookings, option}) => {
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        const options = {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        };
+        const formattedDate = `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+        return formattedDate;
+    };
     
-        return date.toLocaleDateString(undefined, options);
+    const formatHour = (dateString) => {
+        const date = new Date(dateString);
+        const formattedHour = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        return formattedHour;
     };
     return (
         <>
@@ -27,13 +30,17 @@ const DataTable = ({bookings}) => {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
+                                    <TableCell>Reference</TableCell>
+                                    <TableCell>Date</TableCell>
+                                    <TableCell>Time</TableCell>
+                                    <TableCell></TableCell>
                                     <TableCell>Name</TableCell>
-                                    <TableCell align="right">Garage</TableCell>
-                                    <TableCell align="right">Airport</TableCell>
-                                    <TableCell align="right">License Plate</TableCell>
-                                    <TableCell align="right">Start Date</TableCell>
-                                    <TableCell align="right">End Date</TableCell>
-                                    <TableCell align="right">Service Type</TableCell>
+                                    <TableCell>Email</TableCell>
+                                    <TableCell>Flight Nr.</TableCell>
+                                    <TableCell>License Plate</TableCell>
+                                    <TableCell>Car</TableCell>
+                                    <TableCell>Price</TableCell>
+                                    <TableCell>Country</TableCell>
                                 </TableRow>
                             </TableHead>
                         <TableBody>
@@ -43,14 +50,18 @@ const DataTable = ({bookings}) => {
                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                             >
                                 <TableCell component="th" scope="row">
-                                {booking.customer.name}
+                                R324312412
                                 </TableCell>
-                                <TableCell align="right">{booking.garage.name}</TableCell>
-                                <TableCell align="right">{booking.garage.airport}</TableCell>
+                                <TableCell align="right">{option ? formatDate(booking.startDate) : formatDate(booking.endDate)}</TableCell>
+                                <TableCell align="right">{option ? formatHour(booking.startDate) : formatHour(booking.endDate)}</TableCell>
+                                <TableCell align="right">{option ? <FlightTakeoffIcon style={{fontSize: "35px", color: '#DA4A0C'}}/> : <FlightLandIcon style={{fontSize: "35px", color: '#DA4A0C'}}/>}</TableCell>
+                                <TableCell align="right">{booking.customer.name}</TableCell>
+                                <TableCell align="right">{booking.customer.email}</TableCell>
+                                <TableCell align="right">{option ? booking.flightNumberDeparture : booking.flightNumberArrival}</TableCell>
                                 <TableCell align="right">{booking.car.licensePlate}</TableCell>
-                                <TableCell align="right">{formatDate(booking.startDate)}</TableCell>
-                                <TableCell align="right">{formatDate(booking.endDate)}</TableCell>
-                                <TableCell align="right">{booking.service.serviceType}</TableCell>
+                                <TableCell align="right">{booking.car.model}</TableCell>
+                                <TableCell align="right">€ 55.00</TableCell>
+                                <TableCell align="right">NL</TableCell>
                             </TableRow>
                             ))}
                         </TableBody>

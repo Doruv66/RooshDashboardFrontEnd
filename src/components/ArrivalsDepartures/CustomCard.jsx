@@ -8,6 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';  
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import BookingApi from '../../api/BookingApi';
+import { useParkingGarage } from '../ParkingGarageContext';
 
 const CustomCard = (props) => {
     const [arrivalsDepartures, setArrivalsDepartures] = useState(null);
@@ -24,14 +25,14 @@ const CustomCard = (props) => {
         if (!startDate || !endDate || !dayjs.isDayjs(startDate) || !dayjs.isDayjs(endDate)) {
           return 'Select Dates';
         }
-        const formattedStartDate = startDate.format('MM DD YYYY');
-        const formattedEndDate = endDate.format('MM DD YYYY');
+        const formattedStartDate = startDate.format('MM-DD-YYYY');
+        const formattedEndDate = endDate.format('MM-DD-YYYY');
         return `${formattedStartDate} - ${formattedEndDate}`;
     };
 
-    const refreshArrivalsDepartures = async (startDate, endDate) => {
+    const refreshArrivalsDepartures = async (startDate, endDate, garageId) => {
         try {
-            const response = await BookingApi.getIntervalArrivalsDepartures(startDate, endDate);
+            const response = await BookingApi.getIntervalArrivalsDepartures(startDate, endDate, garageId);
             setArrivalsDepartures(response);
             if(interval === "Pick Dates") {
                 props.setData(response);
@@ -46,9 +47,9 @@ const CustomCard = (props) => {
         }
     };
 
-    const refreshArrivalsDeparturesForThisMonth = async (startDate, endDate) => {
+    const refreshArrivalsDeparturesForThisMonth = async (startDate, endDate, garageId) => {
         try {
-            const response = await BookingApi.getIntervalArrivalsDepartures(startDate, endDate);
+            const response = await BookingApi.getIntervalArrivalsDepartures(startDate, endDate, garageId);
             setArrivalsDepartures(response);
             props.setData(response);
         } catch (error) {
@@ -73,7 +74,7 @@ const CustomCard = (props) => {
 
     useEffect(() => {
         if(startDate && endDate) {
-            refreshArrivalsDepartures(startDate, endDate);
+            refreshArrivalsDepartures(startDate, endDate, props.filters.garageId);
             if(interval === "Pick Dates") {
                 props.setTitle(formatDateString(startDate, endDate));
             } 
@@ -115,7 +116,7 @@ const CustomCard = (props) => {
                                 slotProps={{ InputLabel: { size: 'small' } }}
                                 style={{height: '40px'}}
                             >
-                            <MenuItem value={"This Month"} onClick={() => refreshArrivalsDeparturesForThisMonth(startDate, endDate)}>This Month</MenuItem>
+                            <MenuItem value={"This Month"} onClick={() => refreshArrivalsDeparturesForThisMonth(startDate, endDate, props.filters.garageId)}>This Month</MenuItem>
                             <MenuItem value={"Pick Dates"}>Pick Dates</MenuItem>
                         </Select>
                     </FormControl>
@@ -148,14 +149,14 @@ const CustomCard = (props) => {
                     }
                     <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: interval === "Pick Dates" ? '15px' : "30px"}}>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px' }}/>
+                            <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px', color: '#DA4A0C' }}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures !== null ? arrivalsDepartures.arrivals.length : 0}</Typography>
                                 <Typography>ARRIVALS</Typography>
                             </Box>
                         </Box>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
+                        <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px', color: '#DA4A0C'}}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures !== null ? arrivalsDepartures.departures.length : 0}</Typography>
                                 <Typography>DEPARTURES</Typography>

@@ -31,9 +31,9 @@ const BookingApi = {
           });
    },
 
-   getArrivalsDepartures(date) {
+   getArrivalsDepartures(date, garageId) {
     const formattedDate = date.toISOString().split('T')[0]; // Format date to YYYY-MM-DD
-    const arrivalsDeparturesUrl = `${apiUrl}/arrivals-departures?date=${formattedDate}`;
+    const arrivalsDeparturesUrl = `${apiUrl}/arrivals-departures?date=${formattedDate}&garageId=${garageId}`;
     
       return fetch(arrivalsDeparturesUrl, { headers: {
           Authorization: `Bearer ${localStorage.getItem('accessToken')}`
@@ -47,11 +47,11 @@ const BookingApi = {
       });
   },
 
-  async getIntervalArrivalsDepartures(startDate, endDate) {
+  async getIntervalArrivalsDepartures(startDate, endDate, garageId) {
     const formattedStartDate = startDate.toISOString().split('T')[0];
     const formattedEndDate = endDate.toISOString().split('T')[0];
     
-    const intervalArrivalsDeparturesUrl = `${apiUrl}/bookings/interval-arrivals-departures?startTime=${formattedStartDate}&endTime=${formattedEndDate}`;
+    const intervalArrivalsDeparturesUrl = `${apiUrl}/bookings/interval-arrivals-departures?startTime=${formattedStartDate}&endTime=${formattedEndDate}&garageId=${garageId}`;
   
     try {
       const response = await fetch(intervalArrivalsDeparturesUrl, { headers: {

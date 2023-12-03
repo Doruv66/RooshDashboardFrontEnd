@@ -5,10 +5,9 @@ import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import React, { useState, useEffect}from 'react'
 
 const TomorrowsCard = (props) => {
-
     const [arrivalsDepartures, setArrivalsDepartures] = useState(null);
-    const refreshArrivalsDepartures = (date) => {
-        BookingApi.getArrivalsDepartures(date)
+    const refreshArrivalsDepartures = (date, garageId) => {
+        BookingApi.getArrivalsDepartures(date, garageId)
         .then(response => setArrivalsDepartures(response))
         .catch(error => console.log(error))
     };
@@ -16,7 +15,7 @@ const TomorrowsCard = (props) => {
     useEffect(() => {
         const tomorrow = new Date();
         tomorrow.setDate(new Date().getDate() + 1);
-        refreshArrivalsDepartures(tomorrow);
+        refreshArrivalsDepartures(tomorrow, props.filters.garageId);
     }, []);
 
   return (
@@ -41,7 +40,7 @@ const TomorrowsCard = (props) => {
                     <Typography variant="h5">
                     TOMORROW
                     </Typography>
-                    <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '40px'}}>
+                    <Box sx={{display: 'flex', alignItems: 'center', color: '#DA4A0C', justifyContent: 'space-between', marginTop: '40px'}}>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
                             <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px' }}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
@@ -50,7 +49,7 @@ const TomorrowsCard = (props) => {
                             </Box>
                         </Box>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
+                        <FlightLandIcon style={{fontSize: '50px', color: '#DA4A0C', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures.departures.length}</Typography>
                                 <Typography>DEPARTURES</Typography>

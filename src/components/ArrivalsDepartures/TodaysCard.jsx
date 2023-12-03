@@ -5,8 +5,8 @@ import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import BookingApi from '../../api/BookingApi';
 const TodaysCard = (props) => {
     const [arrivalsDepartures, setArrivalsDepartures] = useState(null);
-    const refreshArrivalsDepartures = (date) => {
-        BookingApi.getArrivalsDepartures(date)
+    const refreshArrivalsDepartures = (date, garageId) => {
+        BookingApi.getArrivalsDepartures(date, garageId)
         .then(response => {
             setArrivalsDepartures(response);
             props.setData(response);
@@ -15,7 +15,7 @@ const TodaysCard = (props) => {
     };
 
     useEffect(() => {
-        refreshArrivalsDepartures(new Date());
+        refreshArrivalsDepartures(new Date(), props.filters.garageId);
     }, []);
 
   return (
@@ -42,14 +42,14 @@ const TodaysCard = (props) => {
                     </Typography>
                     <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '40px'}}>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px' }}/>
+                            <FlightTakeoffIcon style={{fontSize: '50px', color: '#DA4A0C', marginRight: '10px', border: '1px ridge', borderRadius: '5px' }}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures.arrivals.length}</Typography>
                                 <Typography>ARRIVALS</Typography>
                             </Box>
                         </Box>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
+                        <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', color: '#DA4A0C', border: '1px ridge', borderRadius: '5px'}}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures.departures.length}</Typography>
                                 <Typography>DEPARTURES</Typography>
