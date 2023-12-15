@@ -198,3 +198,20 @@ input[type="checkbox"]:checked + .parking-garage-checkbox::before {
       flex-direction: column; /* Stack the buttons on top of each other */
   }
 }
+.uploadImagePreview {
+  max-width: 100%;
+  max-height: 100px;
+}
+.uploadImageButton {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+.file-input {
+  display: none;
+}
+.input-label {
+  pointer-events: none;
+}
+.input-label-button {
+  pointer-events: all;
+}

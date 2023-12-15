@@ -2,15 +2,18 @@ import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} fro
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
-import { Box, Button, Tab, Tabs } from '@mui/material';
+import {Box, Button, ImageList, ImageListItem, Tab, Tabs, Typography} from '@mui/material';
 import {useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import ImagePreviewBox from "./ImagePreviewBox.jsx";
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
+    const [images, setImages] = useState([]);
+    const [previewImages, setPreviewImages] = useState([])
     const [editingField ,setEditingField] = useState(null);
     const [editingValue ,setEditingValue] = useState('');
     const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId, setUpdateTrigger } = useParkingGarage();
@@ -359,8 +362,79 @@ export default function GarageInput(){
     TabTwoContent.displayName = 'TabTwoContent';
 
     const TabThreeContent = () => {
-        return <div>Tab Three Content</div>;
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                if (isNewParkingGarage) {
+                    handleSaveNewParkingGarage();
+                } else {
+                    handleUpdateParkingGarage(formValues);
+                }
+            }, 0);
+        };
+        return (
+            <div>
+                <form onSubmit={handleFormSubmit}>
+                    <ImageList cols={6} gap={8}>
+                        {previewImages.map((imageSrc, index) => (
+                            <ImageListItem key={index}>
+                                <img
+                                    src={imageSrc}
+                                    alt={`Preview ${index}`}
+                                    loading="lazy"
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'scale-down'
+                                    }}
+                                />
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                    <input
+                        className="file-input"
+                        accept="image/*"
+                        id="raised-button-file"
+                        type="file"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                    />
+                    <label htmlFor="raised-button-file" className="input-label">
+                        <Button variant="contained" component="span" sx={{ mt: 2, mb: 2 }} className="input-label-button">
+                            Upload Image
+                        </Button>
+                    </label>
+                    {/*{imageError && (*/}
+                    {/*    <Typography>*/}
+                    {/*        {imageError}*/}
+                    {/*    </Typography>*/}
+                    {isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <Button type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#DA4A0C",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
+                                Save new parking garage
+                            </Button>
+                        </div>
+                    )}
+                </form>
+            </div>
+        )
     };
+    TabThreeContent.displayName = 'TabThreeContent';
 
     useEffect(() => {
         const initialValues = parkingGarageAttributes.reduce((acc, attr) => {
@@ -380,6 +454,19 @@ export default function GarageInput(){
         setFormValues(initialValues);
     }, [isNewParkingGarage, parkingGarage]);
 
+    const handleFileChange = (event) => {
+        if (event.target.files && event.target.files[0]) {
+            const newImageFile = event.target.files[0];
+
+            setImages(prevImages => [...prevImages, newImageFile]);
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImages(prevPreviewImages => [...prevPreviewImages, reader.result]);
+            };
+            reader.readAsDataURL(newImageFile);
+        }
+    };
 
     const handleResponse = response => {
         if (!response.ok) {
@@ -435,8 +522,37 @@ export default function GarageInput(){
                 toilet: updatedValues.parkingGarageUtility.toilet || false
             }
         };
+        const formData = new FormData();
 
-        ParkingGarageApi.createParkingGarage(parkingGarageToSave)
+        Object.keys(parkingGarageToSave).forEach(key => {
+            if (key !== 'parkingGarageUtility' && key !== 'images') {
+                formData.append(key, parkingGarageToSave[key]);
+            }
+        });
+
+        // Append nested parkingGarageUtility fields to formData
+        if (parkingGarageToSave.parkingGarageUtility) {
+            Object.keys(parkingGarageToSave.parkingGarageUtility).forEach(key => {
+                formData.append(`parkingGarageUtility.${key}`, parkingGarageToSave.parkingGarageUtility[key]);
+            });
+        }
+
+        // Append images to formData
+        images.forEach((image, index) => {
+            if (image) {
+                formData.append(`images[${index}]`, image);
+            }
+        });
+
+        const formDataEntries = Array.from(formData.entries());
+        const formDataForLog = {};
+        formDataEntries.forEach(([key, value]) => {
+            formDataForLog[key] = value instanceof File ? value.name : value;
+        });
+        console.log('FormData to be sent:', formDataForLog);
+
+
+        ParkingGarageApi.createParkingGarage(formData)
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully created new parking garage: ', data);

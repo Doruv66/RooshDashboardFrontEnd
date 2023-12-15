@@ -6,11 +6,10 @@ const ParkingGarageApi = {
     console.log(ParkingGarageData)
     return fetch(`${apiUrl}`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
+      headers: {
          Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
       },
-      body: JSON.stringify(ParkingGarageData),
+      body: ParkingGarageData,
     });
   },
   
