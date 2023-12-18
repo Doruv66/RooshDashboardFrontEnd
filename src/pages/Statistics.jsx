@@ -25,20 +25,30 @@ const Statistics = () => {
       const garageId = parkingGarage.id;
       
       const fetchStats = async () => {
-        const fetchedStats = await BookingApi.getBookingStatistics(startDate, garageId);
-        if (fetchedStats) {
-          const ordersData = fetchedStats.statisticsMap.map(stat => stat.numOfBookings);
-          const revenueData = fetchedStats.statisticsMap.map(stat => stat.revenue);
-  
-          setStats(prevStats => ({
-            ...prevStats,
-            orders: ordersData.reduce((a, b) => a + b, 0),
-            revenue: revenueData.reduce((a, b) => a + b, 0).toFixed(2),
-            revenueData,
-            ordersData,
-          }));
+        try {
+          const response = await BookingApi.getBookingStatistics(startDate, garageId);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const fetchedStats = await response.json();
+          if (fetchedStats && fetchedStats.statisticsMap) {
+            const statisticsArray = Object.values(fetchedStats.statisticsMap);
+            const ordersData = statisticsArray.map(stat => stat.numOfBookings);
+            const revenueData = statisticsArray.map(stat => stat.revenue);
+      
+            setStats(prevStats => ({
+              ...prevStats,
+              orders: ordersData.reduce((a, b) => a + b, 0),
+              revenue: revenueData.reduce((a, b) => a + b, 0).toFixed(2),
+              revenueData,
+              ordersData,
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching statistics:', error);
         }
       };
+      
   
       fetchStats();
     }
