@@ -7,12 +7,14 @@ import {useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import ImagePreviewBox from "./ImagePreviewBox.jsx";
+import DeleteIcon from '@mui/icons-material/Delete';
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
-    const [images, setImages] = useState([]);
+    const [newImages, setNewImages] = useState([]);
+    const [existingImages, setExistingImages] = useState([]); // For images already on the server
+    const [imagesToRemove, setImagesToRemove] = useState([]); // For images to be removed
     const [previewImages, setPreviewImages] = useState([])
     const [editingField ,setEditingField] = useState(null);
     const [editingValue ,setEditingValue] = useState('');
@@ -39,6 +41,32 @@ export default function GarageInput(){
         }
         setTabValue(newValue);
     };
+
+    useEffect(() => {
+        console.log(isNewParkingGarage)
+        if (!isNewParkingGarage && parkingGarage && parkingGarage.imagePaths) {
+            const fetchImages = async () => {
+                try {
+                    const fetchedImages = await Promise.all(
+                        parkingGarage.imagePaths.map(async (path) => {
+                            const blobUrl = await ParkingGarageApi.fetchImageWithToken(path, localStorage.getItem('accessToken'));
+                            return { blobUrl, path };
+                        })
+                    );
+
+                    setPreviewImages(fetchedImages.map(img => img.blobUrl));
+                    setExistingImages(fetchedImages);
+                } catch (error) {
+                    console.error('Error fetching images:', error);
+                }
+            };
+
+            fetchImages();
+        }
+        else if(isNewParkingGarage) {
+            setPreviewImages([])
+        }
+    }, [isNewParkingGarage, parkingGarage]);
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
@@ -372,6 +400,17 @@ export default function GarageInput(){
                 }
             }, 0);
         };
+        const removeImage = (imageBlobUrl) => {
+            const image = existingImages.find(img => img.blobUrl === imageBlobUrl);
+
+            if (image) {
+                setExistingImages(existingImages.filter(img => img.blobUrl !== imageBlobUrl));
+                setImagesToRemove([...imagesToRemove, image.path]);
+            } else {
+                setNewImages(newImages.filter(img => img !== imageBlobUrl));
+            }
+            setPreviewImages(previewImages.filter(img => img !== imageBlobUrl));
+        };
         return (
             <div>
                 <form onSubmit={handleFormSubmit}>
@@ -388,6 +427,14 @@ export default function GarageInput(){
                                         objectFit: 'scale-down'
                                     }}
                                 />
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={() => removeImage(imageSrc)}
+                                    style={{ position: 'absolute', top: 0, right: 0 }}
+                                >
+                                    <DeleteIcon />
+                                </Button>
                             </ImageListItem>
                         ))}
                     </ImageList>
@@ -408,6 +455,48 @@ export default function GarageInput(){
                     {/*    <Typography>*/}
                     {/*        {imageError}*/}
                     {/*    </Typography>*/}
+                    {!isNewParkingGarage && parkingGarage && (
+                        <div className="crud-button-container">
+                            <Button type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#DA4A0C",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
+                                Update parking garage
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleDeleteParkingGarage}
+                                sx={{
+                                    width: 'max-content',
+                                    margin: '5%',
+                                    padding: "12px 20px",
+                                    fontSize: "large",
+                                    letterSpacing: "1px",
+                                    textTransform: 'none',
+                                    bgcolor: "#DA4A0C",
+                                    '&:hover': {
+                                        bgcolor: '#e80',
+                                    },
+                                    borderRadius: '10px',
+                                    marginLeft: '5%',
+                                }}
+                            >
+                                Delete parking garage
+                            </Button>
+                        </div>
+                    )}
                     {isNewParkingGarage && (
                         <div className="crud-button-container">
                             <Button type="submit"
@@ -458,7 +547,7 @@ export default function GarageInput(){
         if (event.target.files && event.target.files[0]) {
             const newImageFile = event.target.files[0];
 
-            setImages(prevImages => [...prevImages, newImageFile]);
+            setNewImages(prevImages => [...prevImages, newImageFile]);
 
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -525,7 +614,7 @@ export default function GarageInput(){
         const formData = new FormData();
 
         Object.keys(parkingGarageToSave).forEach(key => {
-            if (key !== 'parkingGarageUtility' && key !== 'images') {
+            if (key !== 'parkingGarageUtility') {
                 formData.append(key, parkingGarageToSave[key]);
             }
         });
@@ -538,7 +627,7 @@ export default function GarageInput(){
         }
 
         // Append images to formData
-        images.forEach((image, index) => {
+        newImages.forEach((image, index) => {
             if (image) {
                 formData.append(`images[${index}]`, image);
             }
@@ -559,6 +648,7 @@ export default function GarageInput(){
                 setNewGarageId(data.id);
                 setIsNewParkingGarage(false);
                 setNewGarageAdded(true);
+                setNewImages([])
                 navigate(`/garagedetails`);
                 return ParkingGarageApi.getParkingGarage(data.id);
             })
@@ -601,16 +691,31 @@ export default function GarageInput(){
     };
 
     const handleUpdateParkingGarage = (values) => {
-        const updatedParkingGarage = {
-            ...parkingGarage,
-            ...values,
-            parkingGarageUtility: {
-                ...parkingGarage.parkingGarageUtility,
-                ...values.parkingGarageUtility
+        const formData = new FormData();
+
+        // Append form fields
+        Object.keys(values).forEach(key => {
+            if (key !== 'parkingGarageUtility') {
+                formData.append(key, values[key]);
             }
-        };
-        console.log(updatedParkingGarage)
-        ParkingGarageApi.updateParkingGarage(updatedParkingGarage)
+        });
+
+        // Append nested parkingGarageUtility fields to formData
+        if (values.parkingGarageUtility) {
+            Object.keys(values.parkingGarageUtility).forEach(key => {
+                formData.append(`parkingGarageUtility.${key}`, values.parkingGarageUtility[key]);
+            });
+        }
+
+        // Append new images to formData
+        newImages.forEach((image, index) => {
+            formData.append(`images[${index}]`, image);
+        });
+
+        imagesToRemove.forEach((imagePath, index) => {
+            formData.append(`imagesToRemove[${index}]`, imagePath);
+        });
+        ParkingGarageApi.updateParkingGarage(formData, parkingGarage.id)
             .then(handleResponse)
             .then(data => {
                 console.log(data)
@@ -621,6 +726,7 @@ export default function GarageInput(){
                 setUpdateTrigger(prev => !prev);
                 setNewGarageId(data.id)
                 setNewGarageAdded(true);
+                setNewImages([])
             })
             .catch(error => {
                 console.error('Error updating the parking garage:', error);
