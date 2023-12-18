@@ -1,28 +1,63 @@
-import { Container } from '@mui/material'
-import React from 'react'
-import Header from '../components/StatisticsComponents/Header'
-import StatCard from '../components/StatisticsComponents/StatCard'
-import RevenueChart from '../components/StatisticsComponents/RevenueChart'
-import OrdersChart from '../components/StatisticsComponents/OrdersChart'
+import React, { useEffect, useState } from 'react';
+import { Container } from '@mui/material';
+import { useParkingGarage } from "../components/ParkingGarageContext";
+import Header from '../components/StatisticsComponents/Header';
+import StatCard from '../components/StatisticsComponents/StatCard';
+import RevenueChart from '../components/StatisticsComponents/RevenueChart';
+import OrdersChart from '../components/StatisticsComponents/OrdersChart';
+import BookingApi from '../api/BookingApi';
+import { getDateRange } from '../components/StatisticsComponents/getDateRange'; 
 
 const Statistics = () => {
-  return (
-    <Container sx={{zIndex: '200',marginLeft: '15%'}}>
-        <Header />
-        {/* 3 cards for orders revenue and order value  */}
-        <Container sx={{display: 'flex', gap: 3}}>
-            <StatCard title={'ORDERS'} number={0}/>
-            <StatCard title={'REVENUE'} number={'0,00'}/>
-            <StatCard title={'ORDERVALUE'} number={'0,00'}/>
-        </Container>
-        {/* Revenue and Orders for selected range of time  */}
-        <Container sx={{display: 'flex'}}>
-            <RevenueChart />
-            <OrdersChart /> 
-        </Container>
-        {/* Capacity overview per service  */}
-    </Container>
-  )
-}
+  const { parkingGarage } = useParkingGarage();
+  const [range, setRange] = useState('This Week'); 
+  const [stats, setStats] = useState({
+    orders: 0,
+    revenue: '0,00',
+    orderValue: '0,00',
+    revenueData: [],
+    ordersData: [],
+  });
 
-export default Statistics
+  useEffect(() => {
+    if (parkingGarage && range) {
+      const { startDate } = getDateRange(range);
+      const garageId = parkingGarage.id;
+      
+      const fetchStats = async () => {
+        const fetchedStats = await BookingApi.getBookingStatistics(startDate, garageId);
+        if (fetchedStats) {
+          const ordersData = fetchedStats.statisticsMap.map(stat => stat.numOfBookings);
+          const revenueData = fetchedStats.statisticsMap.map(stat => stat.revenue);
+  
+          setStats(prevStats => ({
+            ...prevStats,
+            orders: ordersData.reduce((a, b) => a + b, 0),
+            revenue: revenueData.reduce((a, b) => a + b, 0).toFixed(2),
+            revenueData,
+            ordersData,
+          }));
+        }
+      };
+  
+      fetchStats();
+    }
+  }, [parkingGarage, range]);
+
+  return (
+    <Container sx={{ zIndex: '200', marginLeft: '15%' }}>
+      <Header range={range} setRange={setRange} />
+      <Container sx={{ display: 'flex', gap: 3 }}>
+        <StatCard title={'ORDERS'} number={stats.orders} />
+        <StatCard title={'REVENUE'} number={stats.revenue} />
+        <StatCard title={'ORDERVALUE'} number={stats.orderValue} />
+      </Container>
+      <Container sx={{ display: 'flex' }}>
+        <RevenueChart data={stats.revenueData} />
+        <OrdersChart data={stats.ordersData} />
+      </Container>
+    </Container>
+  );
+};
+
+export default Statistics;

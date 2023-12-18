@@ -1,12 +1,11 @@
 import { Container, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import React, { useState } from 'react'
+import React from 'react'
 
-const Header = () => {
-    const [range, setRange] = useState('');
-
+const Header = ({ range, setRange }) => {
     const handleRangeChange = (event) => {
         setRange(event.target.value);
-    }
+    };
+
   return (
     <Container sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
         <Container>

@@ -1,31 +1,31 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
-import { useEffect, useRef } from 'react';
 
-const OrdersChart = () => {
- const chartRef = useRef(null);
+const OrdersChart = ({ data }) => {
+  const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
   useEffect(() => {
-    if (chartRef && chartRef.current) {
+    if (chartRef.current) {
+      const ctx = chartRef.current.getContext('2d');
       if (chartInstance.current) {
         chartInstance.current.destroy();
       }
 
-      chartInstance.current = new Chart(chartRef.current, {
+      chartInstance.current = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+          labels: data.map((_, index) => `Month ${index + 1}`), // Replace with actual labels if needed
           datasets: [{
-            label: 'ORDERS', 
-            data: [65, 59, 80, 81, 56, 55],
-            backgroundColor: 'rgba(54, 162, 235, 1)', // Blue color
+            label: 'ORDERS',
+            data: data,
+            backgroundColor: 'rgba(54, 162, 235, 1)',
             borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1,
           }],
         },
         options: {
-          indexAxis: 'x', 
+          indexAxis: 'x',
           scales: {
             y: {
               beginAtZero: true,
@@ -45,7 +45,7 @@ const OrdersChart = () => {
         chartInstance.current.destroy();
       }
     };
-  }, []);
+  }, [data]);
 
   return (
     <div style={{ width: '550px', height: '450px', marginTop: '30px', display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
@@ -53,6 +53,6 @@ const OrdersChart = () => {
       <canvas ref={chartRef}></canvas>
     </div>
   );
-}
+};
 
-export default OrdersChart
+export default OrdersChart;

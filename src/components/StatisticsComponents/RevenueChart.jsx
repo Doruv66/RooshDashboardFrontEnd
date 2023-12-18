@@ -1,59 +1,51 @@
-import React from 'react'
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
-const RevenueChart = () => {
+const RevenueChart = ({ data }) => {
     const chartRef = useRef(null);
-  const chartInstance = useRef(null);
+    const chartInstance = useRef(null);
 
-  useEffect(() => {
-    if (chartRef && chartRef.current) {
-      if (chartInstance.current) {
-        chartInstance.current.destroy();
-      }
+    useEffect(() => {
+      if (chartRef.current) {
+        const ctx = chartRef.current.getContext('2d');
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
+        }
 
-      chartInstance.current = new Chart(chartRef.current, {
-        type: 'line',
-        data: {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-          datasets: [{
-            label: 'REVENUE', 
-            data: [65, 59, 80, 81, 56, 55],
-            fill: false,
-            borderColor: 'rgba(54, 162, 235, 1)',
-            tension: 0.1,
-            showLine: true, // Show the line
-            pointRadius: 0, // Hide the data points
-          }],
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true,
+        chartInstance.current = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.map((_, index) => `Month ${index + 1}`),
+            datasets: [{
+              label: 'REVENUE',
+              data: data,
+              fill: false,
+              borderColor: 'rgba(54, 162, 235, 1)',
+              tension: 0.1,
+            }],
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
             },
           },
-          plugins: {
-            legend: {
-              display: false, // Hide the legend
-            },
-          },
-        },
-      });
-    }
-
-    return () => {
-      if (chartInstance.current) {
-        chartInstance.current.destroy();
+        });
       }
-    };
-  }, []);
 
-  return (
-    <div style={{ width: '550px', height: '450px', marginTop: '30px', display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-        <h3 style={{letterSpacing: '1px'}}>REVENUE</h3>
-      <canvas ref={chartRef}></canvas>
-    </div>
-  );
-}
+      return () => {
+        if (chartInstance.current) {
+          chartInstance.current.destroy();
+        }
+      };
+    }, [data]);
 
-export default RevenueChart
+    return (
+      <div style={{ width: '550px', height: '450px', marginTop: '30px' }}>
+        <canvas ref={chartRef}></canvas>
+      </div>
+    );
+};
+
+export default RevenueChart;
