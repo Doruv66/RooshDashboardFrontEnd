@@ -18,7 +18,6 @@ const CustomCard = (props) => {
 
     const handleIntervalChange = (event) => {
         setInterval(event.target.value);
-
     }
 
     const formatDateString = (startDate, endDate) => {
