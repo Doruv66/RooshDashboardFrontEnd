@@ -7,7 +7,10 @@ import {useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import ImagePreviewBox from "./ImagePreviewBox.jsx";
+import Popover from '@mui/material/Popover';
+import Grid from "@mui/material/Grid";
+import { FormControl, FormGroup, FormLabel } from '@mui/material';
+
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
@@ -67,6 +70,18 @@ export default function GarageInput(){
 
     const TabOneContent = forwardRef((props, ref) => {
         const [localValues, setLocalValues] = useState({});
+        const [anchorEl, setAnchorEl] = useState(null);
+
+        const handlePopoverOpen = (event) => {
+            setAnchorEl(event.currentTarget);
+        };
+
+        const handlePopoverClose = () => {
+            setAnchorEl(null);
+        };
+
+        const open = Boolean(anchorEl);
+
         useEffect(() => {
             setLocalValues(formValues);
         }, [formValues]);
@@ -109,16 +124,150 @@ export default function GarageInput(){
                 label = label + ' (in meters)';
             }
 
-            return (
-                <TextField
-                    name={attr}
-                    key={attr}
-                    label={label}
-                    className="textField"
-                    value={localValues[attr] || ''}
-                    onChange={(e) => handleLocalChange(attr, e.target.value)}
-                />
+            const CoordinatesGroup = () => (
+                <FormControl component="fieldset" className="coordinates-group" fullWidth>
+                    <FormLabel component="legend" sx={{ml:2}}>Coordinates</FormLabel>
+                    <FormGroup row sx={{ml:2}}>
+                            <TextField
+                                placeholder="Long"
+                                variant="outlined"
+                                sx={{backgroundColor: '#FFFFFF', width: '40%'}}
+                            />
+                            <TextField
+                                placeholder="Lat"
+                                variant="outlined"
+                                sx={{backgroundColor: '#FFFFFF', width: '40%'}}
+                            />
+                    </FormGroup>
+                </FormControl>
             );
+
+            const AddressGroup = () => (
+                <div className="address-details">
+                <FormControl component="fieldset" className="address-group" fullWidth>
+                    <FormLabel component="legend" sx={{ml:2}}>Address Details</FormLabel>
+                    <FormGroup sx={{ml:2}}>
+                            <TextField
+                                placeholder="Street and Address"
+                                variant="outlined"
+                                margin="normal"
+                                sx={{backgroundColor: '#FFFFFF',width: '100%', mb:0}}
+                            />
+                            <TextField
+                                margin="normal"
+                                placeholder="Zip code"
+                                sx={{ mr: 8}}
+                            />
+                            <TextField
+                                margin="normal"
+                                placeholder="City"
+                            />
+                            <TextField
+                                placeholder="Country"
+                                variant="outlined"
+                                margin="normal"
+                                sx={{backgroundColor: '#FFFFFF', width: '100%'}}
+                            />
+                    </FormGroup>
+                </FormControl>
+                </div>
+            );
+
+            return (
+                <React.Fragment key={attr}>
+                    {attr === 'airport' ? (
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                            <Button
+                                aria-owns={open ? 'mouse-over-popover' : undefined}
+                                aria-haspopup="true"
+                                onClick={handlePopoverOpen}
+                                variant="contained"
+                                style={{ marginRight: '8px', flexShrink: 0, height: '56px', backgroundColor: '#FF9000' }}
+                            >
+                                Add Airport
+                            </Button>
+                            <TextField
+                                name={attr}
+                                label={label}
+                                value={localValues[attr] || ''}
+                                onChange={(e) => handleLocalChange(attr, e.target.value)}
+                                variant="outlined"
+                                style={{width:'70%'}}
+                            />
+                        </div>
+                    ) : (
+                        <TextField
+                            name={attr}
+                            label={label}
+                            value={localValues[attr] || ''}
+                            onChange={(e) => handleLocalChange(attr, e.target.value)}
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                        />
+                    )}
+                    {attr === 'airport' && (
+                        <Popover
+                            id="mouse-over-popover"
+                            open={open}
+                            anchorEl={anchorEl}
+                            onClose={handlePopoverClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            sx={{
+                                "& .MuiPaper-root": {
+                                    width: "auto",
+                                    maxWidth: "30%",
+                                }
+                            }}
+                        >
+                            <div className="form-grid">
+                                <Box sx={{ padding: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,'&.MuiBox-root': {
+                                        marginTop: '0px',}, }}>
+                                    <Typography variant="h6" gutterBottom>
+                                        Add a new Airport
+                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} md={12}>
+                                            <TextField
+                                                label="IATA Airport Code"
+                                                placeholder="Enter Code"
+                                                variant="outlined"
+                                                sx={{backgroundColor: '#FFFFFF',width: '100%', mt: 1, mb: 1}}
+                                            />
+                                            <TextField
+                                                label="Terminal Name"
+                                                placeholder="Enter Name"
+                                                variant="outlined"
+                                                sx={{backgroundColor: '#FFFFFF',width: '100%', mt: 1, mb: 1}}
+                                            />
+                                            <TextField
+                                                label="Airport Name"
+                                                placeholder="Enter Name"
+                                                variant="outlined"
+                                                sx={{backgroundColor: '#FFFFFF',width: '100%', mt: 1, mb: 2}}
+                                            />
+                                        </Grid>
+                                        <AddressGroup/>
+                                        <CoordinatesGroup/>
+                                        <div className="button-container">
+                                            <Button variant="contained" className="form-button" sx={{mr:2, ml:2, padding: '10px 40px'}}>Save</Button>
+                                            <Button variant="contained" style={{ backgroundColor: '#ef1846'}} sx={{padding: '10px 40px'}} className="form-button">Delete</Button>
+                                        </div>
+                                    </Grid>
+                                </Box>
+                            </div>
+                        </Popover>
+                    )}
+                </React.Fragment>
+            );
+
         });
 
         return (
