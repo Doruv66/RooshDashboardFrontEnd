@@ -3,6 +3,7 @@ import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
 import {
+    Alert,
     Box,
     Button,
     FormControl,
@@ -613,15 +614,18 @@ export default function GarageInput(){
             }, 0);
         };
         const removeImage = (imageBlobUrl) => {
-            const image = existingImages.find(img => img.blobUrl === imageBlobUrl);
+            const imageIndex = previewImages.findIndex(img => img === imageBlobUrl);
 
+            const image = existingImages.find(img => img.blobUrl === imageBlobUrl);
             if (image) {
                 setExistingImages(existingImages.filter(img => img.blobUrl !== imageBlobUrl));
                 setImagesToRemove([...imagesToRemove, image.path]);
-            } else {
-                setNewImages(newImages.filter(img => img !== imageBlobUrl));
             }
-            setPreviewImages(previewImages.filter(img => img !== imageBlobUrl));
+
+            if (imageIndex !== -1) {
+                setNewImages(newImages.filter((_, index) => index !== imageIndex));
+                setPreviewImages(previewImages.filter((_, index) => index !== imageIndex));
+            }
         };
         return (
             <div>
@@ -664,9 +668,9 @@ export default function GarageInput(){
                         </Button>
                     </label>
                     {imageError && (
-                        <Typography>
+                        <Alert severity="error">
                             {imageError}
-                        </Typography>
+                        </Alert>
                     )}
                     {!isNewParkingGarage && parkingGarage && (
                         <div className="crud-button-container">
@@ -739,6 +743,10 @@ export default function GarageInput(){
     TabThreeContent.displayName = 'TabThreeContent';
 
     useEffect(() => {
+        console.log(newImages)
+    }, [newImages]);
+
+    useEffect(() => {
         const initialValues = parkingGarageAttributes.reduce((acc, attr) => {
             acc[attr] = isNewParkingGarage ? '' : (parkingGarage ? parkingGarage[attr] : '');
             return acc;
@@ -774,11 +782,14 @@ export default function GarageInput(){
         if (!response.ok) {
             if (response.status === 400) {
                 return response.json().then(errors => {
+                    console.log(errors);
                     setImageError('');
-                    if (errors.image) {
-                        setImageError(errors.image)
-                    }
-                    throw new Error('Validation error');
+
+                    errors.properties.errors.forEach((error) => {
+                        if (error.field === "images") {
+                            setImageError(error.error);
+                        }
+                    });
                 });
             } else {
                 throw new Error('Error');
