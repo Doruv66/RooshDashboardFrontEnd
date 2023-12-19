@@ -40,7 +40,7 @@ const TomorrowsCard = (props) => {
                     <Typography variant="h5">
                     TOMORROW
                     </Typography>
-                    <Box sx={{display: 'flex', alignItems: 'center', color: '#DA4A0C', justifyContent: 'space-between', marginTop: '40px'}}>
+                    <Box sx={{display: 'flex', alignItems: 'center', color: '#FF9000', justifyContent: 'space-between', marginTop: '40px'}}>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
                             <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px' }}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
@@ -49,7 +49,7 @@ const TomorrowsCard = (props) => {
                             </Box>
                         </Box>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <FlightLandIcon style={{fontSize: '50px', color: '#DA4A0C', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
+                        <FlightLandIcon style={{fontSize: '50px', color: '#FF9000', marginRight: '10px', border: '1px ridge', borderRadius: '5px'}}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures.departures.length}</Typography>
                                 <Typography>DEPARTURES</Typography>
