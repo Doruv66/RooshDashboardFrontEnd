@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
-const OrdersChart = ({ data }) => {
+const OrdersChart = ({ data, labels }) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
@@ -15,7 +15,7 @@ const OrdersChart = ({ data }) => {
       chartInstance.current = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: data.map((_, index) => `Month ${index + 1}`), // Replace with actual labels if needed
+          labels: labels,
           datasets: [{
             label: 'ORDERS',
             data: data,
@@ -45,11 +45,10 @@ const OrdersChart = ({ data }) => {
         chartInstance.current.destroy();
       }
     };
-  }, [data]);
+  }, [data, labels]);
 
   return (
-    <div style={{ width: '550px', height: '450px', marginTop: '30px', display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-      <h3 style={{letterSpacing: '1px'}}>ORDERS</h3>
+    <div style={{ width: '550px', height: '450px', marginTop: '30px' }}>
       <canvas ref={chartRef}></canvas>
     </div>
   );
