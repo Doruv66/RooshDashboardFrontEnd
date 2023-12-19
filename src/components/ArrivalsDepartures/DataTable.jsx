@@ -54,7 +54,7 @@ const DataTable = ({bookings, option}) => {
                                 </TableCell>
                                 <TableCell align="right">{option ? formatDate(booking.startDate) : formatDate(booking.endDate)}</TableCell>
                                 <TableCell align="right">{option ? formatHour(booking.startDate) : formatHour(booking.endDate)}</TableCell>
-                                <TableCell align="right">{option ? <FlightTakeoffIcon style={{fontSize: "35px", color: '#DA4A0C'}}/> : <FlightLandIcon style={{fontSize: "35px", color: '#DA4A0C'}}/>}</TableCell>
+                                <TableCell align="right">{option ? <FlightTakeoffIcon style={{fontSize: "35px", color: '#FF9000'}}/> : <FlightLandIcon style={{fontSize: "35px", color: '#FF9000'}}/>}</TableCell>
                                 <TableCell align="right">{booking.customer.name}</TableCell>
                                 <TableCell align="right">{booking.customer.email}</TableCell>
                                 <TableCell align="right">{option ? booking.flightNumberDeparture : booking.flightNumberArrival}</TableCell>

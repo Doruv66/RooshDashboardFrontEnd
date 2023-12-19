@@ -6,23 +6,21 @@ const ParkingGarageApi = {
     console.log(ParkingGarageData)
     return fetch(`${apiUrl}`, {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
+      headers: {
          Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
       },
-      body: JSON.stringify(ParkingGarageData),
+      body: ParkingGarageData,
     });
   },
   
-  updateParkingGarage(updatedParkingGarage) {  
+  updateParkingGarage(updatedParkingGarage, id) {
     console.log(updatedParkingGarage);
-    return fetch(`${apiUrl}/${updatedParkingGarage.id}`, {
+    return fetch(`${apiUrl}/${id}`, {
       method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
+      headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
        },
-      body: JSON.stringify(updatedParkingGarage),
+      body: updatedParkingGarage,
     });
   },
   
@@ -47,7 +45,16 @@ const ParkingGarageApi = {
       Authorization: `Bearer ${localStorage.getItem('accessToken')}`
     }
   });
+  },
+  async fetchImageWithToken(path, token) {
+    const response = await fetch(`http://localhost:8080/${path}`, {
+      headers: new Headers({
+        'Authorization': `Bearer ${token}`
+      })
+    });
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
   }
-};
+}
 
 export default ParkingGarageApi;
