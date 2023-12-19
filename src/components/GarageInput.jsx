@@ -41,6 +41,7 @@ export default function GarageInput(){
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [errors, setErrors] = useState({});
+    const [imageError, setImageError] = useState("");
 
     const handleTabChange = (event, newValue) => {
         if (tabValue === 0 && tabOneRef.current) {
@@ -658,10 +659,11 @@ export default function GarageInput(){
                             Upload Image
                         </Button>
                     </label>
-                    {/*{imageError && (*/}
-                    {/*    <Typography>*/}
-                    {/*        {imageError}*/}
-                    {/*    </Typography>*/}
+                    {imageError && (
+                        <Typography>
+                            {imageError}
+                        </Typography>
+                    )}
                     {!isNewParkingGarage && parkingGarage && (
                         <div className="crud-button-container">
                             <Button type="submit"
@@ -766,7 +768,17 @@ export default function GarageInput(){
 
     const handleResponse = response => {
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            if (response.status === 400) {
+                return response.json().then(errors => {
+                    setImageError('');
+                    if (errors.image) {
+                        setImageError(errors.image)
+                    }
+                    throw new Error('Validation error');
+                });
+            } else {
+                throw new Error('Error');
+            }
         }
         return response.json();
     };
@@ -856,6 +868,7 @@ export default function GarageInput(){
                 setIsNewParkingGarage(false);
                 setNewGarageAdded(true);
                 setNewImages([])
+                setImageError("")
                 navigate(`/garagedetails`);
                 return ParkingGarageApi.getParkingGarage(data.id);
             })
@@ -934,6 +947,7 @@ export default function GarageInput(){
                 setNewGarageId(data.id)
                 setNewGarageAdded(true);
                 setNewImages([])
+                setImageError("")
             })
             .catch(error => {
                 console.error('Error updating the parking garage:', error);
