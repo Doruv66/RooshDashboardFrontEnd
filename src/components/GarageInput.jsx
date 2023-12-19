@@ -2,15 +2,32 @@ import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} fro
 import './GarageInput.css';
 import { useParkingGarage } from "./ParkingGarageContext";
 import ParkingGarageApi from '../api/ParkingGarageApi';
-import { Box, Button, Tab, Tabs } from '@mui/material';
+import {
+    Box,
+    Button,
+    FormControl,
+    FormGroup,
+    FormLabel,
+    ImageList,
+    ImageListItem, Popover,
+    Tab,
+    Tabs,
+    Typography
+} from '@mui/material';
 import {useNavigate} from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Grid from "@mui/material/Grid";
 export default function GarageInput(){
     const { parkingGarage, setParkingGarage } = useParkingGarage();
     const parkingGarageAttributes = ["name", "airport", "location", "travelTime", "travelDistance", "phoneNumber"];
     const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
+    const [newImages, setNewImages] = useState([]);
+    const [existingImages, setExistingImages] = useState([]); // For images already on the server
+    const [imagesToRemove, setImagesToRemove] = useState([]); // For images to be removed
+    const [previewImages, setPreviewImages] = useState([])
     const [editingField ,setEditingField] = useState(null);
     const [editingValue ,setEditingValue] = useState('');
     const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId, setUpdateTrigger } = useParkingGarage();
@@ -23,6 +40,7 @@ export default function GarageInput(){
     const [confirmationMessage, setConfirmationMessage] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [errors, setErrors] = useState({});
 
     const handleTabChange = (event, newValue) => {
         if (tabValue === 0 && tabOneRef.current) {
@@ -36,6 +54,32 @@ export default function GarageInput(){
         }
         setTabValue(newValue);
     };
+
+    useEffect(() => {
+        console.log(isNewParkingGarage)
+        if (!isNewParkingGarage && parkingGarage && parkingGarage.imagePaths) {
+            const fetchImages = async () => {
+                try {
+                    const fetchedImages = await Promise.all(
+                        parkingGarage.imagePaths.map(async (path) => {
+                            const blobUrl = await ParkingGarageApi.fetchImageWithToken(path, localStorage.getItem('accessToken'));
+                            return { blobUrl, path };
+                        })
+                    );
+
+                    setPreviewImages(fetchedImages.map(img => img.blobUrl));
+                    setExistingImages(fetchedImages);
+                } catch (error) {
+                    console.error('Error fetching images:', error);
+                }
+            };
+
+            fetchImages();
+        }
+        else if(isNewParkingGarage) {
+            setPreviewImages([])
+        }
+    }, [isNewParkingGarage, parkingGarage]);
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
@@ -64,6 +108,18 @@ export default function GarageInput(){
 
     const TabOneContent = forwardRef((props, ref) => {
         const [localValues, setLocalValues] = useState({});
+        const [anchorEl, setAnchorEl] = useState(null);
+
+        const handlePopoverOpen = (event) => {
+            setAnchorEl(event.currentTarget);
+        };
+
+        const handlePopoverClose = () => {
+            setAnchorEl(null);
+        };
+
+        const open = Boolean(anchorEl);
+
         useEffect(() => {
             setLocalValues(formValues);
         }, [formValues]);
@@ -77,19 +133,50 @@ export default function GarageInput(){
 
         const handleLocalChange = (attr, value) => {
             setLocalValues(prev => ({ ...prev, [attr]: value }));
+            if (errors[attr]) {
+                setErrors({ ...errors, [attr]: '' });
+            }
             console.log(localValues)
+        };
+
+        const validateInput = (attr, value) => {
+            if (!value) {
+                return 'This field is required';
+            }
+            if (value.length > 255) {
+                return `Maximum length is 255`;
+            }
+            if ((attr === 'travelTime' || attr === 'travelDistance') && !/^[0-9\b]+$/.test(value)) {
+                return 'Only numbers are allowed';
+            }
+            return '';
         };
 
         const handleFormSubmit = (e) => {
             e.preventDefault();
-            setTimeout(() => {
-                if(isNewParkingGarage){
-                    handleSaveNewParkingGarage()
+
+            let newErrors = {};
+            let formIsValid = true;
+
+            Object.keys(localValues).forEach(attr => {
+                const error = validateInput(attr, localValues[attr]);
+                if (error) {
+                    newErrors[attr] = error;
+                    formIsValid = false;
                 }
-                else{
-                    handleUpdateParkingGarage(localValues);
-                }
-            }, 0);
+            });
+
+            setErrors(newErrors);
+
+            if (formIsValid) {
+                setTimeout(() => {
+                    if (isNewParkingGarage) {
+                        handleSaveNewParkingGarage(localValues);
+                    } else {
+                        handleUpdateParkingGarage(localValues);
+                    }
+                }, 0);
+            }
         };
 
         useImperativeHandle(ref, () => ({
@@ -106,16 +193,167 @@ export default function GarageInput(){
                 label = label + ' (in meters)';
             }
 
-            return (
-                <TextField
-                    name={attr}
-                    key={attr}
-                    label={label}
-                    className="textField"
-                    value={localValues[attr] || ''}
-                    onChange={(e) => handleLocalChange(attr, e.target.value)}
-                />
+            const CoordinatesGroup = () => (
+                <FormControl component="fieldset" className="coordinates-group" fullWidth>
+                    <FormLabel component="legend" sx={{ml:2}}>Coordinates</FormLabel>
+                    <FormGroup row sx={{ml:2}}>
+                        <TextField
+                            placeholder="Long"
+                            variant="outlined"
+                            sx={{backgroundColor: '#FFFFFF', width: '40%'}}
+                            error={Boolean(errors[attr])}
+                            helperText={errors[attr] || ''}
+                        />
+                        <TextField
+                            placeholder="Lat"
+                            variant="outlined"
+                            sx={{backgroundColor: '#FFFFFF', width: '40%'}}
+                            error={Boolean(errors[attr])}
+                            helperText={errors[attr] || ''}
+                        />
+                    </FormGroup>
+                </FormControl>
             );
+
+            const AddressGroup = () => (
+                <div className="address-details">
+                    <FormControl component="fieldset" className="address-group" fullWidth>
+                        <FormLabel component="legend" sx={{ml:2}}>Address Details</FormLabel>
+                        <FormGroup sx={{ml:2}}>
+                            <TextField
+                                placeholder="Street and Address"
+                                variant="outlined"
+                                margin="normal"
+                                sx={{backgroundColor: '#FFFFFF',width: '100%', mb:0}}
+                            />
+                            <TextField
+                                margin="normal"
+                                placeholder="Zip code"
+                                sx={{ mr: 8}}
+                            />
+                            <TextField
+                                margin="normal"
+                                placeholder="City"
+                            />
+                            <TextField
+                                placeholder="Country"
+                                variant="outlined"
+                                margin="normal"
+                                sx={{backgroundColor: '#FFFFFF', width: '100%'}}
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </div>
+            );
+
+            return (
+                <React.Fragment key={attr}>
+                    {attr === 'airport' ? (
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                            <Button
+                                aria-owns={open ? 'mouse-over-popover' : undefined}
+                                aria-haspopup="true"
+                                onClick={handlePopoverOpen}
+                                variant="contained"
+                                style={{ marginRight: '8px', flexShrink: 0, height: '56px', backgroundColor: '#FF9000' }}
+                            >
+                                Add Airport
+                            </Button>
+                            <TextField
+                                name={attr}
+                                error={Boolean(errors[attr])}
+                                helperText={errors[attr] || ''}
+                                label={label}
+                                value={localValues[attr] || ''}
+                                onChange={(e) => handleLocalChange(attr, e.target.value)}
+                                variant="outlined"
+                                style={{width:'70%'}}
+                            />
+                        </div>
+                    ) : (
+                        <TextField
+                            error={Boolean(errors[attr])}
+                            helperText={errors[attr] || ''}
+                            name={attr}
+                            label={label}
+                            value={localValues[attr] || ''}
+                            onChange={(e) => {
+                                if (attr === 'travelTime' || attr === 'travelDistance') {
+                                    const re = /^[0-9\b]+$/;
+                                    if (e.target.value === '' || re.test(e.target.value)) {
+                                        handleLocalChange(attr, e.target.value);
+                                    }
+                                } else {
+                                    handleLocalChange(attr, e.target.value);
+                                }
+                            }}
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                        />
+                    )}
+                    {attr === 'airport' && (
+                        <Popover
+                            id="mouse-over-popover"
+                            open={open}
+                            anchorEl={anchorEl}
+                            onClose={handlePopoverClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                            sx={{
+                                "& .MuiPaper-root": {
+                                    width: "auto",
+                                    maxWidth: "30%",
+                                }
+                            }}
+                        >
+                            <div className="form-grid">
+                                <Box sx={{ padding: 3, borderRadius: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,'&.MuiBox-root': {
+                                        marginTop: '0px',}, }}>
+                                    <Typography variant="h6" gutterBottom>
+                                        Add a new Airport
+                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} md={12}>
+                                            <TextField
+                                                label="IATA Airport Code"
+                                                placeholder="Enter Code"
+                                                variant="outlined"
+                                                sx={{backgroundColor: '#FFFFFF',width: '100%', mt: 1, mb: 1}}
+                                            />
+                                            <TextField
+                                                label="Terminal Name"
+                                                placeholder="Enter Name"
+                                                variant="outlined"
+                                                sx={{backgroundColor: '#FFFFFF',width: '100%', mt: 1, mb: 1}}
+                                            />
+                                            <TextField
+                                                label="Airport Name"
+                                                placeholder="Enter Name"
+                                                variant="outlined"
+                                                sx={{backgroundColor: '#FFFFFF',width: '100%', mt: 1, mb: 2}}
+                                            />
+                                        </Grid>
+                                        <AddressGroup/>
+                                        <CoordinatesGroup/>
+                                        <div className="button-container">
+                                            <Button variant="contained" className="form-button" sx={{mr:2, ml:2, padding: '10px 40px'}}>Save</Button>
+                                            <Button variant="contained" style={{ backgroundColor: '#ef1846'}} sx={{padding: '10px 40px'}} className="form-button">Delete</Button>
+                                        </div>
+                                    </Grid>
+                                </Box>
+                            </div>
+                        </Popover>
+                    )}
+                </React.Fragment>
+            );
+
         });
 
         return (
@@ -131,39 +369,39 @@ export default function GarageInput(){
                     {!isNewParkingGarage && parkingGarage && (
                         <div className="crud-button-container">
                             <Button type="submit"
-                            variant="contained"
-                            sx={{
-                                width: 'max-content',
-                                margin: '5%',
-                                padding: "12px 20px",
-                                fontSize: "large",
-                                letterSpacing: "1px",
-                                textTransform: 'none',
-                                bgcolor: "#DA4A0C",
-                                '&:hover': {
-                                    bgcolor: '#e80',
-                                },
-                                borderRadius: '10px',
-                                marginLeft: '5%',
-                                }}>
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#FF9000",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
                                 Update parking garage
                             </Button>
                             <Button
                                 variant="contained"
                                 onClick={handleDeleteParkingGarage}
                                 sx={{
-                                width: 'max-content',
-                                margin: '5%',
-                                padding: "12px 20px",
-                                fontSize: "large",
-                                letterSpacing: "1px",
-                                textTransform: 'none',
-                                bgcolor: "#DA4A0C",
-                                '&:hover': {
-                                    bgcolor: '#e80',
-                                },
-                                borderRadius: '10px',
-                                marginLeft: '5%',
+                                    width: 'max-content',
+                                    margin: '5%',
+                                    padding: "12px 20px",
+                                    fontSize: "large",
+                                    letterSpacing: "1px",
+                                    textTransform: 'none',
+                                    bgcolor: "#FF9000",
+                                    '&:hover': {
+                                        bgcolor: '#e80',
+                                    },
+                                    borderRadius: '10px',
+                                    marginLeft: '5%',
                                 }}
                             >
                                 Delete parking garage
@@ -172,22 +410,22 @@ export default function GarageInput(){
                     )}
                     {isNewParkingGarage && (
                         <div className="crud-button-container">
-                            <Button type="submit" 
-                            variant="contained"
-                            sx={{
-                                width: 'max-content',
-                                margin: '5%',
-                                padding: "12px 20px",
-                                fontSize: "large",
-                                letterSpacing: "1px",
-                                textTransform: 'none',
-                                bgcolor: "#DA4A0C",
-                                '&:hover': {
-                                    bgcolor: '#e80',
-                                },
-                                borderRadius: '10px',
-                                marginLeft: '5%',
-                                }}>
+                            <Button type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#FF9000",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
                                 Save new parking garage
                             </Button>
                         </div>
@@ -291,63 +529,63 @@ export default function GarageInput(){
                     </div>
                     {!isNewParkingGarage && (
                         <div className="crud-button-container">
-                            <Button type="submit" 
-                            variant="contained"
-                            sx={{
-                                width: 'max-content',
-                                margin: '5%',
-                                padding: "12px 20px",
-                                fontSize: "large",
-                                letterSpacing: "1px",
-                                textTransform: 'none',
-                                bgcolor: "#DA4A0C",
-                                '&:hover': {
-                                    bgcolor: '#e80',
-                                },
-                                borderRadius: '10px',
-                                marginLeft: '5%',
-                                }}>
+                            <Button type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#FF9000",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
                                 Update parking garage
                             </Button>
-                            <Button type="button" 
-                            variant="contained"
-                            sx={{
-                                width: 'max-content',
-                                margin: '5%',
-                                padding: "12px 20px",
-                                fontSize: "large",
-                                letterSpacing: "1px",
-                                textTransform: 'none',
-                                bgcolor: "#DA4A0C",
-                                '&:hover': {
-                                    bgcolor: '#e80',
-                                },
-                                borderRadius: '10px',
-                                marginLeft: '5%',
-                                }}
-                                onClick={handleDeleteParkingGarage}>
+                            <Button type="button"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#FF9000",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}
+                                    onClick={handleDeleteParkingGarage}>
                                 Delete parking garage
                             </Button>
                         </div>
                     )}
                     {isNewParkingGarage && (
                         <div className="crud-button-container">
-                            <Button type="submit" 
-                            variant="contained"
-                            sx={{
-                                width: 'max-content',
-                                margin: '5%',
-                                padding: "12px 20px",
-                                fontSize: "large",
-                                letterSpacing: "1px",
-                                textTransform: 'none',
-                                bgcolor: "#DA4A0C",
-                                '&:hover': {
-                                    bgcolor: '#e80',
-                                },
-                                borderRadius: '10px',
-                                marginLeft: '5%',
-                                }}>
+                            <Button type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#DA4A0C",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
                                 Save new parking garage
                             </Button>
                         </div>
@@ -359,8 +597,140 @@ export default function GarageInput(){
     TabTwoContent.displayName = 'TabTwoContent';
 
     const TabThreeContent = () => {
-        return <div>Tab Three Content</div>;
+        const handleFormSubmit = (e) => {
+            e.preventDefault();
+            setTimeout(() => {
+                if (isNewParkingGarage) {
+                    handleSaveNewParkingGarage();
+                } else {
+                    handleUpdateParkingGarage(formValues);
+                }
+            }, 0);
+        };
+        const removeImage = (imageBlobUrl) => {
+            const image = existingImages.find(img => img.blobUrl === imageBlobUrl);
+
+            if (image) {
+                setExistingImages(existingImages.filter(img => img.blobUrl !== imageBlobUrl));
+                setImagesToRemove([...imagesToRemove, image.path]);
+            } else {
+                setNewImages(newImages.filter(img => img !== imageBlobUrl));
+            }
+            setPreviewImages(previewImages.filter(img => img !== imageBlobUrl));
+        };
+        return (
+            <div>
+                <form onSubmit={handleFormSubmit}>
+                    <ImageList cols={6} gap={8}>
+                        {previewImages.map((imageSrc, index) => (
+                            <ImageListItem key={index}>
+                                <img
+                                    src={imageSrc}
+                                    alt={`Preview ${index}`}
+                                    loading="lazy"
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'scale-down'
+                                    }}
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={() => removeImage(imageSrc)}
+                                    style={{ position: 'absolute', top: 0, right: 0 }}
+                                >
+                                    <DeleteIcon />
+                                </Button>
+                            </ImageListItem>
+                        ))}
+                    </ImageList>
+                    <input
+                        className="file-input"
+                        accept="image/*"
+                        id="raised-button-file"
+                        type="file"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                    />
+                    <label htmlFor="raised-button-file" className="input-label">
+                        <Button variant="contained" component="span" sx={{ mt: 2, mb: 2, backgroundColor: '#FF9000' }} className="input-label-button">
+                            Upload Image
+                        </Button>
+                    </label>
+                    {/*{imageError && (*/}
+                    {/*    <Typography>*/}
+                    {/*        {imageError}*/}
+                    {/*    </Typography>*/}
+                    {!isNewParkingGarage && parkingGarage && (
+                        <div className="crud-button-container">
+                            <Button type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#FF9000",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
+                                Update parking garage
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleDeleteParkingGarage}
+                                sx={{
+                                    width: 'max-content',
+                                    margin: '5%',
+                                    padding: "12px 20px",
+                                    fontSize: "large",
+                                    letterSpacing: "1px",
+                                    textTransform: 'none',
+                                    bgcolor: "#FF9000",
+                                    '&:hover': {
+                                        bgcolor: '#e80',
+                                    },
+                                    borderRadius: '10px',
+                                    marginLeft: '5%',
+                                }}
+                            >
+                                Delete parking garage
+                            </Button>
+                        </div>
+                    )}
+                    {isNewParkingGarage && (
+                        <div className="crud-button-container">
+                            <Button type="submit"
+                                    variant="contained"
+                                    sx={{
+                                        width: 'max-content',
+                                        margin: '5%',
+                                        padding: "12px 20px",
+                                        fontSize: "large",
+                                        letterSpacing: "1px",
+                                        textTransform: 'none',
+                                        bgcolor: "#FF9000",
+                                        '&:hover': {
+                                            bgcolor: '#e80',
+                                        },
+                                        borderRadius: '10px',
+                                        marginLeft: '5%',
+                                    }}>
+                                Save new parking garage
+                            </Button>
+                        </div>
+                    )}
+                </form>
+            </div>
+        )
     };
+    TabThreeContent.displayName = 'TabThreeContent';
 
     useEffect(() => {
         const initialValues = parkingGarageAttributes.reduce((acc, attr) => {
@@ -380,10 +750,23 @@ export default function GarageInput(){
         setFormValues(initialValues);
     }, [isNewParkingGarage, parkingGarage]);
 
+    const handleFileChange = (event) => {
+        if (event.target.files && event.target.files[0]) {
+            const newImageFile = event.target.files[0];
+
+            setNewImages(prevImages => [...prevImages, newImageFile]);
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreviewImages(prevPreviewImages => [...prevPreviewImages, reader.result]);
+            };
+            reader.readAsDataURL(newImageFile);
+        }
+    };
 
     const handleResponse = response => {
         if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
     };
@@ -435,14 +818,44 @@ export default function GarageInput(){
                 toilet: updatedValues.parkingGarageUtility.toilet || false
             }
         };
+        const formData = new FormData();
 
-        ParkingGarageApi.createParkingGarage(parkingGarageToSave)
+        Object.keys(parkingGarageToSave).forEach(key => {
+            if (key !== 'parkingGarageUtility') {
+                formData.append(key, parkingGarageToSave[key]);
+            }
+        });
+
+        // Append nested parkingGarageUtility fields to formData
+        if (parkingGarageToSave.parkingGarageUtility) {
+            Object.keys(parkingGarageToSave.parkingGarageUtility).forEach(key => {
+                formData.append(`parkingGarageUtility.${key}`, parkingGarageToSave.parkingGarageUtility[key]);
+            });
+        }
+
+        // Append images to formData
+        newImages.forEach((image, index) => {
+            if (image) {
+                formData.append(`images[${index}]`, image);
+            }
+        });
+
+        const formDataEntries = Array.from(formData.entries());
+        const formDataForLog = {};
+        formDataEntries.forEach(([key, value]) => {
+            formDataForLog[key] = value instanceof File ? value.name : value;
+        });
+        console.log('FormData to be sent:', formDataForLog);
+
+
+        ParkingGarageApi.createParkingGarage(formData)
             .then(handleResponse)
             .then(data => {
                 console.log('Successfully created new parking garage: ', data);
                 setNewGarageId(data.id);
                 setIsNewParkingGarage(false);
                 setNewGarageAdded(true);
+                setNewImages([])
                 navigate(`/garagedetails`);
                 return ParkingGarageApi.getParkingGarage(data.id);
             })
@@ -485,16 +898,31 @@ export default function GarageInput(){
     };
 
     const handleUpdateParkingGarage = (values) => {
-        const updatedParkingGarage = {
-            ...parkingGarage,
-            ...values,
-            parkingGarageUtility: {
-                ...parkingGarage.parkingGarageUtility,
-                ...values.parkingGarageUtility
+        const formData = new FormData();
+
+        // Append form fields
+        Object.keys(values).forEach(key => {
+            if (key !== 'parkingGarageUtility') {
+                formData.append(key, values[key]);
             }
-        };
-        console.log(updatedParkingGarage)
-        ParkingGarageApi.updateParkingGarage(updatedParkingGarage)
+        });
+
+        // Append nested parkingGarageUtility fields to formData
+        if (values.parkingGarageUtility) {
+            Object.keys(values.parkingGarageUtility).forEach(key => {
+                formData.append(`parkingGarageUtility.${key}`, values.parkingGarageUtility[key]);
+            });
+        }
+
+        // Append new images to formData
+        newImages.forEach((image, index) => {
+            formData.append(`images[${index}]`, image);
+        });
+
+        imagesToRemove.forEach((imagePath, index) => {
+            formData.append(`imagesToRemove[${index}]`, imagePath);
+        });
+        ParkingGarageApi.updateParkingGarage(formData, parkingGarage.id)
             .then(handleResponse)
             .then(data => {
                 console.log(data)
@@ -505,6 +933,7 @@ export default function GarageInput(){
                 setUpdateTrigger(prev => !prev);
                 setNewGarageId(data.id)
                 setNewGarageAdded(true);
+                setNewImages([])
             })
             .catch(error => {
                 console.error('Error updating the parking garage:', error);
@@ -516,32 +945,32 @@ export default function GarageInput(){
 
     return (
 
-            <div className="garage-input">
-                <Snackbar
-                    open={openSnackbar}
-                    autoHideDuration={6000}
+        <div className="garage-input">
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+            >
+                <MuiAlert
                     onClose={handleCloseSnackbar}
+                    severity={snackbarSeverity}
+                    elevation={6}
+                    variant="filled"
                 >
-                    <MuiAlert
-                        onClose={handleCloseSnackbar}
-                        severity={snackbarSeverity}
-                        elevation={6}
-                        variant="filled"
-                    >
-                        {confirmationMessage}
-                    </MuiAlert>
-                </Snackbar>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
-                        <Tab label="General" />
-                        <Tab label="Amenities" />
-                        <Tab label="Images" />
-                    </Tabs>
-                </Box>
-                {tabValue === 0 && <TabOneContent ref={tabOneRef} />}
-                {tabValue === 1 && <TabTwoContent ref={tabTwoRef} />}
-                {tabValue === 2 && <TabThreeContent />}
-            </div>
+                    {confirmationMessage}
+                </MuiAlert>
+            </Snackbar>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={tabValue} onChange={handleTabChange} aria-label="basic tabs example">
+                    <Tab label="General" />
+                    <Tab label="Amenities" />
+                    <Tab label="Images" />
+                </Tabs>
+            </Box>
+            {tabValue === 0 && <TabOneContent ref={tabOneRef} />}
+            {tabValue === 1 && <TabTwoContent ref={tabTwoRef} />}
+            {tabValue === 2 && <TabThreeContent />}
+        </div>
     );
 
 }
