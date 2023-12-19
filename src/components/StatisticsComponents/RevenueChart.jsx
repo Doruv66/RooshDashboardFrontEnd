@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
-const RevenueChart = ({ data }) => {
+const RevenueChart = ({ data, labels }) => {
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
@@ -15,7 +15,7 @@ const RevenueChart = ({ data }) => {
         chartInstance.current = new Chart(ctx, {
           type: 'line',
           data: {
-            labels: data.map((_, index) => `Month ${index + 1}`),
+            labels: labels,
             datasets: [{
               label: 'REVENUE',
               data: data,
@@ -39,7 +39,7 @@ const RevenueChart = ({ data }) => {
           chartInstance.current.destroy();
         }
       };
-    }, [data]);
+    }, [data, labels]);
 
     return (
       <div style={{ width: '550px', height: '450px', marginTop: '30px' }}>
