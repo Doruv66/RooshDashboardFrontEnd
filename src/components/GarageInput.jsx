@@ -328,7 +328,7 @@ export default function GarageInput(){
                                         fontSize: "large",
                                         letterSpacing: "1px",
                                         textTransform: 'none',
-                                        bgcolor: "#DA4A0C",
+                                        bgcolor: "#FF9000",
                                         '&:hover': {
                                             bgcolor: '#e80',
                                         },
@@ -347,7 +347,7 @@ export default function GarageInput(){
                                     fontSize: "large",
                                     letterSpacing: "1px",
                                     textTransform: 'none',
-                                    bgcolor: "#DA4A0C",
+                                    bgcolor: "#FF9000",
                                     '&:hover': {
                                         bgcolor: '#e80',
                                     },
@@ -370,7 +370,7 @@ export default function GarageInput(){
                                         fontSize: "large",
                                         letterSpacing: "1px",
                                         textTransform: 'none',
-                                        bgcolor: "#DA4A0C",
+                                        bgcolor: "#FF9000",
                                         '&:hover': {
                                             bgcolor: '#e80',
                                         },
