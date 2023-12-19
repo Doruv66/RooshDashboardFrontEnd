@@ -17,6 +17,13 @@ const BookingApi = {
     });
     },
 
+    getBookingStatistics(startDate, garageId) {
+      return fetch(`${apiUrl}/getBookingStatistics?startDate=${startDate}&garageId=${garageId}`, { headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    });
+    },
+
     getFilteredBookings(garageId, service, finished, ongoing) {
       const filterUrl = `${apiUrl}/filter?garageId=${garageId}&service=${service}&finished=${finished}&ongoing=${ongoing}`;
       return fetch(filterUrl, { headers: {
