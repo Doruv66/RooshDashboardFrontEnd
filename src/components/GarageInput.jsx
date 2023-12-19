@@ -40,6 +40,7 @@ export default function GarageInput(){
     const [confirmationMessage, setConfirmationMessage] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [errors, setErrors] = useState({});
 
     const handleTabChange = (event, newValue) => {
         if (tabValue === 0 && tabOneRef.current) {
@@ -132,19 +133,50 @@ export default function GarageInput(){
 
         const handleLocalChange = (attr, value) => {
             setLocalValues(prev => ({ ...prev, [attr]: value }));
+            if (errors[attr]) {
+                setErrors({ ...errors, [attr]: '' });
+            }
             console.log(localValues)
+        };
+
+        const validateInput = (attr, value) => {
+            if (!value) {
+                return 'This field is required';
+            }
+            if (value.length > 255) {
+                return `Maximum length is 255`;
+            }
+            if ((attr === 'travelTime' || attr === 'travelDistance') && !/^[0-9\b]+$/.test(value)) {
+                return 'Only numbers are allowed';
+            }
+            return '';
         };
 
         const handleFormSubmit = (e) => {
             e.preventDefault();
-            setTimeout(() => {
-                if(isNewParkingGarage){
-                    handleSaveNewParkingGarage()
+
+            let newErrors = {};
+            let formIsValid = true;
+
+            Object.keys(localValues).forEach(attr => {
+                const error = validateInput(attr, localValues[attr]);
+                if (error) {
+                    newErrors[attr] = error;
+                    formIsValid = false;
                 }
-                else{
-                    handleUpdateParkingGarage(localValues);
-                }
-            }, 0);
+            });
+
+            setErrors(newErrors);
+
+            if (formIsValid) {
+                setTimeout(() => {
+                    if (isNewParkingGarage) {
+                        handleSaveNewParkingGarage(localValues);
+                    } else {
+                        handleUpdateParkingGarage(localValues);
+                    }
+                }, 0);
+            }
         };
 
         useImperativeHandle(ref, () => ({
@@ -169,11 +201,15 @@ export default function GarageInput(){
                             placeholder="Long"
                             variant="outlined"
                             sx={{backgroundColor: '#FFFFFF', width: '40%'}}
+                            error={Boolean(errors[attr])}
+                            helperText={errors[attr] || ''}
                         />
                         <TextField
                             placeholder="Lat"
                             variant="outlined"
                             sx={{backgroundColor: '#FFFFFF', width: '40%'}}
+                            error={Boolean(errors[attr])}
+                            helperText={errors[attr] || ''}
                         />
                     </FormGroup>
                 </FormControl>
@@ -225,6 +261,8 @@ export default function GarageInput(){
                             </Button>
                             <TextField
                                 name={attr}
+                                error={Boolean(errors[attr])}
+                                helperText={errors[attr] || ''}
                                 label={label}
                                 value={localValues[attr] || ''}
                                 onChange={(e) => handleLocalChange(attr, e.target.value)}
@@ -234,10 +272,21 @@ export default function GarageInput(){
                         </div>
                     ) : (
                         <TextField
+                            error={Boolean(errors[attr])}
+                            helperText={errors[attr] || ''}
                             name={attr}
                             label={label}
                             value={localValues[attr] || ''}
-                            onChange={(e) => handleLocalChange(attr, e.target.value)}
+                            onChange={(e) => {
+                                if (attr === 'travelTime' || attr === 'travelDistance') {
+                                    const re = /^[0-9\b]+$/;
+                                    if (e.target.value === '' || re.test(e.target.value)) {
+                                        handleLocalChange(attr, e.target.value);
+                                    }
+                                } else {
+                                    handleLocalChange(attr, e.target.value);
+                                }
+                            }}
                             variant="outlined"
                             fullWidth
                             margin="normal"
@@ -489,7 +538,7 @@ export default function GarageInput(){
                                 fontSize: "large",
                                 letterSpacing: "1px",
                                 textTransform: 'none',
-                                bgcolor: "#DA4A0C",
+                                bgcolor: "#FF9000",
                                 '&:hover': {
                                     bgcolor: '#e80',
                                 },
@@ -507,7 +556,7 @@ export default function GarageInput(){
                                 fontSize: "large",
                                 letterSpacing: "1px",
                                 textTransform: 'none',
-                                bgcolor: "#DA4A0C",
+                                bgcolor: "#FF9000",
                                 '&:hover': {
                                     bgcolor: '#e80',
                                 },
@@ -605,7 +654,7 @@ export default function GarageInput(){
                         style={{ display: 'none' }}
                     />
                     <label htmlFor="raised-button-file" className="input-label">
-                        <Button variant="contained" component="span" sx={{ mt: 2, mb: 2 }} className="input-label-button">
+                        <Button variant="contained" component="span" sx={{ mt: 2, mb: 2, backgroundColor: '#FF9000' }} className="input-label-button">
                             Upload Image
                         </Button>
                     </label>
@@ -624,7 +673,7 @@ export default function GarageInput(){
                                         fontSize: "large",
                                         letterSpacing: "1px",
                                         textTransform: 'none',
-                                        bgcolor: "#DA4A0C",
+                                        bgcolor: "#FF9000",
                                         '&:hover': {
                                             bgcolor: '#e80',
                                         },
@@ -643,7 +692,7 @@ export default function GarageInput(){
                                     fontSize: "large",
                                     letterSpacing: "1px",
                                     textTransform: 'none',
-                                    bgcolor: "#DA4A0C",
+                                    bgcolor: "#FF9000",
                                     '&:hover': {
                                         bgcolor: '#e80',
                                     },
@@ -666,7 +715,7 @@ export default function GarageInput(){
                                         fontSize: "large",
                                         letterSpacing: "1px",
                                         textTransform: 'none',
-                                        bgcolor: "#DA4A0C",
+                                        bgcolor: "#FF9000",
                                         '&:hover': {
                                             bgcolor: '#e80',
                                         },
