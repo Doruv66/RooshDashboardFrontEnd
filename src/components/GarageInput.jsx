@@ -168,7 +168,11 @@ export default function GarageInput(){
 
             setErrors(newErrors);
 
-            if (formIsValid) {
+            if (!formIsValid) {
+                setConfirmationMessage("An input was invalid. Please check the errors and try again.");
+                setSnackbarSeverity("error");
+                setOpenSnackbar(true);
+            } else {
                 setTimeout(() => {
                     if (isNewParkingGarage) {
                         handleSaveNewParkingGarage(localValues);
