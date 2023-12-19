@@ -147,7 +147,7 @@ export default function GarageInput(){
                 return `Maximum length is 255`;
             }
             if ((attr === 'travelTime' || attr === 'travelDistance') && !/^[0-9\b]+$/.test(value)) {
-                return 'Only numbers are allowed';
+                return 'Only numbers are accepted';
             }
             return '';
         };
