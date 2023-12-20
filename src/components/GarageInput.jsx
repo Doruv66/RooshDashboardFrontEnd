@@ -349,7 +349,7 @@ export default function GarageInput(){
                                         <AddressGroup/>
                                         <CoordinatesGroup/>
                                         <div className="button-container">
-                                            <Button variant="contained" className="form-button" sx={{mr:2, ml:2, padding: '10px 40px'}}>Save</Button>
+                                            <Button variant="contained" className="form-button" sx={{mr:2, ml:2, padding: '10px 40px', bgcolor: "#FF9000"}}>Save</Button>
                                             <Button variant="contained" style={{ backgroundColor: '#ef1846'}} sx={{padding: '10px 40px'}} className="form-button">Delete</Button>
                                         </div>
                                     </Grid>
@@ -663,7 +663,13 @@ export default function GarageInput(){
                         style={{ display: 'none' }}
                     />
                     <label htmlFor="raised-button-file" className="input-label">
-                        <Button variant="contained" component="span" sx={{ mt: 2, mb: 2, backgroundColor: '#FF9000' }} className="input-label-button">
+                        <Button variant="contained" component="span" sx={{ mt: 2,
+                            mb: 2,
+                            backgroundColor: '#FF9000',
+                            '&:hover': {
+                                bgcolor: '#e80',
+                            }
+                            ,}} className="input-label-button">
                             Upload Image
                         </Button>
                     </label>
