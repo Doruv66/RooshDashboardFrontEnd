@@ -32,10 +32,10 @@ const Header = (props) => {
                     aria-label="arrivals"
                     sx={{
                         '&.Mui-selected': {
-                        bgcolor: '#DA4A0C', 
+                        bgcolor: '#FF9000',
                         color: 'white', 
                         '&:hover': {
-                            bgcolor: '#DA4A0C', 
+                            bgcolor: '#FF9000',
                             color: 'white', 
                         },
                         },
@@ -49,10 +49,10 @@ const Header = (props) => {
                     aria-label="departures"
                     sx={{
                         '&.Mui-selected': {
-                        bgcolor: '#DA4A0C', 
+                        bgcolor: '#FF9000',
                         color: 'white', 
                         '&:hover': {
-                            bgcolor: '#DA4A0C', 
+                            bgcolor: '#FF9000',
                             color: 'white', 
                         },
                         },

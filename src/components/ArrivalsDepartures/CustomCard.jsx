@@ -18,7 +18,6 @@ const CustomCard = (props) => {
 
     const handleIntervalChange = (event) => {
         setInterval(event.target.value);
-
     }
 
     const formatDateString = (startDate, endDate) => {
@@ -149,14 +148,14 @@ const CustomCard = (props) => {
                     }
                     <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: interval === "Pick Dates" ? '15px' : "30px"}}>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px', color: '#DA4A0C' }}/>
+                            <FlightTakeoffIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px', color: '#FF9000' }}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures !== null ? arrivalsDepartures.arrivals.length : 0}</Typography>
                                 <Typography>ARRIVALS</Typography>
                             </Box>
                         </Box>
                         <Box sx={{display: 'flex', alignItems: 'center'}}>
-                        <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px', color: '#DA4A0C'}}/>
+                        <FlightLandIcon style={{fontSize: '50px', marginRight: '10px', border: '1px ridge', borderRadius: '5px', color: '#FF9000'}}/>
                             <Box sx={{display: 'flex', flexDirection: "column"}}>
                                 <Typography variant='h5'>{arrivalsDepartures !== null ? arrivalsDepartures.departures.length : 0}</Typography>
                                 <Typography>DEPARTURES</Typography>
