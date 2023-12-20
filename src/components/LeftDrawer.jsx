@@ -9,6 +9,7 @@ import GarageIcon from '@mui/icons-material/Garage';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
 import PaidIcon from '@mui/icons-material/Paid';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import TokenManager from "../api/TokenManager.jsx"
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import { NavLink } from "react-router-dom";
@@ -17,6 +18,7 @@ import ParkingGarageMenu from "./ParkingGarageMenu.jsx";
 import './LeftDrawer.css';
 import {ListItemText} from "@mui/material";
 import {useParkingGarage} from "./ParkingGarageContext.jsx";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const LeftDrawer = ({ isDrawerOpen }) => {
     const { setIsNewParkingGarage, isNewParkingGarage } = useParkingGarage();
@@ -33,7 +35,17 @@ const LeftDrawer = ({ isDrawerOpen }) => {
             handleAddGarageClick();
         } else if (text === "Garage Details") {
             handleGarageDetailsClick();
+        } else if (text === "Logout") {
+            handleLogout();
         }
+    };
+
+    const handleLogout = () => {
+        console.log("Logging out...");
+        TokenManager.clear();
+
+        window.location.href = "/login"
+      
     };
     const getIcon = (text) => {
         switch (text) {
@@ -43,6 +55,7 @@ const LeftDrawer = ({ isDrawerOpen }) => {
             case "Statistics": return <BarChartIcon />;
             case "Booking History": return <LibraryBooksIcon />;
             case "Pricing": return <PaidIcon/>;
+            case "Logout" : return <LogoutIcon />;
             default: return null;
         }
     }

@@ -34,6 +34,7 @@ const ParkingGarageApi = {
   },
   
   getParkingGarage(parkingGarageId) {
+    console.log(localStorage.getItem('accessToken'))
     return fetch(`${apiUrl}/${parkingGarageId}`, { headers: {
       Authorization: `Bearer ${localStorage.getItem('accessToken')}`
     }

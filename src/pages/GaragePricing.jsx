@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, TextField, Checkbox, FormControlLabel } from '@mui/material';
+import {
+  Grid,
+  Typography,
+  TextField,
+  Checkbox,
+  FormControlLabel,
+  Button,
+  Box
+} from '@mui/material';
+
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import ParkingGarageApi from '../api/ParkingGarageApi';
+
+import PriceListApi from '../api/PriceList';  // Import the PriceListApi
 
 function GaragePricing() {
   const [shuttleUncoveredChecked, setShuttleUncoveredChecked] = useState(true);
@@ -10,12 +26,50 @@ function GaragePricing() {
   const [shuttleCoveredValues, setShuttleCoveredValues] = useState(Array.from({ length: 30 }, () => ''));
   const [valetUncoveredValues, setValetUncoveredValues] = useState(Array.from({ length: 30 }, () => ''));
 
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const [parkingGarages, setParkingGarages] = useState([]);
+
+  const [existingPriceLists, setExistingPriceLists] = useState([]);
+
+  const handleResponse = response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+  };
+
+  const getParkingGarage = () => {
+    ParkingGarageApi.getAllParkingGarages()
+    .then(handleResponse)
+    .then(data => {
+        if(data.parkingGarages){
+          setParkingGarages(data.parkingGarages);
+          console.log("Succesfully fetched all parking garages", data.parkingGarages);
+        }
+        else{
+          setParkingGarages([]);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching the parking garages:', error);        
+        setError('An error occurred while fetching data.');
+      })
+  }
+
   useEffect(() => {
     // Set all items as included when the component mounts
     setShuttleUncoveredChecked(true);
     setShuttleCoveredChecked(true);
     setValetUncoveredChecked(true);
+
+    // Fetch existing price lists when the component mounts
+    fetchExistingPriceLists();
+   
+   
   }, []);
+
 
   const handleCheckboxChange = (prefix, value) => {
     switch (prefix) {
@@ -36,6 +90,111 @@ function GaragePricing() {
     }
   };
 
+  const handleInputChange = (values, setValues) => (index) => (event) => {
+    const newValues = [...values];
+    newValues[index] = event.target.value;
+    setValues(newValues);
+  };
+
+  const renderInputBoxes = (prefix, values, editable, setValues) => {
+    const days = Array.from({ length: 30 }, (_, index) => index + 1);
+
+    return days.map((day, index) => (
+      <TextField
+        key={day}
+        label={`Day ${day}`}
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        type="number"
+        value={values[index]}
+        onChange={handleInputChange(values, setValues)(index)}
+        InputProps={{ inputProps: { min: 0 }, readOnly: !editable }}
+        sx={{ backgroundColor: !editable ? '#f2f2f2' : 'inherit' }}
+      />
+    )).concat(
+      <TextField
+        key={`${prefix}After30Days`}
+        label={`After 30 Days`}
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        type="number"
+        value={values[30]}
+        onChange={handleInputChange(values, setValues)(30)}
+        InputProps={{ inputProps: { min: 0 }, readOnly: !editable }}
+        sx={{ backgroundColor: !editable ? '#f2f2f2' : 'inherit' }}
+      />
+    );
+  };
+
+  const handleSaveButtonClick = async () => {
+    try {
+      getParkingGarage()
+      console.log(parkingGarages)
+      console.log(parkingGarages[1])
+      // Prepare the payload based on the backend entity structure
+      const payload = {
+        garage: parkingGarages[1], // Replace with the actual garage ID
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        day1Price: parseFloat(shuttleUncoveredValues[0]),
+        day2Price: parseFloat(shuttleUncoveredValues[1]),
+        day3Price: parseFloat(shuttleUncoveredValues[2]),
+        day4Price: parseFloat(shuttleUncoveredValues[3]),
+        day5Price: parseFloat(shuttleUncoveredValues[4]),
+        day6Price: parseFloat(shuttleUncoveredValues[5]),
+        day7Price: parseFloat(shuttleUncoveredValues[6]),
+        day8Price: parseFloat(shuttleUncoveredValues[7]),
+        day9Price: parseFloat(shuttleUncoveredValues[8]),
+        day10Price: parseFloat(shuttleUncoveredValues[9]),
+        day11Price: parseFloat(shuttleUncoveredValues[10]),
+        day12Price: parseFloat(shuttleUncoveredValues[11]),
+        day13Price: parseFloat(shuttleUncoveredValues[12]),
+        day14Price: parseFloat(shuttleUncoveredValues[13]),
+        day15Price: parseFloat(shuttleUncoveredValues[14]),
+        day16Price: parseFloat(shuttleUncoveredValues[15]),
+        day17Price: parseFloat(shuttleUncoveredValues[16]),
+        day18Price: parseFloat(shuttleUncoveredValues[17]),
+        day19Price: parseFloat(shuttleUncoveredValues[18]),
+        day20Price: parseFloat(shuttleUncoveredValues[19]),
+        day21Price: parseFloat(shuttleUncoveredValues[20]),
+        day22Price: parseFloat(shuttleUncoveredValues[21]),
+        day23Price: parseFloat(shuttleUncoveredValues[22]),
+        day24Price: parseFloat(shuttleUncoveredValues[23]),
+        day25Price: parseFloat(shuttleUncoveredValues[24]),
+        day26Price: parseFloat(shuttleUncoveredValues[25]),
+        day27Price: parseFloat(shuttleUncoveredValues[26]),
+        day28Price: parseFloat(shuttleUncoveredValues[27]),
+        day29Price: parseFloat(shuttleUncoveredValues[28]),
+        day30Price: parseFloat(shuttleUncoveredValues[29]),
+        extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
+      };
+
+      // Call the createPriceList method from PriceListApi with the adjusted payload
+      await PriceListApi.createPriceList(payload);
+
+      console.log('Price list saved!');
+      
+      // Refetch existing price lists after saving
+      fetchExistingPriceLists();
+    } catch (error) {
+      console.error('Error saving price list:', error);
+      // Add logic to handle error (e.g., show an error message)
+    }
+  };
+
+  const fetchExistingPriceLists = async () => {
+    try {
+      // Call the method from PriceListApi to fetch existing price lists
+      const priceLists = await PriceListApi.getAllPriceLists();
+      setExistingPriceLists(priceLists);
+    } catch (error) {
+      console.error('Error fetching existing price lists:', error);
+      // Add logic to handle error (e.g., show an error message)
+    }
+  };
+
   return (
     <div>
       <Grid container justifyContent="center">
@@ -44,7 +203,7 @@ function GaragePricing() {
       <Grid container spacing={3} sx={{ paddingLeft: 31 }}>
 
         {/* Row 1: Shuttle Uncovered */}
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <Typography variant="h6">Shuttle Uncovered</Typography>
           <FormControlLabel
             control={<Checkbox checked={shuttleUncoveredChecked} onChange={(e) => handleCheckboxChange('shuttleUncovered', e.target.checked)} />}
@@ -54,7 +213,7 @@ function GaragePricing() {
         </Grid>
 
         {/* Row 2: Shuttle Covered */}
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <Typography variant="h6">Shuttle Covered</Typography>
           <FormControlLabel
             control={<Checkbox checked={shuttleCoveredChecked} onChange={(e) => handleCheckboxChange('shuttleCovered', e.target.checked)} />}
@@ -64,7 +223,7 @@ function GaragePricing() {
         </Grid>
 
         {/* Row 3: Valet Uncovered */}
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <Typography variant="h6">Valet Uncovered</Typography>
           <FormControlLabel
             control={<Checkbox checked={valetUncoveredChecked} onChange={(e) => handleCheckboxChange('valetUncovered', e.target.checked)} />}
@@ -72,46 +231,52 @@ function GaragePricing() {
           />
           {renderInputBoxes('valetUncovered', valetUncoveredValues, valetUncoveredChecked, setValetUncoveredValues)}
         </Grid>
+
+        {/* Row 4: Date Range */}
+        <Grid item xs={3}>
+          <Typography variant="h6">Date Range</Typography>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['DatePicker', 'DatePicker']} >
+              <Grid item xs={12} md={6}>
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  renderInput={(props) => <TextField {...props} />}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  renderInput={(props) => <TextField {...props} />}
+                />
+              </Grid>
+            </DemoContainer>
+          </LocalizationProvider>
+        </Grid>
       </Grid>
+
+      {/* Save Button */}
+      <Grid container justifyContent="center" mt={3}>
+        <Button variant="contained" color="primary" onClick={handleSaveButtonClick}>
+          Save Price List
+        </Button>
+      </Grid>
+
+      {/* Existing Price Lists */}
+      {/* <Box mt={3} p={2} sx={{ border: '1px solid #ccc', borderRadius: '4px' }}>
+        <Typography variant="h6">Existing Price Lists</Typography>
+        {existingPriceLists.map((priceList) => (
+          Display existing price lists, adjust this based on your actual data structure
+          <div key={priceList.id}>
+            <Typography variant="body1">{`Start Date: ${priceList.startDate}, End Date: ${priceList.endDate}`}</Typography>
+            Display other price list details
+          </div>
+        ))}
+      </Box> */}
     </div>
-  );
-}
-
-function renderInputBoxes(prefix, values, editable, setValues) {
-  const days = Array.from({ length: 30 }, (_, index) => index + 1);
-
-  const handleInputChange = (index) => (event) => {
-    const newValues = [...values];
-    newValues[index] = event.target.value;
-    setValues(newValues);
-  };
-
-  return days.map((day, index) => (
-    <TextField
-      key={day}
-      label={`Day ${day}`}
-      variant="outlined"
-      fullWidth
-      margin="normal"
-      type="number"
-      value={values[index]}
-      onChange={handleInputChange(index)}
-      InputProps={{ inputProps: { min: 0 }, readOnly: !editable }}
-      sx={{ backgroundColor: !editable ? '#f2f2f2' : 'inherit' }}
-    />
-  )).concat(
-    <TextField
-      key={`${prefix}After30Days`}
-      label={`After 30 Days`}
-      variant="outlined"
-      fullWidth
-      margin="normal"
-      type="number"
-      value={values[30]}
-      onChange={handleInputChange(30)}
-      InputProps={{ inputProps: { min: 0 }, readOnly: !editable }}
-      sx={{ backgroundColor: !editable ? '#f2f2f2' : 'inherit' }}
-    />
   );
 }
 
