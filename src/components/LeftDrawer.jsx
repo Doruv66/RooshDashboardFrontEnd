@@ -7,6 +7,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import GarageIcon from '@mui/icons-material/Garage';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
+import PaidIcon from '@mui/icons-material/Paid';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
@@ -41,6 +42,7 @@ const LeftDrawer = ({ isDrawerOpen }) => {
             case "Departures and Arrivals": return <AirplaneTicketIcon />;
             case "Statistics": return <BarChartIcon />;
             case "Booking History": return <LibraryBooksIcon />;
+            case "Pricing": return <PaidIcon/>;
             default: return null;
         }
     }
