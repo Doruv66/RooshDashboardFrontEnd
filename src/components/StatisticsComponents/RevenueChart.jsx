@@ -25,6 +25,11 @@ const RevenueChart = ({ data, labels }) => {
             }],
           },
           options: {
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
             scales: {
               y: {
                 beginAtZero: true,
@@ -42,7 +47,8 @@ const RevenueChart = ({ data, labels }) => {
     }, [data, labels]);
 
     return (
-      <div style={{ width: '550px', height: '450px', marginTop: '30px' }}>
+      <div style={{ width: '550px',display: 'flex', flexDirection: 'column', alignItems: 'center', height: '450px', marginTop: '30px' }}>
+        <h4 style={{letterSpacing: 2}}>REVENUE</h4>
         <canvas ref={chartRef}></canvas>
       </div>
     );

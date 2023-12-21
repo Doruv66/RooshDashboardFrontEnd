@@ -22,7 +22,7 @@ const OrdersChart = ({ data, labels }) => {
             backgroundColor: 'rgba(54, 162, 235, 1)',
             borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 1,
-          }],
+          }], 
         },
         options: {
           indexAxis: 'x',
@@ -48,7 +48,8 @@ const OrdersChart = ({ data, labels }) => {
   }, [data, labels]);
 
   return (
-    <div style={{ width: '550px', height: '450px', marginTop: '30px' }}>
+    <div style={{ width: '550px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '450px', marginTop: '30px' }}>
+      <h4 style={{letterSpacing: 2}}>ORDERS</h4>
       <canvas ref={chartRef}></canvas>
     </div>
   );
