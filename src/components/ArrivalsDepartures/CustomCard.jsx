@@ -77,7 +77,16 @@ const CustomCard = (props) => {
             if(interval === "Pick Dates") {
                 props.setTitle(formatDateString(startDate, endDate));
             } 
+        } else if (startDate) {
+            let startDateObj = new Date(startDate);
+            if (!(startDateObj instanceof Date && !isNaN(startDateObj))) {
+                startDateObj = new Date(); // Set to today's date if startDate is invalid
+            }
+            const nextDay = new Date(startDateObj.getTime() + 24 * 60 * 60 * 1000); 
+            refreshArrivalsDepartures(startDate, nextDay, props.filters.garageId);
+            props.setTitle(formatDateString(startDate, nextDay));
         }
+        
     }, [startDate, endDate]);
 
   return (
