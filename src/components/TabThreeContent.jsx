@@ -30,6 +30,13 @@ const TabThreeContent = ({
             }
         }, 0);
     };
+
+    const imageListStyle = {
+        height: '300px',
+        overflowY: 'scroll',
+        marginBottom: '20px'
+    };
+
     const removeImage = (imageBlobUrl) => {
         const imageIndex = previewImages.findIndex(img => img === imageBlobUrl);
 
@@ -47,7 +54,7 @@ const TabThreeContent = ({
     return (
         <div>
             <form onSubmit={handleFormSubmit}>
-                <ImageList cols={6} gap={8}>
+                <ImageList cols={6} gap={8} style={imageListStyle}>
                     {previewImages.map((imageSrc, index) => (
                         <ImageListItem key={index}>
                             <img
