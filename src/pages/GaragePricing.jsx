@@ -17,11 +17,15 @@ import ParkingGarageApi from '../api/ParkingGarageApi';
 
 import PriceListApi from '../api/PriceList';
 import TokenManager from "../api/TokenManager.jsx";  // Import the PriceListApi
+import { useParkingGarage } from '../components/ParkingGarageContext.jsx';
+import Alert from '@mui/material/Alert';
 
 function GaragePricing() {
+  const { parkingGarage, setParkingGarage } = useParkingGarage();
   const [shuttleUncoveredChecked, setShuttleUncoveredChecked] = useState(true);
   const [shuttleCoveredChecked, setShuttleCoveredChecked] = useState(true);
   const [valetUncoveredChecked, setValetUncoveredChecked] = useState(true);
+  const [failedMessage, setFailedMessage] = useState(null);
 
   const [shuttleUncoveredValues, setShuttleUncoveredValues] = useState(Array.from({ length: 30 }, () => ''));
   const [shuttleCoveredValues, setShuttleCoveredValues] = useState(Array.from({ length: 30 }, () => ''));
@@ -33,6 +37,12 @@ function GaragePricing() {
   const [parkingGarages, setParkingGarages] = useState([]);
 
   const [existingPriceLists, setExistingPriceLists] = useState([]);
+
+  // const[shuttleUncovered, setShuttleUncovered] = useState(null);
+  // const[shuttleCovered, setShuttleCovered] = useState(null);
+  // const[valetUncovered, setvaletUncovered] = useState(null);
+
+  
 
   const handleResponse = response => {
     if (!response.ok) {
@@ -131,70 +141,319 @@ function GaragePricing() {
   };
 
   const handleSaveButtonClick = async () => {
-    try {
-      getParkingGarage()
-      console.log(parkingGarages)
-      console.log(parkingGarages[1])
-      // Prepare the payload based on the backend entity structure
-      const payload = {
-        garage: parkingGarages[1], // Replace with the actual garage ID
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        day1Price: parseFloat(shuttleUncoveredValues[0]),
-        day2Price: parseFloat(shuttleUncoveredValues[1]),
-        day3Price: parseFloat(shuttleUncoveredValues[2]),
-        day4Price: parseFloat(shuttleUncoveredValues[3]),
-        day5Price: parseFloat(shuttleUncoveredValues[4]),
-        day6Price: parseFloat(shuttleUncoveredValues[5]),
-        day7Price: parseFloat(shuttleUncoveredValues[6]),
-        day8Price: parseFloat(shuttleUncoveredValues[7]),
-        day9Price: parseFloat(shuttleUncoveredValues[8]),
-        day10Price: parseFloat(shuttleUncoveredValues[9]),
-        day11Price: parseFloat(shuttleUncoveredValues[10]),
-        day12Price: parseFloat(shuttleUncoveredValues[11]),
-        day13Price: parseFloat(shuttleUncoveredValues[12]),
-        day14Price: parseFloat(shuttleUncoveredValues[13]),
-        day15Price: parseFloat(shuttleUncoveredValues[14]),
-        day16Price: parseFloat(shuttleUncoveredValues[15]),
-        day17Price: parseFloat(shuttleUncoveredValues[16]),
-        day18Price: parseFloat(shuttleUncoveredValues[17]),
-        day19Price: parseFloat(shuttleUncoveredValues[18]),
-        day20Price: parseFloat(shuttleUncoveredValues[19]),
-        day21Price: parseFloat(shuttleUncoveredValues[20]),
-        day22Price: parseFloat(shuttleUncoveredValues[21]),
-        day23Price: parseFloat(shuttleUncoveredValues[22]),
-        day24Price: parseFloat(shuttleUncoveredValues[23]),
-        day25Price: parseFloat(shuttleUncoveredValues[24]),
-        day26Price: parseFloat(shuttleUncoveredValues[25]),
-        day27Price: parseFloat(shuttleUncoveredValues[26]),
-        day28Price: parseFloat(shuttleUncoveredValues[27]),
-        day29Price: parseFloat(shuttleUncoveredValues[28]),
-        day30Price: parseFloat(shuttleUncoveredValues[29]),
-        extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
-      };
+    
+    if(shuttleUncoveredValues[1] != "") {
+      try {
 
-      // Call the createPriceList method from PriceListApi with the adjusted payload
-      await PriceListApi.createPriceList(payload);
+        const existingPriceListResponse = await PriceListApi.getPriceListByParkingGarage(parkingGarage.id);
+        const existingPriceLists = await existingPriceListResponse.json();
 
-      console.log('Price list saved!');
-      
-      // Refetch existing price lists after saving
-      fetchExistingPriceLists();
-    } catch (error) {
-      console.error('Error saving price list:', error);
-      // Add logic to handle error (e.g., show an error message)
+        console.log(existingPriceLists);
+
+         // Ensure existingPriceLists is an array
+          const existingPriceListsArray = Array.isArray(existingPriceLists.priceLists) ? existingPriceLists.priceLists : [existingPriceLists.priceLists];
+
+          // Check for date range overlaps
+          const isOverlap = existingPriceListsArray.some(priceList => {
+            const priceListStartDate = new Date(priceList.startDate);
+            const priceListEndDate = new Date(priceList.endDate);
+
+            const newStartDate = startDate;
+            const newEndDate = endDate;
+
+            return (
+              (newStartDate >= priceListStartDate && newStartDate <= priceListEndDate) ||
+              (newEndDate >= priceListStartDate && newEndDate <= priceListEndDate) ||
+              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate)
+            );
+          });
+
+          if (isOverlap) {
+            console.error('Date range overlaps with existing price scheme. Cannot save.');
+            setFailedMessage("Date range overlaps with existing price scheme. Cannot save.");
+            setTimeout(() => {
+              setFailedMessage(null);
+            }, 3000);
+
+            return;
+          }
+
+        // Prepare the payload based on the backend entity structure
+        const payload = {
+          id: 0,
+          garage: parkingGarage, // Replace with the actual garage ID
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          day1Price: parseFloat(shuttleUncoveredValues[0]),
+          day2Price: parseFloat(shuttleUncoveredValues[1]),
+          day3Price: parseFloat(shuttleUncoveredValues[2]),
+          day4Price: parseFloat(shuttleUncoveredValues[3]),
+          day5Price: parseFloat(shuttleUncoveredValues[4]),
+          day6Price: parseFloat(shuttleUncoveredValues[5]),
+          day7Price: parseFloat(shuttleUncoveredValues[6]),
+          day8Price: parseFloat(shuttleUncoveredValues[7]),
+          day9Price: parseFloat(shuttleUncoveredValues[8]),
+          day10Price: parseFloat(shuttleUncoveredValues[9]),
+          day11Price: parseFloat(shuttleUncoveredValues[10]),
+          day12Price: parseFloat(shuttleUncoveredValues[11]),
+          day13Price: parseFloat(shuttleUncoveredValues[12]),
+          day14Price: parseFloat(shuttleUncoveredValues[13]),
+          day15Price: parseFloat(shuttleUncoveredValues[14]),
+          day16Price: parseFloat(shuttleUncoveredValues[15]),
+          day17Price: parseFloat(shuttleUncoveredValues[16]),
+          day18Price: parseFloat(shuttleUncoveredValues[17]),
+          day19Price: parseFloat(shuttleUncoveredValues[18]),
+          day20Price: parseFloat(shuttleUncoveredValues[19]),
+          day21Price: parseFloat(shuttleUncoveredValues[20]),
+          day22Price: parseFloat(shuttleUncoveredValues[21]),
+          day23Price: parseFloat(shuttleUncoveredValues[22]),
+          day24Price: parseFloat(shuttleUncoveredValues[23]),
+          day25Price: parseFloat(shuttleUncoveredValues[24]),
+          day26Price: parseFloat(shuttleUncoveredValues[25]),
+          day27Price: parseFloat(shuttleUncoveredValues[26]),
+          day28Price: parseFloat(shuttleUncoveredValues[27]),
+          day29Price: parseFloat(shuttleUncoveredValues[28]),
+          day30Price: parseFloat(shuttleUncoveredValues[29]),
+          extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
+          type: "Shuttle uncovered"
+        };
+  
+        const updatedGarage = {
+          ...payload,
+          garage: {
+            ...payload.garage,
+            account: {
+              ...payload.garage.account,
+              roles: [], // Set roles to an empty array
+            },
+          },
+        };
+  
+        // Call the createPriceList method from PriceListApi with the adjusted payload
+        console.log(updatedGarage)
+        await PriceListApi.createPriceList(updatedGarage);
+  
+        console.log('Price list saved!');
+        
+        
+        // Refetch existing price lists after saving
+        fetchExistingPriceLists();
+      } catch (error) {
+        console.error('Error saving price list:', error);
+        
+        // Add logic to handle error (e.g., show an error message)
+      }
     }
+    if(shuttleCoveredValues[1] != "") {
+      try {
+
+        const existingPriceListResponse = await PriceListApi.getPriceListByParkingGarage(parkingGarage.id);
+        const existingPriceLists = await existingPriceListResponse.json();
+
+        console.log(existingPriceLists);
+
+         // Ensure existingPriceLists is an array
+          const existingPriceListsArray = Array.isArray(existingPriceLists.priceLists) ? existingPriceLists.priceLists : [existingPriceLists.priceLists];
+
+          // Check for date range overlaps
+          const isOverlap = existingPriceListsArray.some(priceList => {
+            const priceListStartDate = new Date(priceList.startDate);
+            const priceListEndDate = new Date(priceList.endDate);
+
+            const newStartDate = startDate;
+            const newEndDate = endDate;
+
+            return (
+              (newStartDate >= priceListStartDate && newStartDate <= priceListEndDate) ||
+              (newEndDate >= priceListStartDate && newEndDate <= priceListEndDate) ||
+              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate)
+            );
+          });
+
+          if (isOverlap) {
+            console.error('Date range overlaps with existing price scheme. Cannot save.');
+            setFailedMessage("Date range overlaps with existing price scheme. Cannot save.");
+            setTimeout(() => {
+              setFailedMessage(null);
+            }, 3000);
+
+            return;
+          }
+        // Prepare the payload based on the backend entity structure
+        const payload = {
+          id: 0,
+          garage: parkingGarage, // Replace with the actual garage ID
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          day1Price: parseFloat(shuttleUncoveredValues[0]),
+          day2Price: parseFloat(shuttleUncoveredValues[1]),
+          day3Price: parseFloat(shuttleUncoveredValues[2]),
+          day4Price: parseFloat(shuttleUncoveredValues[3]),
+          day5Price: parseFloat(shuttleUncoveredValues[4]),
+          day6Price: parseFloat(shuttleUncoveredValues[5]),
+          day7Price: parseFloat(shuttleUncoveredValues[6]),
+          day8Price: parseFloat(shuttleUncoveredValues[7]),
+          day9Price: parseFloat(shuttleUncoveredValues[8]),
+          day10Price: parseFloat(shuttleUncoveredValues[9]),
+          day11Price: parseFloat(shuttleUncoveredValues[10]),
+          day12Price: parseFloat(shuttleUncoveredValues[11]),
+          day13Price: parseFloat(shuttleUncoveredValues[12]),
+          day14Price: parseFloat(shuttleUncoveredValues[13]),
+          day15Price: parseFloat(shuttleUncoveredValues[14]),
+          day16Price: parseFloat(shuttleUncoveredValues[15]),
+          day17Price: parseFloat(shuttleUncoveredValues[16]),
+          day18Price: parseFloat(shuttleUncoveredValues[17]),
+          day19Price: parseFloat(shuttleUncoveredValues[18]),
+          day20Price: parseFloat(shuttleUncoveredValues[19]),
+          day21Price: parseFloat(shuttleUncoveredValues[20]),
+          day22Price: parseFloat(shuttleUncoveredValues[21]),
+          day23Price: parseFloat(shuttleUncoveredValues[22]),
+          day24Price: parseFloat(shuttleUncoveredValues[23]),
+          day25Price: parseFloat(shuttleUncoveredValues[24]),
+          day26Price: parseFloat(shuttleUncoveredValues[25]),
+          day27Price: parseFloat(shuttleUncoveredValues[26]),
+          day28Price: parseFloat(shuttleUncoveredValues[27]),
+          day29Price: parseFloat(shuttleUncoveredValues[28]),
+          day30Price: parseFloat(shuttleUncoveredValues[29]),
+          extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
+          type: "Shuttle covered"
+        };
+  
+        const updatedGarage = {
+          ...payload,
+          garage: {
+            ...payload.garage,
+            account: {
+              ...payload.garage.account,
+              roles: [], // Set roles to an empty array
+            },
+          },
+        };
+  
+        // Call the createPriceList method from PriceListApi with the adjusted payload
+        console.log(updatedGarage)
+        await PriceListApi.createPriceList(updatedGarage);
+  
+        console.log('Price list saved!');
+        
+        // Refetch existing price lists after saving
+        fetchExistingPriceLists();
+      } catch (error) {
+        console.error('Error saving price list:', error);
+        // Add logic to handle error (e.g., show an error message)
+      } 
+    }
+    if(valetUncoveredValues[1] != "") {
+      try {
+
+        const existingPriceListResponse = await PriceListApi.getPriceListByParkingGarage(parkingGarage.id);
+        const existingPriceLists = await existingPriceListResponse.json();
+
+        console.log(existingPriceLists);
+
+         // Ensure existingPriceLists is an array
+          const existingPriceListsArray = Array.isArray(existingPriceLists.priceLists) ? existingPriceLists.priceLists : [existingPriceLists.priceLists];
+
+          // Check for date range overlaps
+          const isOverlap = existingPriceListsArray.some(priceList => {
+            const priceListStartDate = new Date(priceList.startDate);
+            const priceListEndDate = new Date(priceList.endDate);
+
+            const newStartDate = startDate;
+            const newEndDate = endDate;
+
+            return (
+              (newStartDate >= priceListStartDate && newStartDate <= priceListEndDate) ||
+              (newEndDate >= priceListStartDate && newEndDate <= priceListEndDate) ||
+              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate)
+            );
+          });
+
+          if (isOverlap) {
+            console.error('Date range overlaps with existing price scheme. Cannot save.');
+            setFailedMessage("Date range overlaps with existing price scheme. Cannot save.");
+            setTimeout(() => {
+              setFailedMessage(null);
+            }, 3000);
+
+            return;
+          }
+        // Prepare the payload based on the backend entity structure
+        const payload = {
+          id: 0,
+          garage: parkingGarage, // Replace with the actual garage ID
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          day1Price: parseFloat(shuttleUncoveredValues[0]),
+          day2Price: parseFloat(shuttleUncoveredValues[1]),
+          day3Price: parseFloat(shuttleUncoveredValues[2]),
+          day4Price: parseFloat(shuttleUncoveredValues[3]),
+          day5Price: parseFloat(shuttleUncoveredValues[4]),
+          day6Price: parseFloat(shuttleUncoveredValues[5]),
+          day7Price: parseFloat(shuttleUncoveredValues[6]),
+          day8Price: parseFloat(shuttleUncoveredValues[7]),
+          day9Price: parseFloat(shuttleUncoveredValues[8]),
+          day10Price: parseFloat(shuttleUncoveredValues[9]),
+          day11Price: parseFloat(shuttleUncoveredValues[10]),
+          day12Price: parseFloat(shuttleUncoveredValues[11]),
+          day13Price: parseFloat(shuttleUncoveredValues[12]),
+          day14Price: parseFloat(shuttleUncoveredValues[13]),
+          day15Price: parseFloat(shuttleUncoveredValues[14]),
+          day16Price: parseFloat(shuttleUncoveredValues[15]),
+          day17Price: parseFloat(shuttleUncoveredValues[16]),
+          day18Price: parseFloat(shuttleUncoveredValues[17]),
+          day19Price: parseFloat(shuttleUncoveredValues[18]),
+          day20Price: parseFloat(shuttleUncoveredValues[19]),
+          day21Price: parseFloat(shuttleUncoveredValues[20]),
+          day22Price: parseFloat(shuttleUncoveredValues[21]),
+          day23Price: parseFloat(shuttleUncoveredValues[22]),
+          day24Price: parseFloat(shuttleUncoveredValues[23]),
+          day25Price: parseFloat(shuttleUncoveredValues[24]),
+          day26Price: parseFloat(shuttleUncoveredValues[25]),
+          day27Price: parseFloat(shuttleUncoveredValues[26]),
+          day28Price: parseFloat(shuttleUncoveredValues[27]),
+          day29Price: parseFloat(shuttleUncoveredValues[28]),
+          day30Price: parseFloat(shuttleUncoveredValues[29]),
+          extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
+          type: "Valet uncovered"
+        };
+  
+        const updatedGarage = {
+          ...payload,
+          garage: {
+            ...payload.garage,
+            account: {
+              ...payload.garage.account,
+              roles: [], // Set roles to an empty array
+            },
+          },
+        };
+  
+        // Call the createPriceList method from PriceListApi with the adjusted payload
+        console.log(updatedGarage)
+        await PriceListApi.createPriceList(updatedGarage);
+  
+        console.log('Price list saved!');
+        
+        // Refetch existing price lists after saving
+        fetchExistingPriceLists();
+      } catch (error) {
+        console.error('Error saving price list:', error);
+        // Add logic to handle error (e.g., show an error message)
+      }
+    }
+    
   };
 
   const fetchExistingPriceLists = async () => {
-    try {
-      // Call the method from PriceListApi to fetch existing price lists
-      const priceLists = await PriceListApi.getAllPriceLists();
-      setExistingPriceLists(priceLists);
-    } catch (error) {
-      console.error('Error fetching existing price lists:', error);
-      // Add logic to handle error (e.g., show an error message)
-    }
+    // try {
+    //   // Call the method from PriceListApi to fetch existing price lists
+    //   const priceLists = await PriceListApi.getAllPriceLists();
+    //   setExistingPriceLists(priceLists);
+    // } catch (error) {
+    //   console.error('Error fetching existing price lists:', error);
+    //   // Add logic to handle error (e.g., show an error message)
+    // }
   };
 
   return (
@@ -266,6 +525,12 @@ function GaragePricing() {
           Save Price List
         </Button>
       </Grid>
+
+      {failedMessage && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {failedMessage}
+              </Alert>
+            )}
 
       {/* Existing Price Lists */}
       {/* <Box mt={3} p={2} sx={{ border: '1px solid #ccc', borderRadius: '4px' }}>
