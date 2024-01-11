@@ -3,7 +3,6 @@ const apiUrl = 'http://localhost:8080/parkinggarage';
 const ParkingGarageApi = {
   
   createParkingGarage(ParkingGarageData) {
-    console.log(ParkingGarageData)
     return fetch(`${apiUrl}`, {
       method: 'POST',
       headers: {
@@ -14,7 +13,7 @@ const ParkingGarageApi = {
   },
   
   updateParkingGarage(updatedParkingGarage, id) {
-    console.log(updatedParkingGarage);
+    console.log(updatedParkingGarage, id)
     return fetch(`${apiUrl}/${id}`, {
       method: 'PUT',
       headers: {
