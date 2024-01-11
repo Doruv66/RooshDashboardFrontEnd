@@ -24,6 +24,7 @@ function App() {
       .catch(() => alert("Login failed!"))
       .then(claims => setClaims(claims))
       .catch(error => console.error(error));
+    console.log(TokenManager.getAccessToken())
   }
 
   return (

@@ -15,7 +15,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import ParkingGarageApi from '../api/ParkingGarageApi';
 
-import PriceListApi from '../api/PriceList';  // Import the PriceListApi
+import PriceListApi from '../api/PriceList';
+import TokenManager from "../api/TokenManager.jsx";  // Import the PriceListApi
 
 function GaragePricing() {
   const [shuttleUncoveredChecked, setShuttleUncoveredChecked] = useState(true);
@@ -41,7 +42,8 @@ function GaragePricing() {
   };
 
   const getParkingGarage = () => {
-    ParkingGarageApi.getAllParkingGarages()
+    const userId = TokenManager.getClaims().id;
+    ParkingGarageApi.getParkingGaragesByUserId(userId)
     .then(handleResponse)
     .then(data => {
         if(data.parkingGarages){

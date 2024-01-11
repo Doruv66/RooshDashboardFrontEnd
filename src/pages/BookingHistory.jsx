@@ -16,20 +16,17 @@ const BookingHistory = () => {
   useEffect(() => {
     const fetchFilteredBookings = async () => {
         try {
-            // Consistent usage of BookingAPI
             const data = await BookingAPI.getFilteredBookings(
-                filters.garageId, 
-                filters.service, 
-                filters.finished, 
+                filters.garageId,
+                filters.service,
+                filters.finished,
                 filters.ongoing
             );
 
-            console.log('Data received:', data); // Debugging: Log the received data
+            console.log('Data received:', data);
 
-            // Updating state with the fetched bookings
             setBookings(data);
         } catch (error) {
-            // Handling errors
             console.error('Error fetching filtered bookings:', error);
         }
     };

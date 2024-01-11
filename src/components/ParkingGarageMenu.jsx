@@ -7,6 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { useParkingGarage } from "./ParkingGarageContext";
 import "./ParkingGarageMenu.css"
+import TokenManager from "../api/TokenManager.jsx";
 
 export default function ParkingGarageMenu() {
     const [parkingGarages, setParkingGarages] = useState([]);
@@ -20,7 +21,8 @@ export default function ParkingGarageMenu() {
         const fetchParkingGarages = async () => {
             setLoading(true);
             try {
-                const response = await ParkingGarageApi.getAllParkingGarages();
+                const userId = TokenManager.getClaims().id;
+                const response = await ParkingGarageApi.getParkingGaragesByUserId(userId);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();
                 setParkingGarages(data.parkingGarages);

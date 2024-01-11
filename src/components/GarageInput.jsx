@@ -58,7 +58,6 @@ export default function GarageInput(){
     };
 
     useEffect(() => {
-        console.log(isNewParkingGarage)
         if (!isNewParkingGarage && parkingGarage && parkingGarage.imagePaths) {
             const fetchImages = async () => {
                 try {
@@ -97,7 +96,6 @@ export default function GarageInput(){
     };
     const updateGlobalState = (newValues) => {
         setFormValues(prev => ({ ...prev, ...newValues }));
-        console.log(formValues)
     };
 
     const toTitleCase = (str) => {
@@ -128,7 +126,6 @@ export default function GarageInput(){
 
         useEffect(() => {
             if (tabValue !== 0) {
-                console.log(localValues)
                 updateGlobalState(localValues);
             }
         }, [tabValue]);
@@ -138,7 +135,6 @@ export default function GarageInput(){
             if (errors[attr]) {
                 setErrors({ ...errors, [attr]: '' });
             }
-            console.log(localValues)
         };
 
         const validateInput = (attr, value) => {
@@ -462,7 +458,6 @@ export default function GarageInput(){
 
         const handleLocalChange = (attr, value) => {
             setLocalValues(prev => ({ ...prev, [attr]: value }));
-            console.log(localValues)
         };
 
         useImperativeHandle(ref, () => ({
@@ -748,9 +743,6 @@ export default function GarageInput(){
     };
     TabThreeContent.displayName = 'TabThreeContent';
 
-    useEffect(() => {
-        console.log(newImages)
-    }, [newImages]);
 
     useEffect(() => {
         const initialValues = parkingGarageAttributes.reduce((acc, attr) => {
@@ -878,7 +870,6 @@ export default function GarageInput(){
         formDataEntries.forEach(([key, value]) => {
             formDataForLog[key] = value instanceof File ? value.name : value;
         });
-        console.log('FormData to be sent:', formDataForLog);
 
 
         ParkingGarageApi.createParkingGarage(formData)
@@ -912,7 +903,6 @@ export default function GarageInput(){
 
     const handleDeleteParkingGarage = (event) => {
         event.preventDefault();
-        console.log(parkingGarage);
         ParkingGarageApi.deleteParkingGarage(parkingGarage.id)
             .then(handleResponse)
             .then(data => {
@@ -959,7 +949,6 @@ export default function GarageInput(){
         ParkingGarageApi.updateParkingGarage(formData, parkingGarage.id)
             .then(handleResponse)
             .then(data => {
-                console.log(data)
                 console.log('Successfully updated parking garage: ', data);
                 setConfirmationMessage('Parking garage successfully updated.');
                 setSnackbarSeverity('success');

@@ -40,7 +40,16 @@ const ParkingGarageApi = {
     }
   });
   },
-  
+
+  getParkingGaragesByUserId(userId) {
+    return fetch(`${apiUrl}/user/${userId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    });
+  },
+
   getAllParkingGarages() {
     return fetch(`${apiUrl}`, { headers: {
       Authorization: `Bearer ${localStorage.getItem('accessToken')}`
