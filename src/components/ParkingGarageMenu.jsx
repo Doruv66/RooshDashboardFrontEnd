@@ -21,7 +21,7 @@ export default function ParkingGarageMenu() {
         const fetchParkingGarages = async () => {
             setLoading(true);
             try {
-                const userId = TokenManager.getClaims().id;
+                const userId = TokenManager.getClaims().accountId;
                 const response = await ParkingGarageApi.getParkingGaragesByUserId(userId);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const data = await response.json();

@@ -22,11 +22,8 @@ export default function GarageInput(){
     const [existingImages, setExistingImages] = useState([]);
     const [imagesToRemove, setImagesToRemove] = useState([]);
     const [previewImages, setPreviewImages] = useState([])
-    const [setEditingField] = useState(null);
-    const [editingValue ,setEditingValue] = useState('');
     const { isNewParkingGarage, setIsNewParkingGarage, setNewGarageAdded, setNewGarageId, setUpdateTrigger } = useParkingGarage();
     const [tabValue, setTabValue] = useState(0);
-    const [newParkingGarage, setNewParkingGarage] = useState({})
     const [formValues, setFormValues] = useState({});
     const navigate = useNavigate();
     const tabOneRef = useRef(null);
@@ -36,6 +33,7 @@ export default function GarageInput(){
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
     const [errors, setErrors] = useState({});
     const [imageError, setImageError] = useState("");
+    const parkingGarageUtilityAttributes = [ "parkingSpaces", "parkingSpacesElectric", "floors"];
 
 
     const handleTabChange = (event, newValue) => {
@@ -149,28 +147,6 @@ export default function GarageInput(){
         }
         return response.json();
     };
-
-    useEffect(() => {
-        if (isNewParkingGarage) {
-            setEditingField(null);
-            setEditingValue('');
-        }
-    }, [isNewParkingGarage]);
-
-
-    useEffect(() => {
-        if (isNewParkingGarage) {
-            const emptyGarage = {
-                ...parkingGarageAttributes.reduce((obj, attr) => ({ ...obj, [attr]: '' }), {}),
-                parkingGarageUtility: {
-                    ...parkingGarageUtilityAttributes.reduce((obj, attr) => ({ ...obj, [attr]: '' }), {}),
-                    electricChargePoint: false,
-                    toilet: false
-                }
-            };
-            setNewParkingGarage(emptyGarage);
-        }
-    }, []);
 
     const handleSaveNewParkingGarage = () => {
         const tabOneValues = tabOneRef.current ? tabOneRef.current.getLatestValues() : {};

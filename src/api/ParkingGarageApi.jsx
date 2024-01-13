@@ -1,12 +1,15 @@
+import TokenManager from "./TokenManager.jsx";
+
 const apiUrl = 'http://localhost:8080/parkinggarage';
 
 const ParkingGarageApi = {
   
   createParkingGarage(ParkingGarageData) {
+    console.log(ParkingGarageData, "Saving Data")
     return fetch(`${apiUrl}`, {
       method: 'POST',
       headers: {
-         Authorization: `Bearer ${localStorage.getItem('accessToken')}` 
+         Authorization: `Bearer ${TokenManager.getAccessToken()}`
       },
       body: ParkingGarageData,
     });
