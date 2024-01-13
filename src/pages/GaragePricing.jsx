@@ -19,6 +19,13 @@ import PriceListApi from '../api/PriceList';
 import TokenManager from "../api/TokenManager.jsx";  // Import the PriceListApi
 import { useParkingGarage } from '../components/ParkingGarageContext.jsx';
 import Alert from '@mui/material/Alert';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 function GaragePricing() {
   const { parkingGarage, setParkingGarage } = useParkingGarage();
@@ -36,7 +43,7 @@ function GaragePricing() {
 
   const [parkingGarages, setParkingGarages] = useState([]);
 
-  const [existingPriceLists, setExistingPriceLists] = useState([]);
+  const [currentPriceLists, setCurrentPriceLists] = useState([]);
 
   // const[shuttleUncovered, setShuttleUncovered] = useState(null);
   // const[shuttleCovered, setShuttleCovered] = useState(null);
@@ -51,24 +58,24 @@ function GaragePricing() {
     return response.json();
   };
 
-  const getParkingGarage = () => {
-    const userId = TokenManager.getClaims().id;
-    ParkingGarageApi.getParkingGaragesByUserId(userId)
-    .then(handleResponse)
-    .then(data => {
-        if(data.parkingGarages){
-          setParkingGarages(data.parkingGarages);
-          console.log("Succesfully fetched all parking garages", data.parkingGarages);
-        }
-        else{
-          setParkingGarages([]);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching the parking garages:', error);        
-        setError('An error occurred while fetching data.');
-      })
-  }
+  // const getParkingGarage = () => {
+  //   const userId = TokenManager.getClaims().id;
+  //   ParkingGarageApi.getParkingGaragesByUserId(userId)
+  //   .then(handleResponse)
+  //   .then(data => {
+  //       if(data.parkingGarages){
+  //         setParkingGarages(data.parkingGarages);
+  //         console.log("Succesfully fetched all parking garages", data.parkingGarages);
+  //       }
+  //       else{
+  //         setParkingGarages([]);
+  //       }
+  //     })
+  //     .catch(error => {
+  //       console.error('Error fetching the parking garages:', error);        
+  //       setError('An error occurred while fetching data.');
+  //     })
+  // }
 
   useEffect(() => {
     // Set all items as included when the component mounts
@@ -76,11 +83,13 @@ function GaragePricing() {
     setShuttleCoveredChecked(true);
     setValetUncoveredChecked(true);
 
-    // Fetch existing price lists when the component mounts
-    fetchExistingPriceLists();
-   
+
    
   }, []);
+
+  useEffect(() => {
+    fetchExistingPriceLists();
+  }, [parkingGarage]);
 
 
   const handleCheckboxChange = (prefix, value) => {
@@ -161,11 +170,15 @@ function GaragePricing() {
             const newStartDate = startDate;
             const newEndDate = endDate;
 
-            return (
+            const isDateOverlap =
               (newStartDate >= priceListStartDate && newStartDate <= priceListEndDate) ||
               (newEndDate >= priceListStartDate && newEndDate <= priceListEndDate) ||
-              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate)
-            );
+              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate);
+
+            const isGarageOverlap = priceList.garage.id === parkingGarage.id;
+            const isTypeOverlap = priceList.type === "Shuttle uncovered";
+
+            return isDateOverlap && isGarageOverlap && isTypeOverlap;
           });
 
           if (isOverlap) {
@@ -263,11 +276,17 @@ function GaragePricing() {
             const newStartDate = startDate;
             const newEndDate = endDate;
 
-            return (
+            const isDateOverlap =
               (newStartDate >= priceListStartDate && newStartDate <= priceListEndDate) ||
               (newEndDate >= priceListStartDate && newEndDate <= priceListEndDate) ||
-              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate)
-            );
+              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate);
+
+            const isGarageOverlap = priceList.garage.id === parkingGarage.id;
+            const isTypeOverlap = priceList.type === "Shuttle covered";
+
+      
+
+            return isDateOverlap && isGarageOverlap && isTypeOverlap;
           });
 
           if (isOverlap) {
@@ -285,37 +304,37 @@ function GaragePricing() {
           garage: parkingGarage, // Replace with the actual garage ID
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
-          day1Price: parseFloat(shuttleUncoveredValues[0]),
-          day2Price: parseFloat(shuttleUncoveredValues[1]),
-          day3Price: parseFloat(shuttleUncoveredValues[2]),
-          day4Price: parseFloat(shuttleUncoveredValues[3]),
-          day5Price: parseFloat(shuttleUncoveredValues[4]),
-          day6Price: parseFloat(shuttleUncoveredValues[5]),
-          day7Price: parseFloat(shuttleUncoveredValues[6]),
-          day8Price: parseFloat(shuttleUncoveredValues[7]),
-          day9Price: parseFloat(shuttleUncoveredValues[8]),
-          day10Price: parseFloat(shuttleUncoveredValues[9]),
-          day11Price: parseFloat(shuttleUncoveredValues[10]),
-          day12Price: parseFloat(shuttleUncoveredValues[11]),
-          day13Price: parseFloat(shuttleUncoveredValues[12]),
-          day14Price: parseFloat(shuttleUncoveredValues[13]),
-          day15Price: parseFloat(shuttleUncoveredValues[14]),
-          day16Price: parseFloat(shuttleUncoveredValues[15]),
-          day17Price: parseFloat(shuttleUncoveredValues[16]),
-          day18Price: parseFloat(shuttleUncoveredValues[17]),
-          day19Price: parseFloat(shuttleUncoveredValues[18]),
-          day20Price: parseFloat(shuttleUncoveredValues[19]),
-          day21Price: parseFloat(shuttleUncoveredValues[20]),
-          day22Price: parseFloat(shuttleUncoveredValues[21]),
-          day23Price: parseFloat(shuttleUncoveredValues[22]),
-          day24Price: parseFloat(shuttleUncoveredValues[23]),
-          day25Price: parseFloat(shuttleUncoveredValues[24]),
-          day26Price: parseFloat(shuttleUncoveredValues[25]),
-          day27Price: parseFloat(shuttleUncoveredValues[26]),
-          day28Price: parseFloat(shuttleUncoveredValues[27]),
-          day29Price: parseFloat(shuttleUncoveredValues[28]),
-          day30Price: parseFloat(shuttleUncoveredValues[29]),
-          extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
+          day1Price: parseFloat(c[0]),
+          day2Price: parseFloat(shuttleCoveredValues[1]),
+          day3Price: parseFloat(shuttleCoveredValues[2]),
+          day4Price: parseFloat(shuttleCoveredValues[3]),
+          day5Price: parseFloat(shuttleCoveredValues[4]),
+          day6Price: parseFloat(shuttleCoveredValues[5]),
+          day7Price: parseFloat(shuttleCoveredValues[6]),
+          day8Price: parseFloat(shuttleCoveredValues[7]),
+          day9Price: parseFloat(shuttleCoveredValues[8]),
+          day10Price: parseFloat(shuttleCoveredValues[9]),
+          day11Price: parseFloat(shuttleCoveredValues[10]),
+          day12Price: parseFloat(shuttleCoveredValues[11]),
+          day13Price: parseFloat(shuttleCoveredValues[12]),
+          day14Price: parseFloat(shuttleCoveredValues[13]),
+          day15Price: parseFloat(shuttleCoveredValues[14]),
+          day16Price: parseFloat(shuttleCoveredValues[15]),
+          day17Price: parseFloat(shuttleCoveredValues[16]),
+          day18Price: parseFloat(shuttleCoveredValues[17]),
+          day19Price: parseFloat(shuttleCoveredValues[18]),
+          day20Price: parseFloat(shuttleCoveredValues[19]),
+          day21Price: parseFloat(shuttleCoveredValues[20]),
+          day22Price: parseFloat(shuttleCoveredValues[21]),
+          day23Price: parseFloat(shuttleCoveredValues[22]),
+          day24Price: parseFloat(shuttleCoveredValues[23]),
+          day25Price: parseFloat(shuttleCoveredValues[24]),
+          day26Price: parseFloat(shuttleCoveredValues[25]),
+          day27Price: parseFloat(shuttleCoveredValues[26]),
+          day28Price: parseFloat(shuttleCoveredValues[27]),
+          day29Price: parseFloat(shuttleCoveredValues[28]),
+          day30Price: parseFloat(shuttleCoveredValues[29]),
+          extraDayPrice: parseFloat(shuttleCoveredValues[30]),
           type: "Shuttle covered"
         };
   
@@ -362,11 +381,15 @@ function GaragePricing() {
             const newStartDate = startDate;
             const newEndDate = endDate;
 
-            return (
+            const isDateOverlap =
               (newStartDate >= priceListStartDate && newStartDate <= priceListEndDate) ||
               (newEndDate >= priceListStartDate && newEndDate <= priceListEndDate) ||
-              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate)
-            );
+              (newStartDate <= priceListStartDate && newEndDate >= priceListEndDate);
+
+            const isGarageOverlap = priceList.garage.id === parkingGarage.id;
+            const isTypeOverlap = priceList.type === "valet uncovered";
+
+            return isDateOverlap && isGarageOverlap && isTypeOverlap;
           });
 
           if (isOverlap) {
@@ -384,37 +407,37 @@ function GaragePricing() {
           garage: parkingGarage, // Replace with the actual garage ID
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
-          day1Price: parseFloat(shuttleUncoveredValues[0]),
-          day2Price: parseFloat(shuttleUncoveredValues[1]),
-          day3Price: parseFloat(shuttleUncoveredValues[2]),
-          day4Price: parseFloat(shuttleUncoveredValues[3]),
-          day5Price: parseFloat(shuttleUncoveredValues[4]),
-          day6Price: parseFloat(shuttleUncoveredValues[5]),
-          day7Price: parseFloat(shuttleUncoveredValues[6]),
-          day8Price: parseFloat(shuttleUncoveredValues[7]),
-          day9Price: parseFloat(shuttleUncoveredValues[8]),
-          day10Price: parseFloat(shuttleUncoveredValues[9]),
-          day11Price: parseFloat(shuttleUncoveredValues[10]),
-          day12Price: parseFloat(shuttleUncoveredValues[11]),
-          day13Price: parseFloat(shuttleUncoveredValues[12]),
-          day14Price: parseFloat(shuttleUncoveredValues[13]),
-          day15Price: parseFloat(shuttleUncoveredValues[14]),
-          day16Price: parseFloat(shuttleUncoveredValues[15]),
-          day17Price: parseFloat(shuttleUncoveredValues[16]),
-          day18Price: parseFloat(shuttleUncoveredValues[17]),
-          day19Price: parseFloat(shuttleUncoveredValues[18]),
-          day20Price: parseFloat(shuttleUncoveredValues[19]),
-          day21Price: parseFloat(shuttleUncoveredValues[20]),
-          day22Price: parseFloat(shuttleUncoveredValues[21]),
-          day23Price: parseFloat(shuttleUncoveredValues[22]),
-          day24Price: parseFloat(shuttleUncoveredValues[23]),
-          day25Price: parseFloat(shuttleUncoveredValues[24]),
-          day26Price: parseFloat(shuttleUncoveredValues[25]),
-          day27Price: parseFloat(shuttleUncoveredValues[26]),
-          day28Price: parseFloat(shuttleUncoveredValues[27]),
-          day29Price: parseFloat(shuttleUncoveredValues[28]),
-          day30Price: parseFloat(shuttleUncoveredValues[29]),
-          extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
+          day1Price: parseFloat(valetUncoveredValues[0]),
+          day2Price: parseFloat(valetUncoveredValues[1]),
+          day3Price: parseFloat(valetUncoveredValues[2]),
+          day4Price: parseFloat(valetUncoveredValues[3]),
+          day5Price: parseFloat(valetUncoveredValues[4]),
+          day6Price: parseFloat(valetUncoveredValues[5]),
+          day7Price: parseFloat(valetUncoveredValues[6]),
+          day8Price: parseFloat(valetUncoveredValues[7]),
+          day9Price: parseFloat(valetUncoveredValues[8]),
+          day10Price: parseFloat(valetUncoveredValues[9]),
+          day11Price: parseFloat(valetUncoveredValues[10]),
+          day12Price: parseFloat(valetUncoveredValues[11]),
+          day13Price: parseFloat(valetUncoveredValues[12]),
+          day14Price: parseFloat(valetUncoveredValues[13]),
+          day15Price: parseFloat(valetUncoveredValues[14]),
+          day16Price: parseFloat(valetUncoveredValues[15]),
+          day17Price: parseFloat(valetUncoveredValues[16]),
+          day18Price: parseFloat(valetUncoveredValues[17]),
+          day19Price: parseFloat(valetUncoveredValues[18]),
+          day20Price: parseFloat(valetUncoveredValues[19]),
+          day21Price: parseFloat(valetUncoveredValues[20]),
+          day22Price: parseFloat(valetUncoveredValues[21]),
+          day23Price: parseFloat(valetUncoveredValues[22]),
+          day24Price: parseFloat(valetUncoveredValues[23]),
+          day25Price: parseFloat(valetUncoveredValues[24]),
+          day26Price: parseFloat(valetUncoveredValues[25]),
+          day27Price: parseFloat(valetUncoveredValues[26]),
+          day28Price: parseFloat(valetUncoveredValues[27]),
+          day29Price: parseFloat(valetUncoveredValues[28]),
+          day30Price: parseFloat(valetUncoveredValues[29]),
+          extraDayPrice: parseFloat(valetUncoveredValues[30]),
           type: "Valet uncovered"
         };
   
@@ -445,16 +468,87 @@ function GaragePricing() {
     
   };
 
-  const fetchExistingPriceLists = async () => {
-    // try {
-    //   // Call the method from PriceListApi to fetch existing price lists
-    //   const priceLists = await PriceListApi.getAllPriceLists();
-    //   setExistingPriceLists(priceLists);
-    // } catch (error) {
-    //   console.error('Error fetching existing price lists:', error);
-    //   // Add logic to handle error (e.g., show an error message)
-    // }
+  const formatDate = (dateTimeString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
+    return new Date(dateTimeString).toLocaleDateString('en-US', options);
   };
+
+  const fetchExistingPriceLists = async () => {
+    try {
+      // Fetch the current parking garage's price lists
+      const priceListResponse = await PriceListApi.getPriceListByParkingGarage(parkingGarage.id);
+      const priceLists = await priceListResponse.json();
+  
+      console.log('Existing Price Lists:', priceLists.priceLists);
+  
+      // Update the state with the fetched price lists
+      setCurrentPriceLists(priceLists.priceLists);
+  
+      // Store the price lists in a constant (optional)
+      // const storedPriceLists = priceLists.priceLists;
+      // console.log(currentPriceLists);
+  
+      // ... Use storedPriceLists as needed
+  
+    } catch (error) {
+      console.error('Error fetching existing price lists:', error);
+      // Add logic to handle error (e.g., show an error message)
+    }
+  };
+
+  const handleDeleteButtonClick = async (priceListId) => {
+    try {
+      const response = await PriceListApi.deletePriceList(priceListId);
+      
+      if (response.ok) {
+        console.log('Price list deleted successfully');
+        // Optionally, you can update your local state or fetch existing price lists again
+        fetchExistingPriceLists();
+      } else {
+        console.error(`Failed to delete price list. HTTP error! Status: ${response.status}`);
+        // Handle error scenarios
+      }
+    } catch (error) {
+      console.error('Error deleting price list:', error);
+      // Handle error scenarios
+    }
+  };
+
+  const uniquePriceLists = currentPriceLists.reduce((uniqueLists, priceList) => {
+    const hasDuplicate = uniqueLists.some(
+      (uniqueList) =>
+        uniqueList.startDate === priceList.startDate &&
+        uniqueList.endDate === priceList.endDate
+    );
+
+    if (!hasDuplicate) {
+      uniqueLists.push(priceList);
+    }
+
+    return uniqueLists;
+  }, []);
+
+
+  const handleEditButtonClick = async (priceList) => {
+    try {
+      // Fetch the details of the selected price list
+      const startDate = priceList.startDate;
+      const endDate = priceList.endDate;
+      const response = await PriceListApi.getPriceListByStartDateEndDate(startDate, endDate);
+      const priceListDetails = await response.json();
+      console.log(priceListDetails);
+
+      setShuttleUncoveredValues(Array.from({ length: 30 }, (_, index) => priceListDetails.priceLists[0][`shuttleUncoveredDay${index + 1}Price`]));
+      setShuttleCoveredValues(Array.from({ length: 30 }, (_, index) => priceListDetails.priceLists[0][`shuttleCoveredDay${index + 1}Price`]));
+      setValetUncoveredValues(Array.from({ length: 30 }, (_, index) => priceListDetails.priceLists[0][`valetUncoveredDay${index + 1}Price`]));
+
+
+    } catch (error) {
+      console.error('Error fetching price list details for editing:', error);
+      // Add logic to handle error (e.g., show an error message)
+    }
+  };
+
 
   return (
     <div>
@@ -516,6 +610,50 @@ function GaragePricing() {
               </Grid>
             </DemoContainer>
           </LocalizationProvider>
+          {/* Existing Price Lists */}
+        <Grid container justifyContent="flex-end">
+          <Box mt={3} p={2} sx={{ border: '1px solid #ccc', borderRadius: '4px' }}>
+            <Typography variant="h6">Existing Price Lists</Typography>
+            {uniquePriceLists && uniquePriceLists.length > 0 ? (
+              <List>
+                {uniquePriceLists.map((priceList) => (
+                  <ListItem key={priceList.id}>
+                    <Grid container spacing={1} alignItems="center">
+                      <Grid item xs={12} sm={6}>
+                        <Typography variant="body1">
+                          <span style={{ fontWeight: 'bold' }}>{`Start Date: `}</span>
+                          {formatDate(priceList.startDate)}
+                        </Typography>
+                        <Typography variant="body1">
+                          <span style={{ fontWeight: 'bold' }}>{`End Date: `}</span>
+                          {formatDate(priceList.endDate)}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6} container justifyContent="flex-end">
+                        <IconButton
+                          onClick={() => handleEditButtonClick(priceList)}
+                          edge="end"
+                          aria-label="edit"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleDeleteButtonClick(priceList.id)}
+                          edge="end"
+                          aria-label="delete"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Typography variant="body2">No pricing schemes available.</Typography>
+            )}
+          </Box>
+        </Grid>
         </Grid>
       </Grid>
 
@@ -532,17 +670,7 @@ function GaragePricing() {
               </Alert>
             )}
 
-      {/* Existing Price Lists */}
-      {/* <Box mt={3} p={2} sx={{ border: '1px solid #ccc', borderRadius: '4px' }}>
-        <Typography variant="h6">Existing Price Lists</Typography>
-        {existingPriceLists.map((priceList) => (
-          Display existing price lists, adjust this based on your actual data structure
-          <div key={priceList.id}>
-            <Typography variant="body1">{`Start Date: ${priceList.startDate}, End Date: ${priceList.endDate}`}</Typography>
-            Display other price list details
-          </div>
-        ))}
-      </Box> */}
+      
     </div>
   );
 }

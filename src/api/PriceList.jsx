@@ -9,6 +9,19 @@ const PriceListApi = {
     });
   },
 
+  getPriceListByStartDateEndDate(startDate, endDate) {
+    const queryParams = new URLSearchParams({
+      startDate: startDate,
+      endDate: endDate,
+    });
+
+    return fetch(`${apiUrl}/byStartDateEndDate?${queryParams}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+  },
+
   createPriceList(priceListData) {
     return fetch(`${apiUrl}`, {
       method: 'POST',
@@ -28,6 +41,24 @@ const PriceListApi = {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
       body: JSON.stringify(priceListData),
+    });
+  },
+
+  deletePriceList(priceListId) {
+    return fetch(`${apiUrl}/${priceListId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+  },
+
+  deleteParkingGarage(parkingGarageId) {
+    return fetch(`${apiUrl}/${parkingGarageId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
     });
   },
 };
