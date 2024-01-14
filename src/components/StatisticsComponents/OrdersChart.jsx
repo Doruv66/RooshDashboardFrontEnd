@@ -5,6 +5,31 @@ const OrdersChart = ({ data, labels }) => {
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
 
+  const containerStyles = {
+    width: '550px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    height: '450px',
+    marginTop: '30px',
+  };
+
+  const headingStyles = {
+    letterSpacing: 2,
+  };
+
+  // Adjust styles for screens with a width of 550px
+  if (window.innerWidth <= 550) {
+    containerStyles.width = '400px';
+    containerStyles.marginTop= '0px'
+  }
+
+  // Adjust styles for screens with a width of 400px
+  if (window.innerWidth <= 400) {
+    containerStyles.width = '450px';
+    headingStyles.fontSize = '12px';
+  }
+
   useEffect(() => {
     if (chartRef.current) {
       const ctx = chartRef.current.getContext('2d');
@@ -48,8 +73,8 @@ const OrdersChart = ({ data, labels }) => {
   }, [data, labels]);
 
   return (
-    <div style={{ width: '550px', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '450px', marginTop: '30px' }}>
-      <h4 style={{letterSpacing: 2}}>ORDERS</h4>
+    <div style={containerStyles}>
+      <h4 style={headingStyles}>ORDERS</h4>
       <canvas ref={chartRef}></canvas>
     </div>
   );

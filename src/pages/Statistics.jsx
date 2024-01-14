@@ -85,14 +85,14 @@ const Statistics = () => {
   }, [parkingGarage, range]);
 
   return (
-    <Container sx={{ zIndex: '200', marginLeft: '15%' }}>
+    <Container sx={{ zIndex: '200', marginLeft: ['0%', '15%'] }}>
       <Header range={range} setRange={setRange} />
-      <Container sx={{ display: 'flex', gap: 3 }}>
+      <Container sx={{ display: 'flex', gap: 3,  flexDirection: ['column', 'row']}}>
         <StatCard title={'ORDERS'} number={stats.orders} />
         <StatCard title={'REVENUE'} number={stats.revenue} />
         <StatCard title={'ORDERVALUE'} number={stats.orderValue} />
       </Container>
-      <Container sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
+      <Container sx={{ display: 'flex', justifyContent: ['center' ,'space-evenly'], alignItems: 'center',  flexDirection: ['column', 'row']}}>
         <RevenueChart data={stats.revenueData} labels={stats.monthLabels} />
         <OrdersChart data={stats.ordersData} labels={stats.monthLabels} />
       </Container>
