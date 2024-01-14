@@ -69,7 +69,7 @@ const CustomCard = (props) => {
             setStartDate(null);
             setEndDate(null);
         }
-    }, [interval]);
+    }, [interval, props.filters]);
 
     useEffect(() => {
         if(startDate && endDate) {
@@ -87,7 +87,7 @@ const CustomCard = (props) => {
             props.setTitle(formatDateString(startDate, nextDay));
         }
         
-    }, [startDate, endDate]);
+    }, [startDate, endDate, props.filters]);
 
   return (
     <Card onClick={() => {

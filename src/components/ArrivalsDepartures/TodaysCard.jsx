@@ -16,7 +16,7 @@ const TodaysCard = (props) => {
 
     useEffect(() => {
         refreshArrivalsDepartures(new Date(), props.filters.garageId);
-    }, []);
+    }, [props.filters]);
 
   return (
         arrivalsDepartures !== null ?

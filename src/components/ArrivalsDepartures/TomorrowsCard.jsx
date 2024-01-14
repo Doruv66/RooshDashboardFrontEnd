@@ -16,7 +16,7 @@ const TomorrowsCard = (props) => {
         const tomorrow = new Date();
         tomorrow.setDate(new Date().getDate() + 1);
         refreshArrivalsDepartures(tomorrow, props.filters.garageId);
-    }, []);
+    }, [props.filters]);
 
   return (
     arrivalsDepartures !== null ?
