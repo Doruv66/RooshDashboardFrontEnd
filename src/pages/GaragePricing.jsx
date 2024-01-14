@@ -45,6 +45,8 @@ function GaragePricing() {
 
   const [currentPriceLists, setCurrentPriceLists] = useState([]);
 
+  const [editMode, setEditMode] = useState(false);
+
   // const[shuttleUncovered, setShuttleUncovered] = useState(null);
   // const[shuttleCovered, setShuttleCovered] = useState(null);
   // const[valetUncovered, setvaletUncovered] = useState(null);
@@ -150,7 +152,18 @@ function GaragePricing() {
   };
 
   const handleSaveButtonClick = async () => {
+    if (editMode) {
+      // Execute different save function for edit mode
+      handleEditSave();
+    } else {
+      // Execute the normal save function
+      handleNormalSave();
+    }
     
+  };
+
+
+  const handleNormalSave = async () => {
     if(shuttleUncoveredValues[1] != "") {
       try {
 
@@ -465,7 +478,6 @@ function GaragePricing() {
         // Add logic to handle error (e.g., show an error message)
       }
     }
-    
   };
 
   const formatDate = (dateTimeString) => {
@@ -530,23 +542,67 @@ function GaragePricing() {
 
 
   const handleEditButtonClick = async (priceList) => {
-    try {
+
+      setEditMode(true);
+
+      setShuttleUncoveredValues(Array.from({ length: 30 }, () => ''));
+      setShuttleUncoveredValues(prevValues => [...prevValues, '']);
+      setShuttleCoveredValues(Array.from({ length: 30 }, () => ''));
+      setShuttleCoveredValues(prevValues => [...prevValues, '']);
+      setValetUncoveredValues(Array.from({ length: 30 }, () => ''));
+      setValetUncoveredValues(prevValues => [...prevValues, '']);
       // Fetch the details of the selected price list
       const startDate = priceList.startDate;
       const endDate = priceList.endDate;
       const response = await PriceListApi.getPriceListByStartDateEndDate(startDate, endDate);
       const priceListDetails = await response.json();
       console.log(priceListDetails);
+  
+      // Separate the price lists based on the type
+      const shuttleUncoveredPriceList = priceListDetails.priceLists.find(pl => pl.type === 'Shuttle uncovered');
+      const shuttleCoveredPriceList = priceListDetails.priceLists.find(pl => pl.type === 'Shuttle covered');
+      const valetUncoveredPriceList = priceListDetails.priceLists.find(pl => pl.type === 'Valet uncovered');
 
-      setShuttleUncoveredValues(Array.from({ length: 30 }, (_, index) => priceListDetails.priceLists[0][`shuttleUncoveredDay${index + 1}Price`]));
-      setShuttleCoveredValues(Array.from({ length: 30 }, (_, index) => priceListDetails.priceLists[0][`shuttleCoveredDay${index + 1}Price`]));
-      setValetUncoveredValues(Array.from({ length: 30 }, (_, index) => priceListDetails.priceLists[0][`valetUncoveredDay${index + 1}Price`]));
+      console.log(shuttleUncoveredPriceList);
+      console.log(shuttleCoveredPriceList);
+      console.log(valetUncoveredPriceList);
+      // Set the state values based on the existing price list details
+      if(shuttleUncoveredPriceList) {
+        setShuttleUncoveredValues(
+          Array.from({ length: 30 }, (_, index) => shuttleUncoveredPriceList[`day${index + 1}Price`])
+        );
+  
+        setShuttleUncoveredValues(prevValues => [
+          ...prevValues,
+          shuttleUncoveredPriceList.extraDayPrice // Set value for "After 30 Days"
+        ]);
+      }
+     
+      if(shuttleCoveredPriceList) {
+        setShuttleCoveredValues(
+          Array.from({ length: 30 }, (_, index) => shuttleCoveredPriceList[`day${index + 1}Price`])
+        );
 
+        setShuttleCoveredValues(prevValues => [
+          ...prevValues,
+          shuttleCoveredPriceList.extraDayPrice // Set value for "After 30 Days"
+        ]);
+      }
 
-    } catch (error) {
-      console.error('Error fetching price list details for editing:', error);
-      // Add logic to handle error (e.g., show an error message)
+      if(valetUncoveredPriceList) {
+        setValetUncoveredValues(
+          Array.from({ length: 30 }, (_, index) => valetUncoveredPriceList[`day${index + 1}Price`])
+        );
+
+        setValetUncoveredValues(prevValues => [
+          ...prevValues,
+          valetUncoveredPriceList.extraDayPrice // Set value for "After 30 Days"
+        ]);
     }
+  
+      // Set the start and end date
+      setStartDate(new Date(priceList.startDate));
+      setEndDate(new Date(priceList.endDate));
   };
 
 
