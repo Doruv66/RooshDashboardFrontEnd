@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import style from './BookingHistoryFilters.module.css'
-import { InputLabel } from '@mui/material'
+import { Container, InputLabel } from '@mui/material'
 import {Select} from '@mui/material'
 import {MenuItem} from '@mui/material'
 import {FormControl} from '@mui/material'
@@ -47,8 +47,13 @@ const handleSortByChange = (event) => {
 
 
   return (
-    <div className={style.filters}>
-        <FormControl fullWidth sx={{width: 250}}>
+    <Container sx={{
+      display: 'flex',
+      flexDirection: ['column', 'row'], 
+      alignItems: 'center',
+      justifyContent: ['space-around', 'space-evenly'],
+    }}>
+        <FormControl fullWidth sx={{width: 250, margin: 1}}>
           <InputLabel id="sort-select-label" sx={{paddingLeft: '20px'}}>Sort By</InputLabel>
           <Select
             labelId="sort-select-label"
@@ -89,7 +94,7 @@ const handleSortByChange = (event) => {
       }
       label="Completed"
     />
-    </div>
+    </Container>
   )
 }
 

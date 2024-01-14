@@ -25,7 +25,7 @@ const DeparturesAndArrivals = () => {
   return (
     <Container sx={{zIndex: '200',marginLeft: '15%'}}>
         <Header title={title} option={option} setOption={setOption}/>
-        <Box sx={{display: 'flex', justifyContent: 'space-around'}}>  
+        <Box sx={{display: 'flex', justifyContent: 'space-around', flexDirection: ['column', 'row']}}>  
             <TodaysCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
             <TomorrowsCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
             <CustomCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
