@@ -1,5 +1,4 @@
-import { Container, Box} from '@mui/material';
-
+import { Container, Grid, useMediaQuery} from '@mui/material';
 import React, { useState, useEffect } from 'react'
 import Header from '../components/ArrivalsDepartures/Header';
 import TodaysCard from '../components/ArrivalsDepartures/TodaysCard';
@@ -22,17 +21,26 @@ const DeparturesAndArrivals = () => {
       navigate("/departuresandarrivals");
     }, [filters])
 
-  return (
-    <Container sx={{zIndex: '200',marginLeft: '15%'}}>
-        <Header title={title} option={option} setOption={setOption}/>
-        <Box sx={{display: 'flex', justifyContent: 'space-around', flexDirection: ['column', 'row']}}>  
-            <TodaysCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
-            <TomorrowsCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
-            <CustomCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
-        </Box>
-        <DataTable bookings={arrivalsDepartures !== null ? option ? arrivalsDepartures.arrivals : arrivalsDepartures.departures : []} option={option}/>
-    </Container>
+    const isSmallScreen = useMediaQuery('(max-width:1150px)');
+
+
+    return (
+      <Container sx={{ zIndex: '200', marginLeft: '15%', padding: '20px' }}>
+          <Header title={title} option={option} setOption={setOption}/>
+          <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
+              <Grid item xs={12} sm={6} md={isSmallScreen ? 6 : 4}>
+                  <TodaysCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
+              </Grid>
+              <Grid item xs={12} sm={6} md={isSmallScreen ? 6 : 4}>
+                  <TomorrowsCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
+              </Grid>
+              <Grid item xs={12} sm={6} md={isSmallScreen ? 6 : 4}>
+                  <CustomCard setData={setArrivalsDepartures} setTitle={setTitle} filters={filters}/>
+              </Grid>
+          </Grid>
+          <DataTable bookings={arrivalsDepartures !== null ? option ? arrivalsDepartures.arrivals : arrivalsDepartures.departures : []} option={option}/>
+      </Container>
   )
 }
 
-export default DeparturesAndArrivals
+export default DeparturesAndArrivals;

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, Typography, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Box, Typography, ToggleButton, ToggleButtonGroup, useMediaQuery } from '@mui/material'
 import FlightLandIcon from '@mui/icons-material/FlightLand';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';  
 import { useState } from 'react';
@@ -13,6 +13,9 @@ const Header = (props) => {
         props.setOption(!props.option);
         }
     };
+    const isSmallScreen = useMediaQuery('(max-width:1150px)');
+
+
   return (
     <Box sx={{display:'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px'}}>
             <Box sx={{flexDirection: 'column', alignContent: 'start'}}>
