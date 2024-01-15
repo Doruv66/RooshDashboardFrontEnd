@@ -44,14 +44,18 @@ const PriceListApi = {
     });
   },
 
-  deletePriceList(priceListId) {
-    return fetch(`${apiUrl}/${priceListId}`, {
+  deletePriceList(priceList) {
+    const startDate = priceList.startDate;
+    const endDate = priceList.endDate;
+    
+    return fetch(`${apiUrl}?startDate=${startDate}&endDate=${endDate}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
   },
+  
 
   deleteParkingGarage(parkingGarageId) {
     return fetch(`${apiUrl}/${parkingGarageId}`, {

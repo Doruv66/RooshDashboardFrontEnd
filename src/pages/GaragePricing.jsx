@@ -25,6 +25,7 @@ import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
 
 function GaragePricing() {
@@ -33,6 +34,7 @@ function GaragePricing() {
   const [shuttleCoveredChecked, setShuttleCoveredChecked] = useState(true);
   const [valetUncoveredChecked, setValetUncoveredChecked] = useState(true);
   const [failedMessage, setFailedMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   const [shuttleUncoveredValues, setShuttleUncoveredValues] = useState(Array.from({ length: 30 }, () => ''));
   const [shuttleCoveredValues, setShuttleCoveredValues] = useState(Array.from({ length: 30 }, () => ''));
@@ -46,6 +48,10 @@ function GaragePricing() {
   const [currentPriceLists, setCurrentPriceLists] = useState([]);
 
   const [editMode, setEditMode] = useState(false);
+
+  const [shuttleUncovered, setShuttleUncovered] = useState([]);
+  const [shuttleCovered, setShuttleCovered] = useState([]);
+  const [valetUncovered, setValetUncovered] = useState([]);
 
   // const[shuttleUncovered, setShuttleUncovered] = useState(null);
   // const[shuttleCovered, setShuttleCovered] = useState(null);
@@ -264,6 +270,10 @@ function GaragePricing() {
         
         // Refetch existing price lists after saving
         fetchExistingPriceLists();
+        setSuccessMessage("Successfully saved new price list");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
       } catch (error) {
         console.error('Error saving price list:', error);
         
@@ -317,7 +327,7 @@ function GaragePricing() {
           garage: parkingGarage, // Replace with the actual garage ID
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
-          day1Price: parseFloat(c[0]),
+          day1Price: parseFloat(shuttleCoveredValues[0]),
           day2Price: parseFloat(shuttleCoveredValues[1]),
           day3Price: parseFloat(shuttleCoveredValues[2]),
           day4Price: parseFloat(shuttleCoveredValues[3]),
@@ -370,6 +380,10 @@ function GaragePricing() {
         
         // Refetch existing price lists after saving
         fetchExistingPriceLists();
+        setSuccessMessage("Successfully saved new price list");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
       } catch (error) {
         console.error('Error saving price list:', error);
         // Add logic to handle error (e.g., show an error message)
@@ -473,6 +487,10 @@ function GaragePricing() {
         
         // Refetch existing price lists after saving
         fetchExistingPriceLists();
+        setSuccessMessage("Successfully saved new price list");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
       } catch (error) {
         console.error('Error saving price list:', error);
         // Add logic to handle error (e.g., show an error message)
@@ -496,11 +514,6 @@ function GaragePricing() {
       // Update the state with the fetched price lists
       setCurrentPriceLists(priceLists.priceLists);
   
-      // Store the price lists in a constant (optional)
-      // const storedPriceLists = priceLists.priceLists;
-      // console.log(currentPriceLists);
-  
-      // ... Use storedPriceLists as needed
   
     } catch (error) {
       console.error('Error fetching existing price lists:', error);
@@ -508,12 +521,22 @@ function GaragePricing() {
     }
   };
 
-  const handleDeleteButtonClick = async (priceListId) => {
+  const handleDeleteButtonClick = async (priceList) => {
     try {
-      const response = await PriceListApi.deletePriceList(priceListId);
+
+
+
+      console.log(priceList);
+      const response = await PriceListApi.deletePriceList(priceList);
       
       if (response.ok) {
         console.log('Price list deleted successfully');
+        setShuttleUncoveredValues(Array.from({ length: 30 }, () => ''));
+        setShuttleUncoveredValues((prevValues) => [...prevValues, '']);
+        setShuttleCoveredValues(Array.from({ length: 30 }, () => ''));
+        setShuttleCoveredValues((prevValues) => [...prevValues, '']);
+        setValetUncoveredValues(Array.from({ length: 30 }, () => ''));
+        setValetUncoveredValues((prevValues) => [...prevValues, '']);
         // Optionally, you can update your local state or fetch existing price lists again
         fetchExistingPriceLists();
       } else {
@@ -542,76 +565,367 @@ function GaragePricing() {
 
 
   const handleEditButtonClick = async (priceList) => {
-
-      setEditMode(true);
-
-      setShuttleUncoveredValues(Array.from({ length: 30 }, () => ''));
-      setShuttleUncoveredValues(prevValues => [...prevValues, '']);
-      setShuttleCoveredValues(Array.from({ length: 30 }, () => ''));
-      setShuttleCoveredValues(prevValues => [...prevValues, '']);
-      setValetUncoveredValues(Array.from({ length: 30 }, () => ''));
-      setValetUncoveredValues(prevValues => [...prevValues, '']);
-      // Fetch the details of the selected price list
-      const startDate = priceList.startDate;
-      const endDate = priceList.endDate;
+    setEditMode(true);
+  
+    setShuttleUncoveredValues(Array.from({ length: 30 }, () => ''));
+    setShuttleUncoveredValues((prevValues) => [...prevValues, '']);
+    setShuttleCoveredValues(Array.from({ length: 30 }, () => ''));
+    setShuttleCoveredValues((prevValues) => [...prevValues, '']);
+    setValetUncoveredValues(Array.from({ length: 30 }, () => ''));
+    setValetUncoveredValues((prevValues) => [...prevValues, '']);
+  
+    const startDate = priceList.startDate;
+    const endDate = priceList.endDate;
+  
+    try {
       const response = await PriceListApi.getPriceListByStartDateEndDate(startDate, endDate);
       const priceListDetails = await response.json();
       console.log(priceListDetails);
   
       // Separate the price lists based on the type
-      const shuttleUncoveredPriceList = priceListDetails.priceLists.find(pl => pl.type === 'Shuttle uncovered');
-      const shuttleCoveredPriceList = priceListDetails.priceLists.find(pl => pl.type === 'Shuttle covered');
-      const valetUncoveredPriceList = priceListDetails.priceLists.find(pl => pl.type === 'Valet uncovered');
-
+      const shuttleUncoveredPriceList = priceListDetails.priceLists.find(
+        (pl) => pl.type === 'Shuttle uncovered'
+      );
+      const shuttleCoveredPriceList = priceListDetails.priceLists.find(
+        (pl) => pl.type === 'Shuttle covered'
+      );
+      const valetUncoveredPriceList = priceListDetails.priceLists.find(
+        (pl) => pl.type === 'Valet uncovered'
+      );
+  
       console.log(shuttleUncoveredPriceList);
       console.log(shuttleCoveredPriceList);
       console.log(valetUncoveredPriceList);
+
+      setShuttleUncovered(shuttleUncoveredPriceList);
+      setShuttleCovered(shuttleCoveredPriceList);
+      setValetUncovered(valetUncoveredPriceList);
+
+  
       // Set the state values based on the existing price list details
-      if(shuttleUncoveredPriceList) {
+      if (shuttleUncoveredPriceList) {
         setShuttleUncoveredValues(
           Array.from({ length: 30 }, (_, index) => shuttleUncoveredPriceList[`day${index + 1}Price`])
         );
   
-        setShuttleUncoveredValues(prevValues => [
+        setShuttleUncoveredValues((prevValues) => [
           ...prevValues,
           shuttleUncoveredPriceList.extraDayPrice // Set value for "After 30 Days"
         ]);
       }
-     
-      if(shuttleCoveredPriceList) {
+  
+      if (shuttleCoveredPriceList) {
         setShuttleCoveredValues(
           Array.from({ length: 30 }, (_, index) => shuttleCoveredPriceList[`day${index + 1}Price`])
         );
-
-        setShuttleCoveredValues(prevValues => [
+  
+        setShuttleCoveredValues((prevValues) => [
           ...prevValues,
           shuttleCoveredPriceList.extraDayPrice // Set value for "After 30 Days"
         ]);
       }
-
-      if(valetUncoveredPriceList) {
+  
+      if (valetUncoveredPriceList) {
         setValetUncoveredValues(
           Array.from({ length: 30 }, (_, index) => valetUncoveredPriceList[`day${index + 1}Price`])
         );
-
-        setValetUncoveredValues(prevValues => [
+  
+        setValetUncoveredValues((prevValues) => [
           ...prevValues,
           valetUncoveredPriceList.extraDayPrice // Set value for "After 30 Days"
         ]);
-    }
+      }
   
       // Set the start and end date
-      setStartDate(new Date(priceList.startDate));
-      setEndDate(new Date(priceList.endDate));
+      // const startDate = dayjs(priceList.startDate);
+      // const endDate = dayjs(priceList.endDate);
+    } catch (error) {
+      console.error('Error fetching price list details:', error);
+      // Handle error scenarios
+    }
   };
+
+  const handleEditSave = async () => {
+    try {
+      if(shuttleUncovered) {
+        const priceListId = shuttleUncovered.id;
+        
+        // Prepare the payload based on the backend entity structure
+        const payload = {
+          // Adjust the properties as needed
+          id: priceListId,
+          day1Price: parseFloat(shuttleUncoveredValues[0]),
+          day2Price: parseFloat(shuttleUncoveredValues[1]),
+          day3Price: parseFloat(shuttleUncoveredValues[2]),
+          day4Price: parseFloat(shuttleUncoveredValues[3]),
+          day5Price: parseFloat(shuttleUncoveredValues[4]),
+          day6Price: parseFloat(shuttleUncoveredValues[5]),
+          day7Price: parseFloat(shuttleUncoveredValues[6]),
+          day8Price: parseFloat(shuttleUncoveredValues[7]),
+          day9Price: parseFloat(shuttleUncoveredValues[8]),
+          day10Price: parseFloat(shuttleUncoveredValues[9]),
+          day11Price: parseFloat(shuttleUncoveredValues[10]),
+          day12Price: parseFloat(shuttleUncoveredValues[11]),
+          day13Price: parseFloat(shuttleUncoveredValues[12]),
+          day14Price: parseFloat(shuttleUncoveredValues[13]),
+          day15Price: parseFloat(shuttleUncoveredValues[14]),
+          day16Price: parseFloat(shuttleUncoveredValues[15]),
+          day17Price: parseFloat(shuttleUncoveredValues[16]),
+          day18Price: parseFloat(shuttleUncoveredValues[17]),
+          day19Price: parseFloat(shuttleUncoveredValues[18]),
+          day20Price: parseFloat(shuttleUncoveredValues[19]),
+          day21Price: parseFloat(shuttleUncoveredValues[20]),
+          day22Price: parseFloat(shuttleUncoveredValues[21]),
+          day23Price: parseFloat(shuttleUncoveredValues[22]),
+          day24Price: parseFloat(shuttleUncoveredValues[23]),
+          day25Price: parseFloat(shuttleUncoveredValues[24]),
+          day26Price: parseFloat(shuttleUncoveredValues[25]),
+          day27Price: parseFloat(shuttleUncoveredValues[26]),
+          day28Price: parseFloat(shuttleUncoveredValues[27]),
+          day29Price: parseFloat(shuttleUncoveredValues[28]),
+          day30Price: parseFloat(shuttleUncoveredValues[29]),
+          extraDayPrice: parseFloat(shuttleUncoveredValues[30]),
+          type: "Shuttle uncovered"
+        };
+  
+    
+        // Call the updatePriceList method from PriceListApi with the priceListId and updated payload
+        await PriceListApi.updatePriceList(priceListId, payload);
+    
+        console.log('Price list updated!');
+        
+        // Reset edit mode after saving
+        setEditMode(false);
+    
+        // Refetch existing price lists after saving
+        fetchExistingPriceLists();
+        setSuccessMessage("Successfully saved new edited price list");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
+      }
+      if(shuttleCovered) {
+        const priceListId = shuttleCovered.id;
+
+        // Prepare the payload based on the backend entity structure
+        const payload = {
+          // Adjust the properties as needed
+          id: priceListId,
+          day1Price: parseFloat(shuttleCoveredValues[0]),
+          day2Price: parseFloat(shuttleCoveredValues[1]),
+          day3Price: parseFloat(shuttleCoveredValues[2]),
+          day4Price: parseFloat(shuttleCoveredValues[3]),
+          day5Price: parseFloat(shuttleCoveredValues[4]),
+          day6Price: parseFloat(shuttleCoveredValues[5]),
+          day7Price: parseFloat(shuttleCoveredValues[6]),
+          day8Price: parseFloat(shuttleCoveredValues[7]),
+          day9Price: parseFloat(shuttleCoveredValues[8]),
+          day10Price: parseFloat(shuttleCoveredValues[9]),
+          day11Price: parseFloat(shuttleCoveredValues[10]),
+          day12Price: parseFloat(shuttleCoveredValues[11]),
+          day13Price: parseFloat(shuttleCoveredValues[12]),
+          day14Price: parseFloat(shuttleCoveredValues[13]),
+          day15Price: parseFloat(shuttleCoveredValues[14]),
+          day16Price: parseFloat(shuttleCoveredValues[15]),
+          day17Price: parseFloat(shuttleCoveredValues[16]),
+          day18Price: parseFloat(shuttleCoveredValues[17]),
+          day19Price: parseFloat(shuttleCoveredValues[18]),
+          day20Price: parseFloat(shuttleCoveredValues[19]),
+          day21Price: parseFloat(shuttleCoveredValues[20]),
+          day22Price: parseFloat(shuttleCoveredValues[21]),
+          day23Price: parseFloat(shuttleCoveredValues[22]),
+          day24Price: parseFloat(shuttleCoveredValues[23]),
+          day25Price: parseFloat(shuttleCoveredValues[24]),
+          day26Price: parseFloat(shuttleCoveredValues[25]),
+          day27Price: parseFloat(shuttleCoveredValues[26]),
+          day28Price: parseFloat(shuttleCoveredValues[27]),
+          day29Price: parseFloat(shuttleCoveredValues[28]),
+          day30Price: parseFloat(shuttleCoveredValues[29]),
+          extraDayPrice: parseFloat(shuttleCoveredValues[30]),
+          type: "Shuttle covered"
+        };
+  
+    
+        // Call the updatePriceList method from PriceListApi with the priceListId and updated payload
+        await PriceListApi.updatePriceList(priceListId, payload);
+    
+        console.log('Price list updated!');
+        
+        // Reset edit mode after saving
+        setEditMode(false);
+    
+        // Refetch existing price lists after saving
+        fetchExistingPriceLists();
+        setSuccessMessage("Successfully saved new edited price list");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
+      }
+      if(valetUncovered) {
+        const priceListId = valetUncovered.id;
+
+        // Prepare the payload based on the backend entity structure
+        const payload = {
+          // Adjust the properties as needed
+          id: priceListId,
+          day1Price: parseFloat(valetUncoveredValues[0]),
+          day2Price: parseFloat(valetUncoveredValues[1]),
+          day3Price: parseFloat(valetUncoveredValues[2]),
+          day4Price: parseFloat(valetUncoveredValues[3]),
+          day5Price: parseFloat(valetUncoveredValues[4]),
+          day6Price: parseFloat(valetUncoveredValues[5]),
+          day7Price: parseFloat(valetUncoveredValues[6]),
+          day8Price: parseFloat(valetUncoveredValues[7]),
+          day9Price: parseFloat(valetUncoveredValues[8]),
+          day10Price: parseFloat(valetUncoveredValues[9]),
+          day11Price: parseFloat(valetUncoveredValues[10]),
+          day12Price: parseFloat(valetUncoveredValues[11]),
+          day13Price: parseFloat(valetUncoveredValues[12]),
+          day14Price: parseFloat(valetUncoveredValues[13]),
+          day15Price: parseFloat(valetUncoveredValues[14]),
+          day16Price: parseFloat(valetUncoveredValues[15]),
+          day17Price: parseFloat(valetUncoveredValues[16]),
+          day18Price: parseFloat(valetUncoveredValues[17]),
+          day19Price: parseFloat(valetUncoveredValues[18]),
+          day20Price: parseFloat(valetUncoveredValues[19]),
+          day21Price: parseFloat(valetUncoveredValues[20]),
+          day22Price: parseFloat(valetUncoveredValues[21]),
+          day23Price: parseFloat(valetUncoveredValues[22]),
+          day24Price: parseFloat(valetUncoveredValues[23]),
+          day25Price: parseFloat(valetUncoveredValues[24]),
+          day26Price: parseFloat(valetUncoveredValues[25]),
+          day27Price: parseFloat(valetUncoveredValues[26]),
+          day28Price: parseFloat(valetUncoveredValues[27]),
+          day29Price: parseFloat(valetUncoveredValues[28]),
+          day30Price: parseFloat(valetUncoveredValues[29]),
+          extraDayPrice: parseFloat(valetUncoveredValues[30]),
+          type: "Valet uncovered"
+        };
+  
+    
+        // Call the updatePriceList method from PriceListApi with the priceListId and updated payload
+        await PriceListApi.updatePriceList(priceListId, payload);
+    
+        console.log('Price list updated!');
+        
+        // Reset edit mode after saving
+        setEditMode(false);
+    
+        // Refetch existing price lists after saving
+        fetchExistingPriceLists();
+        setSuccessMessage("Successfully saved new edited price list");
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
+      }
+      // Assuming you have the priceListId and parkingGarageId available
+    } catch (error) {
+      console.error('Error updating price list:', error);
+      // Add logic to handle error (e.g., show an error message)
+    }
+  };
+
+  const handleViewButtonClick = async (priceList) => {
+    setEditMode(false);
+  
+    setShuttleUncoveredValues(Array.from({ length: 30 }, () => ''));
+    setShuttleUncoveredValues((prevValues) => [...prevValues, '']);
+    setShuttleCoveredValues(Array.from({ length: 30 }, () => ''));
+    setShuttleCoveredValues((prevValues) => [...prevValues, '']);
+    setValetUncoveredValues(Array.from({ length: 30 }, () => ''));
+    setValetUncoveredValues((prevValues) => [...prevValues, '']);
+  
+    const startDate = priceList.startDate;
+    const endDate = priceList.endDate;
+  
+    try {
+      const response = await PriceListApi.getPriceListByStartDateEndDate(startDate, endDate);
+      const priceListDetails = await response.json();
+      console.log(priceListDetails);
+  
+      // Separate the price lists based on the type
+      const shuttleUncoveredPriceList = priceListDetails.priceLists.find(
+        (pl) => pl.type === 'Shuttle uncovered'
+      );
+      const shuttleCoveredPriceList = priceListDetails.priceLists.find(
+        (pl) => pl.type === 'Shuttle covered'
+      );
+      const valetUncoveredPriceList = priceListDetails.priceLists.find(
+        (pl) => pl.type === 'Valet uncovered'
+      );
+  
+      console.log(shuttleUncoveredPriceList);
+      console.log(shuttleCoveredPriceList);
+      console.log(valetUncoveredPriceList);
+
+      setShuttleUncovered(shuttleUncoveredPriceList);
+      setShuttleCovered(shuttleCoveredPriceList);
+      setValetUncovered(valetUncoveredPriceList);
+
+  
+      // Set the state values based on the existing price list details
+      if (shuttleUncoveredPriceList) {
+        setShuttleUncoveredValues(
+          Array.from({ length: 30 }, (_, index) => shuttleUncoveredPriceList[`day${index + 1}Price`])
+        );
+  
+        setShuttleUncoveredValues((prevValues) => [
+          ...prevValues,
+          shuttleUncoveredPriceList.extraDayPrice // Set value for "After 30 Days"
+        ]);
+      }
+  
+      if (shuttleCoveredPriceList) {
+        setShuttleCoveredValues(
+          Array.from({ length: 30 }, (_, index) => shuttleCoveredPriceList[`day${index + 1}Price`])
+        );
+  
+        setShuttleCoveredValues((prevValues) => [
+          ...prevValues,
+          shuttleCoveredPriceList.extraDayPrice // Set value for "After 30 Days"
+        ]);
+      }
+  
+      if (valetUncoveredPriceList) {
+        setValetUncoveredValues(
+          Array.from({ length: 30 }, (_, index) => valetUncoveredPriceList[`day${index + 1}Price`])
+        );
+  
+        setValetUncoveredValues((prevValues) => [
+          ...prevValues,
+          valetUncoveredPriceList.extraDayPrice // Set value for "After 30 Days"
+        ]);
+      }
+  
+      // Set the start and end date
+      // const startDate = dayjs(priceList.startDate);
+      // const endDate = dayjs(priceList.endDate);
+    } catch (error) {
+      console.error('Error fetching price list details:', error);
+      // Handle error scenarios
+    }
+  };
+  
+
+
+    if (!parkingGarage) {
+      return (
+        <div>
+          <Typography variant="h4" sx={{ paddingLeft: 31, textAlign: 'center' }}>Please select a parking garage.</Typography>
+        </div>
+      );
+    }
 
 
   return (
     <div>
+      
       <Grid container justifyContent="center">
         <h1 sx={{ paddingLeft: 31, textAlign: 'center' }}>Parking Garage Pricing</h1>
       </Grid>
       <Grid container spacing={3} sx={{ paddingLeft: 31 }}>
+
+      
 
         {/* Row 1: Shuttle Uncovered */}
         <Grid item xs={3}>
@@ -687,6 +1001,13 @@ function GaragePricing() {
                       </Grid>
                       <Grid item xs={12} sm={6} container justifyContent="flex-end">
                         <IconButton
+                          onClick={() => handleViewButtonClick(priceList)}
+                          edge="end"
+                          aria-label="view"
+                        > 
+                          <RemoveRedEyeIcon />
+                        </IconButton>
+                        <IconButton
                           onClick={() => handleEditButtonClick(priceList)}
                           edge="end"
                           aria-label="edit"
@@ -694,7 +1015,7 @@ function GaragePricing() {
                           <EditIcon />
                         </IconButton>
                         <IconButton
-                          onClick={() => handleDeleteButtonClick(priceList.id)}
+                          onClick={() => handleDeleteButtonClick(priceList)}
                           edge="end"
                           aria-label="delete"
                         >
@@ -714,19 +1035,21 @@ function GaragePricing() {
       </Grid>
 
       {/* Save Button */}
-      <Grid container justifyContent="center" mt={3}>
-        <Button variant="contained" color="primary" onClick={handleSaveButtonClick}>
-          Save Price List
-        </Button>
-      </Grid>
-
       {failedMessage && (
-              <Alert severity="error" sx={{ mt: 2 }}>
+              <Alert severity="error" sx={{ paddingLeft: 31, textAlign: 'center' }}>
                 {failedMessage}
               </Alert>
             )}
-
-      
+      {successMessage && (
+              <Alert severity="success" sx={{ paddingLeft: 31, textAlign: 'center' }}>
+                {successMessage}
+              </Alert>
+            )}
+      <Grid container justifyContent="center" mt={3}>
+      <Button variant="contained" color="primary" onClick={handleSaveButtonClick}>
+          {editMode ? 'Edit Price List' : 'Save Price List'}
+        </Button>
+      </Grid>   
     </div>
   );
 }
