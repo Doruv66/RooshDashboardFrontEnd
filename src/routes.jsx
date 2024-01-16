@@ -3,6 +3,16 @@ import BookingHistory from "./pages/BookingHistory";
 import GarageDetails from "./pages/GarageDetails";
 import DeparturesAndArrivals from "./pages/DeparturesAndArrivals.jsx";
 import Statistics from "./pages/Statistics.jsx";
+import Pricing from "./pages/GaragePricing.jsx";
+import Logout from "./pages/Logout.jsx"
+
+
+const handleLogout = () => {
+  console.log("Logging out...");
+  TokenManager.clear();
+  window.location.reload();
+};
+
 
 const routes = [
     {
@@ -44,7 +54,20 @@ const routes = [
         isNavLink: true,
         text: "Statistics"
     },
-  ];
+    {
+      path: "/pricing",
+      component: Pricing,
+      isNavLink: true,
+      text: "Pricing"
+    },
+{   path: "/logout",
+    component: Logout,
+    text: "Logout",
+    isNavLink: true,
+    onClick: handleLogout
+   },
+];
+
   
   export default routes;
   

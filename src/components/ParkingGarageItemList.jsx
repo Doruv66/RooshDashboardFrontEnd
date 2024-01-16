@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ParkingGarageApi from '../api/ParkingGarageApi';
 import ParkingGarageItem from './ParkingGarageItem';
 import { useParkingGarage } from "./ParkingGarageContext";
+import TokenManager from "../api/TokenManager.jsx";
 
 export default function ParkingGarageItemList(){
     const [parkingGarages, setParkingGarages] = useState([]);
@@ -17,9 +18,10 @@ export default function ParkingGarageItemList(){
     };
   
     useEffect(() => {
-      ParkingGarageApi.getAllParkingGarages()
-      .then(handleResponse)
-      .then(data => {
+        const userId = TokenManager.getClaims().id
+        ParkingGarageApi.getParkingGaragesByUserId(userId)
+            .then(handleResponse)
+            .then(data => {
         if(data.parkingGarages){
           setParkingGarages(data.parkingGarages);
           console.log("Succesfully fetched all parking garages", data.parkingGarages);
