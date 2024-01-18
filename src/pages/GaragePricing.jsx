@@ -1046,7 +1046,12 @@ function GaragePricing() {
               </Alert>
             )}
       <Grid container justifyContent="center" mt={3}>
-      <Button variant="contained" color="primary" onClick={handleSaveButtonClick}>
+      <Button variant="contained" color="primary" onClick={handleSaveButtonClick} sx={{ mt: 2,
+        mb: 2,
+        backgroundColor: '#FF9000',
+        '&:hover': {
+              bgcolor: '#e80',
+            }}}>
           {editMode ? 'Edit Price List' : 'Save Price List'}
         </Button>
       </Grid>   
